@@ -62,6 +62,7 @@ func Update(ctx *gin.Context) {
 		"error": "Product not found",
 	})
 }
+
 func Delete(ctx *gin.Context) {
 	id := ctx.Param("id")
 	for i, p := range ProductList {
