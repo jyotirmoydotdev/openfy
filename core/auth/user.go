@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -67,16 +65,20 @@ func LoginUser(ctx *gin.Context) {
 		return
 	}
 	var userOk bool
-	for _, u := range users {
-		if u.Username == loginRequest.Username {
-			if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(loginRequest.Password)); err == nil {
-				userOk = true
-				break
+	if _, ok := userSecrets[loginRequest.Username]; !ok {
+		userOk = false
+	} else {
+		for _, u := range users {
+			if u.Username == loginRequest.Username {
+				if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(loginRequest.Password)); err == nil {
+					userOk = true
+					break
+				}
 			}
 		}
 	}
 	if userOk {
-		Token, err := GenerateJWT(loginRequest.Username)
+		Token, err := GenerateJWT(loginRequest.Username, false)
 		if err != nil {
 			ctx.JSON(http.StatusOK, gin.H{
 				"error": "Internal Server error",
@@ -92,12 +94,4 @@ func LoginUser(ctx *gin.Context) {
 		})
 		return
 	}
-}
-func generateRandomKey() (string, error) {
-	key := make([]byte, 32)
-	_, err := rand.Read(key)
-	if err != nil {
-		return "Something went wrong", err
-	}
-	return base64.URLEncoding.EncodeToString(key), nil
 }
