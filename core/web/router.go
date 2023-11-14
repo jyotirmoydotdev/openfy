@@ -15,6 +15,7 @@ func SetupRouter() *gin.Engine {
 
 	router.GET("/products", GetAllProducts)
 	router.GET("/products/:id", GetProduct)
+
 	authGroup := router.Group("/admin", auth.AuthenticateMiddleware())
 	{
 		authGroup.POST("/products/new", Create)
