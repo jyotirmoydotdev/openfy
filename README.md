@@ -1,4 +1,4 @@
-![](src/openfy_logo.png)
+![](src/openfyLogo.png)
 
 # Openfy - Self-Hosted E-Commerce Platform
 
