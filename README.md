@@ -1,4 +1,8 @@
-<img src="https://raw.githubusercontent.com/jyotirmoydotdev/Openfy/main/src/openfyLogo.svg" alt="Openfy logo">
+<p align="center">
+   
+![](src/OpenfyLogo.svg)
+
+</p>
 
 # Openfy - Self-Hosted E-Commerce Platform
 
