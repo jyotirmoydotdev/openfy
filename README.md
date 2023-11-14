@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/jyotirmoydotdev/Openfy/main/src/openfyLogo.webp?token=GHSAT0AAAAAACFH77FILYLL2PLSLII334IIZKTN7LQ" alt="Openfy logo">
+<img src="https://raw.githubusercontent.com/jyotirmoydotdev/Openfy/main/src/openfyLogo.svg" alt="Openfy logo">
 
 # Openfy - Self-Hosted E-Commerce Platform
 
