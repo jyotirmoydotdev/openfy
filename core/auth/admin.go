@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,7 @@ type Admin struct {
 
 var admins []Admin
 var adminSecrets = make(map[string]string)
+var adminIDCounter int
 
 func RegisterAdmin(ctx *gin.Context) {
 	var newAdmin Admin
@@ -50,6 +52,7 @@ func RegisterAdmin(ctx *gin.Context) {
 	}
 	adminSecrets[newAdmin.Username] = secretKey
 	newAdmin.Password = string(hashPassword)
+	newAdmin.ID = generateAdminID()
 	admins = append(admins, newAdmin)
 	ctx.JSON(http.StatusOK, gin.H{
 		"status": "User registered successfully",
@@ -97,4 +100,13 @@ func LoginAdmin(ctx *gin.Context) {
 		})
 		return
 	}
+}
+
+func generateAdminID() string {
+	adminIDCounter++
+	return fmt.Sprintf("A%d", adminIDCounter)
+}
+
+func HashAdmin() bool {
+	return len(admins) != 0
 }

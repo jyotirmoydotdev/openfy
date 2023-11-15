@@ -1,7 +1,10 @@
 package auth
 
 import (
+	"fmt"
 	"net/http"
+	"regexp"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -11,11 +14,14 @@ type User struct {
 	ID       string `json:"id"`
 	Username string `json:"username"`
 	Password string `json:"password,omitempty"`
+	Email    string `json:"email"`
 }
 
 var users []User
 
 var userSecrets = make(map[string]string)
+
+var userIDCounter int
 
 func RegisterUser(ctx *gin.Context) {
 	var newUser User
@@ -25,6 +31,14 @@ func RegisterUser(ctx *gin.Context) {
 		})
 		return
 	}
+	// username can only have letter and number
+	if username := newUser.Username; !isValidUsername(username) {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "username can only contain letter and number",
+		})
+		return
+	}
+	newUser.Username = strings.ToLower(newUser.Username)
 	for _, u := range users {
 		if u.Username == newUser.Username {
 			ctx.JSON(http.StatusBadRequest, gin.H{
@@ -48,6 +62,7 @@ func RegisterUser(ctx *gin.Context) {
 	}
 	userSecrets[newUser.Username] = secretKey
 	newUser.Password = string(hashPassword)
+	newUser.ID = generateUserID()
 	users = append(users, newUser)
 	ctx.JSON(http.StatusOK, gin.H{
 		"status": "User registered successfully",
@@ -94,4 +109,15 @@ func LoginUser(ctx *gin.Context) {
 		})
 		return
 	}
+}
+
+func generateUserID() string {
+	userIDCounter++
+	return fmt.Sprintf("U%d", userIDCounter)
+}
+
+func isValidUsername(username string) bool {
+	patter := "^[A-Za-z0-9]+$"
+	regexPattern := regexp.MustCompile(patter)
+	return regexPattern.MatchString(username)
 }

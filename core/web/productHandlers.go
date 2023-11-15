@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -19,12 +20,17 @@ type Product struct {
 
 var ProductList []Product
 
+var productIDCounter int
+
 func Create(ctx *gin.Context) {
 	var product Product
 	if err := ctx.ShouldBindJSON(&product); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	product.ID = generateProductID()
+
 	if product.Title == "" || product.Price <= 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "Title and Price are requied",
@@ -90,4 +96,9 @@ func GetProduct(ctx *gin.Context) {
 	ctx.JSON(http.StatusNotFound, gin.H{
 		"error": "Product not Found",
 	})
+}
+
+func generateProductID() string {
+	productIDCounter++
+	return fmt.Sprintf("P%d", productIDCounter)
 }
