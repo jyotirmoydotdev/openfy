@@ -46,7 +46,19 @@ func ValidateToken(tokenString string) (jwt.MapClaims, error) {
 	if !ok {
 		return nil, fmt.Errorf("invalid token claims")
 	}
+	checkExpiration := CheckExpiration(token)
+	if !checkExpiration {
+		return nil, fmt.Errorf("token expired")
+	}
 	return claims, nil
+}
+func CheckExpiration(token *jwt.Token) bool {
+	expirationTime, ok := token.Claims.(jwt.MapClaims)["exp"].(float64)
+	if !ok {
+		return false
+	}
+	expiration := time.Unix(int64(expirationTime), 0)
+	return time.Now().Before(expiration)
 }
 func extractSecretkeyFromToken(token *jwt.Token) string {
 	username := extractUsernameFromToken(token)

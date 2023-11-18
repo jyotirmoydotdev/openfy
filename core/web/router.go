@@ -12,16 +12,7 @@ func SetupRouter() *gin.Engine {
 
 	router.POST("/signup", auth.RegisterUser)
 	router.POST("/login", auth.LoginUser)
-	router.POST("/admin/signup", func(ctx *gin.Context) {
-		hashAdmin := auth.HashAdmin()
-		if hashAdmin {
-			ctx.JSON(http.StatusForbidden, gin.H{
-				"error": "Admin signup is not allowed", // TODO: rephrase error message
-			})
-			return
-		}
-		auth.RegisterAdmin(ctx)
-	})
+	router.POST("/admin/signup", hashAdmin(), auth.RegisterAdmin)
 	router.POST("/admin/login", auth.LoginAdmin)
 
 	router.GET("/products", GetAllProducts)
@@ -35,4 +26,16 @@ func SetupRouter() *gin.Engine {
 	}
 
 	return router
+}
+
+func hashAdmin() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		hashAdmin := auth.HashAdmin()
+		if hashAdmin {
+			ctx.JSON(http.StatusForbidden, gin.H{
+				"error": "Contact Admin for signup",
+			})
+			return
+		}
+	}
 }

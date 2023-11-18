@@ -75,3 +75,5 @@ Contributions are welcome! Feel free to open issues or submit pull requests.
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 Make sure to replace placeholder details like `yourusername` and update the project-specific sections based on your actual project structure, features, and configurations. Include any additional information that might be relevant to users and contributors.
+
+<iframe style="border: 1px solid rgba(0, 0, 0, 0.1);" width="800" height="450" src="https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FDdnZ03JxOvicLeXQuts4gA%2FOpenfy%3Fpage-id%3D0%253A1%26type%3Ddesign%26node-id%3D33-20%26viewport%3D404%252C559%252C0.94%26t%3D98564Tf0lb67O8Ca-1%26scaling%3Dmin-zoom%26starting-point-node-id%3D33%253A20%26mode%3Ddesign" allowfullscreen></iframe>

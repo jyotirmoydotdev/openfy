@@ -12,7 +12,7 @@ This document outlines tasks, features, and improvements that need attention in 
 
 ## Features
 
-- [ ] **User Authentication**:
+- [ ] **User Authentication & Management**:
   - [x] Implement user registration functionality.
   - [ ] Allow users to reset their passwords.
   - [ ] Enhance user profile management.

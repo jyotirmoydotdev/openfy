@@ -12,7 +12,6 @@ func AuthenticateMiddleware() gin.HandlerFunc {
 		if tokenString == "" {
 			ctx.JSON(http.StatusUnauthorized, gin.H{
 				"error": "Unauthorized ",
-				"reson": "No token",
 			})
 			ctx.Abort()
 			return
@@ -21,11 +20,11 @@ func AuthenticateMiddleware() gin.HandlerFunc {
 		if err != nil {
 			ctx.JSON(http.StatusUnauthorized, gin.H{
 				"error": "Unauthorized",
-				"reson": "Invalid Claim",
 			})
 			ctx.Abort()
 			return
 		}
+
 		ctx.Set("claims", claims)
 		ctx.Next()
 	}
