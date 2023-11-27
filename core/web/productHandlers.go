@@ -1,3 +1,5 @@
+// Todo : remove the useless data
+
 package web
 
 import (
@@ -8,14 +10,58 @@ import (
 )
 
 type Product struct {
-	ID               string   `json:"id"`
-	Title            string   `json:"title"`
-	Description      string   `json:"description"`
-	Media            []string `json:"media"`
-	Price            int      `json:"price"`
-	Compare_At_Price int      `json:"compareatprice"`
-	Tax              bool     `json:"tax"`
-	Cost_Per_Item    int      `json:"costperitem"`
+	ID                    string `json:"id"`
+	Handle                string `json:"handle"`
+	Description           string `json:"description"`
+	Status                string `json:"status"`
+	TotalVariants         int    `json:"totalVariants"`
+	TotalInventory        int    `json:"totalInventory"`
+	HasOnlyDefaultVariant bool   `json:"hasOnlyDefaultVariant"`
+	OnlineStoreURL        string `json:"onlineStoreUrl"`
+	HasSKUs               bool   `json:"hasSkus"`
+	HasBarcodes           bool   `json:"hasBarcodes"`
+	SKURequired           bool   `json:"skuRequired"`
+	Options               []struct {
+		ID       string   `json:"id"`
+		Name     string   `json:"name"`
+		Position int      `json:"position"`
+		Values   []string `json:"values"`
+	} `json:"options"`
+	SEO struct {
+		Title       string `json:"title"`
+		Description string `json:"description"`
+	} `json:"seo"`
+	ProductCategory string    `json:"productCategory"`
+	Variants        []Variant `json:"variants"`
+}
+
+type Variant struct {
+	Price            float64 `json:"price"`
+	CompareAtPrice   float64 `json:"compareAtPrice"`
+	Taxable          bool    `json:"taxable"`
+	Profit           float64 `json:"profit"`
+	CostPerItem      float64 `json:"costPerItem"`
+	Margin           float64 `json:"margin"`
+	RequiresShipping bool    `json:"requiresShipping"`
+	Weight           float64 `json:"weight"`
+	Barcode          string  `json:"barcode"`
+	SKU              string  `json:"sku"`
+	SelectedOptions  []struct {
+		Name  string `json:"name"`
+		Value string `json:"value"`
+	} `json:"selectedOptions"`
+	Inventory struct {
+		Available             int    `json:"available"`
+		Committed             int    `json:"committed"`
+		OnHand                int    `json:"onHand"`
+		CanDeactivate         bool   `json:"canDeactivate"`
+		DeactivationAlertHtml string `json:"deactivationAlertHtml"`
+		Incoming              int    `json:"incoming"`
+		Unavailable           []struct {
+			Quantity int    `json:"quantity"`
+			Name     string `json:"name"`
+		} `json:"unavailable"`
+	} `json:"inventory"`
 }
 
 var ProductList []Product
@@ -31,11 +77,28 @@ func Create(ctx *gin.Context) {
 
 	product.ID = generateProductID()
 
-	if product.Title == "" || product.Price <= 0 {
+	if product.Handle == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Title and Price are requied",
+			"error": "Title requied",
 		})
 		return
+	}
+	if product.HasOnlyDefaultVariant {
+		if product.Variants[0].Price <= 0 {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error": "Price requied",
+			})
+			return
+		}
+	} else {
+		for i := range product.Variants {
+			if product.Variants[i].Price <= 0 {
+				ctx.JSON(http.StatusBadRequest, gin.H{
+					"error": "Price requied",
+				})
+				return
+			}
+		}
 	}
 	ProductList = append(ProductList, product)
 	ctx.JSON(http.StatusOK, gin.H{

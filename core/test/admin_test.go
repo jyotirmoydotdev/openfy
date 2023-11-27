@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/jyotirmoydotdev/openfy/auth"
@@ -96,14 +99,31 @@ func TestFailAdminSignup(t *testing.T) {
 }
 
 func TestAddProduct(t *testing.T) {
-	newProduct := web.Product{
-		Title:            "Sample Product",
-		Description:      "This is a sample product description.",
-		Media:            []string{"https://example.com/image1.jpg", "https://example.com/image2.jpg"},
-		Price:            100,
-		Compare_At_Price: 120,
-		Tax:              true,
-		Cost_Per_Item:    80,
+	currentDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	jsonFilePath := filepath.Join(currentDir, "jsonExample", "product.json")
+	file, err := os.Open(jsonFilePath)
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return
+	}
+	defer file.Close()
+
+	Content, err := io.ReadAll(file)
+	if err != nil {
+		fmt.Println("Error reading file:", err)
+		return
+	}
+	defer file.Close()
+
+	var newProduct web.Product
+
+	err = json.Unmarshal(Content, &newProduct)
+	if err != nil {
+		fmt.Println("Error unmarshaling JSON:", err)
+		return
 	}
 
 	jsonProduct, err := json.Marshal(newProduct)
