@@ -1,0 +1,84 @@
+{
+  "id": "shoe123",
+  "handle": "air-max-90",
+  "description": "Nike Air Max 90 Running Shoe",
+  "status": true,
+  "totalVariants": 2,
+  "totalInventory": 50,
+  "hasOnlyDefaultVariant": false,
+  "onlineStoreUrl": "https://example.com/products/air-max-90",
+  "hasSkus": true,
+  "hasBarcodes": true,
+  "skuRequired": true,
+  "options": [
+    {
+      "id": "color",
+      "name": "Color",
+      "position": 1,
+      "values": ["White", "Black", "Red"]
+    },
+    {
+      "id": "size",
+      "name": "Size",
+      "position": 2,
+      "values": ["US 9", "US 10", "US 11"]
+    }
+  ],
+  "seo": {
+    "title": "Nike Air Max 90",
+    "description": "The iconic Nike Air Max 90 running shoe for ultimate comfort and style."
+  },
+  "productCategory": "Running Shoes",
+  "variants": [
+    {
+      "price": 120.00,
+      "compareAtPrice": 150.00,
+      "taxable": true,
+      "profit": 30.00,
+      "costPerItem": 90.00,
+      "margin": 25.00,
+      "requiresShipping": true,
+      "weight": 1.2,
+      "barcode": "123456789",
+      "sku": "airmax90-001",
+      "selectedOptions": [
+        {"name": "Color", "value": "White"},
+        {"name": "Size", "value": "US 9"}
+      ],
+      "inventory": {
+        "available": 20,
+        "committed": 5,
+        "onHand": 15,
+        "canDeactivate": true,
+        "deactivationAlertHtml": "",
+        "incoming": 5,
+        "unavailable": []
+      }
+    },
+    {
+      "price": 130.00,
+      "compareAtPrice": 160.00,
+      "taxable": true,
+      "profit": 30.00,
+      "costPerItem": 100.00,
+      "margin": 23.08,
+      "requiresShipping": true,
+      "weight": 1.3,
+      "barcode": "987654321",
+      "sku": "airmax90-002",
+      "selectedOptions": [
+        {"name": "Color", "value": "Black"},
+        {"name": "Size", "value": "US 10"}
+      ],
+      "inventory": {
+        "available": 30,
+        "committed": 10,
+        "onHand": 20,
+        "canDeactivate": true,
+        "deactivationAlertHtml": "",
+        "incoming": 10,
+        "unavailable": []
+      }
+    }
+  ]
+}

@@ -15,16 +15,19 @@ func SetupRouter() *gin.Engine {
 	router.POST("/admin/signup", hashAdmin(), auth.RegisterAdmin)
 	router.POST("/admin/login", auth.LoginAdmin)
 
-	router.GET("/products", GetAllProducts)
-	router.GET("/products/:id", GetProduct)
-
-	authGroup := router.Group("/admin", auth.AuthenticateMiddleware())
+	user := router.Group("/user", auth.AuthenticateMiddleware())
 	{
-		authGroup.POST("/products/new", Create)
-		authGroup.PUT("/products/:id", Update)
-		authGroup.DELETE("/products/:id", Delete)
+		user.GET("/products", GetAllProducts)
 	}
 
+	admin := router.Group("/admin", auth.AuthenticateMiddleware())
+	{
+		admin.GET("/products/:id", GetProduct)
+		admin.GET("/products", GetAllProducts)
+		admin.POST("/products/new", Create)
+		admin.PUT("/products/:id", Update)
+		admin.DELETE("/products/:id", Delete)
+	}
 	return router
 }
 
@@ -35,6 +38,7 @@ func hashAdmin() gin.HandlerFunc {
 			ctx.JSON(http.StatusForbidden, gin.H{
 				"error": "Contact Admin for signup",
 			})
+			ctx.Abort()
 			return
 		}
 	}
