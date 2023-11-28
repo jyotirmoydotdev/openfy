@@ -134,15 +134,6 @@ func Create(ctx *gin.Context) {
 		})
 		return
 	}
-	// Price should not be 0
-	for i := range product.Variants {
-		if product.Variants[i].Price == 0.0 {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "Product does not have Price",
-			})
-			return
-		}
-	}
 	// Check if there is vairants and inventory
 	// If lenght of product.Variants != Database.TotalVariants
 	// Return error
@@ -166,6 +157,12 @@ func Create(ctx *gin.Context) {
 	// save Total Inventory to database
 	// check if it has sku and barcode
 	for i := range product.Variants {
+		if product.Variants[i].Price == 0.0 {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error": "Product does not have Price",
+			})
+			return
+		}
 		if product.Variants[i].SKU != "" {
 			Database.HasSKUs = true
 		}
