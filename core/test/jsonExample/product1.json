@@ -1,0 +1,73 @@
+{
+    "handle": "comfort-shoes",
+    "description": "A pair of comfortable shoes for everyday use",
+    "status": true,
+    "tags": ["comfortable", "everyday", "shoes"],
+    "collections": ["spring", "casual"],
+    "productCategory": "footwear",
+    "options": [
+      {
+        "name": "Color",
+        "position": 1,
+        "values": ["black", "white", "blue"]
+      },
+      {
+        "name": "Size",
+        "position": 2,
+        "values": ["7"]
+      }
+    ],
+    "variants": [
+      {
+        "price": 59.99,
+        "compareAtPrice": 79.99,
+        "costPerItem": 39.99,
+        "taxable": true,
+        "sku": "COMFORT-BLK-7",
+        "barcode": "123456789012",
+        "weight":{
+            "value": 300,
+            "uint":"gram"
+        },
+        "selectedOptions": [
+          {"name": "Color", "value": "black"},
+          {"name": "Size", "value": "7"}
+        ],
+        "inventory": {"available": 150}
+      },
+      {
+        "price": 59.99,
+        "compareAtPrice": 79.99,
+        "costPerItem": 49.99,
+        "taxable": true,
+        "sku": "COMFORT-WHT-8",
+        "barcode": "123456789013",
+        "weight":{
+            "value":300,
+            "uint":"gram"
+        },
+        "selectedOptions": [
+          {"name": "Color", "value": "white"},
+          {"name": "Size", "value": "7"}
+        ],
+        "inventory": {"available": 180}
+      },
+      {
+        "price": 59.99,
+        "compareAtPrice": 79.99,
+        "costPerItem": 49.99,
+        "taxable": true,
+        "sku": "COMFORT-BLU-9",
+        "barcode": "123456789014",
+        "weight":{
+            "value":300,
+            "uint":"gram"
+        },
+        "selectedOptions": [
+            {"name": "Color", "value": "blue"},
+            {"name": "Size", "value": "7"}
+        ],
+        "inventory": {"available": 200}
+      }
+    ]
+}  

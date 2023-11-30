@@ -19,7 +19,7 @@
     ],
     "variants": [
       {
-        "price": 59.99,
+        "price": 69.99,
         "compareAtPrice": 79.99,
         "costPerItem": 39.99,
         "taxable": true,
@@ -36,7 +36,7 @@
         "inventory": {"available": 150}
       },
       {
-        "price": 59.99,
+        "price": 69.99,
         "compareAtPrice": 79.99,
         "costPerItem": 49.99,
         "taxable": true,
@@ -53,7 +53,7 @@
         "inventory": {"available": 180}
       },
       {
-        "price": 59.99,
+        "price": 69.99,
         "compareAtPrice": 79.99,
         "costPerItem": 49.99,
         "taxable": true,
@@ -70,5 +70,4 @@
         "inventory": {"available": 200}
       }
     ]
-  }
-  
+}  

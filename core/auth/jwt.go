@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	database "github.com/jyotirmoydotdev/openfy/Database"
 )
 
 func GenerateJWT(username string, isAdmin bool) (string, error) {
@@ -24,7 +25,7 @@ func GenerateJWT(username string, isAdmin bool) (string, error) {
 	})
 	var secretKey string
 	if isAdmin {
-		secretKey = adminSecrets[username]
+		secretKey = database.AdminSecrets[username]
 	} else {
 		secretKey = userSecrets[username]
 	}
@@ -65,7 +66,7 @@ func extractSecretkeyFromToken(token *jwt.Token) string {
 	var secretkey string
 	var isOk bool
 	if isAdmin, err := extractIsAdminFromToken(token); err == nil && isAdmin {
-		secretkey, isOk = adminSecrets[username]
+		secretkey, isOk = database.AdminSecrets[username]
 	} else {
 		secretkey, isOk = userSecrets[username]
 	}

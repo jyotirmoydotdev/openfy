@@ -5,34 +5,36 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/copier"
+	database "github.com/jyotirmoydotdev/openfy/Database"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Admin struct {
-	ID        string `json:"id"`
-	Username  string `json:"username"`
-	Password  string `json:"password"`
-	Email     string `json:"email"`
-	FirstName string `json:"firstname"`
-	LastName  string `json:"lastname"`
-}
-
-var admins []Admin
-var adminSecrets = make(map[string]string)
-var adminIDCounter int
-
 func RegisterAdmin(ctx *gin.Context) {
-	var newAdmin Admin
+	var newAdmin struct {
+		Email     string `json:"email"`
+		FirstName string `json:"firstname"`
+		LastName  string `json:"lastname"`
+		Username  string `json:"username"`
+		Password  string `json:"password"`
+	}
+	var newAdminDatabase database.Admin
 	if err := ctx.ShouldBindJSON(&newAdmin); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
-	for _, a := range admins {
+	for _, a := range database.Admins {
 		if a.Username == newAdmin.Username {
 			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "Admin name not available",
+				"error": "username not available",
+			})
+			return
+		}
+		if a.Email == newAdmin.Email {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error": "email already exist",
 			})
 			return
 		}
@@ -50,10 +52,15 @@ func RegisterAdmin(ctx *gin.Context) {
 			"error": "Internal Server Error",
 		})
 	}
-	adminSecrets[newAdmin.Username] = secretKey
+	database.AdminSecrets[newAdmin.Username] = secretKey
 	newAdmin.Password = string(hashPassword)
-	newAdmin.ID = generateAdminID()
-	admins = append(admins, newAdmin)
+	newAdminDatabase.ID = generateAdminID()
+	err = copier.Copy(&newAdminDatabase, &newAdmin)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	database.Admins = append(database.Admins, newAdminDatabase)
 	ctx.JSON(http.StatusOK, gin.H{
 		"status": "User registered successfully",
 	})
@@ -71,10 +78,10 @@ func LoginAdmin(ctx *gin.Context) {
 		return
 	}
 	var adminOk bool
-	if _, ok := adminSecrets[loginRequest.Username]; !ok {
+	if _, ok := database.AdminSecrets[loginRequest.Username]; !ok {
 		adminOk = false
 	} else {
-		for _, a := range admins {
+		for _, a := range database.Admins {
 			if a.Username == loginRequest.Username {
 				if err := bcrypt.CompareHashAndPassword([]byte(a.Password), []byte(loginRequest.Password)); err == nil {
 					adminOk = true
@@ -103,10 +110,10 @@ func LoginAdmin(ctx *gin.Context) {
 }
 
 func generateAdminID() string {
-	adminIDCounter++
-	return fmt.Sprintf("A%d", adminIDCounter)
+	database.AdminIDCounter++
+	return fmt.Sprintf("A%d", database.AdminIDCounter)
 }
 
 func HashAdmin() bool {
-	return len(admins) != 0
+	return len(database.Admins) != 0
 }
