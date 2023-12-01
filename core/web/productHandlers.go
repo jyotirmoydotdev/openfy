@@ -5,6 +5,7 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"slices"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
@@ -108,6 +109,20 @@ func Create(ctx *gin.Context) {
 	}
 	database.ProductList = append(database.ProductList, productDatabase)
 	database.ProductMapID[productDatabase.ID] = productDatabase
+	for _, v := range productDatabase.Tags {
+		if slices.Contains(database.Tags, v) {
+			continue
+		} else {
+			database.Tags = append(database.Tags, v)
+		}
+	}
+	for _, v := range productDatabase.Collections {
+		if slices.Contains(database.Collections, v) {
+			continue
+		} else {
+			database.Collections = append(database.Collections, v)
+		}
+	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"status": "Product add successfully",
 	})

@@ -20,18 +20,18 @@ var token string
 // Expected : 200
 func TestAdminSignup(t *testing.T) {
 	type NewAdminStruct struct {
-		Username  string
-		Password  string
 		Email     string
+		Username  string
 		FirstName string
 		LastName  string
+		Password  string
 	}
 	newAdmin := NewAdminStruct{
-		Username:  "testadmin",
-		Password:  "testpassword",
 		Email:     "test@example.com",
+		Username:  "testadmin",
 		FirstName: "Test",
 		LastName:  "Admin",
+		Password:  "testpassword",
 	}
 	jsonAdmin, err := json.Marshal(newAdmin)
 	if err != nil {

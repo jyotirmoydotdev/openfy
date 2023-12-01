@@ -70,3 +70,5 @@ type Variant struct {
 var ProductMapID map[string]Product
 var ProductList []Product
 var ProductIDCounter int
+var Tags []string
+var Collections []string
