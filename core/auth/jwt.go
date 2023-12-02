@@ -11,7 +11,7 @@ import (
 	database "github.com/jyotirmoydotdev/openfy/Database"
 )
 
-func GenerateJWT(username string, isAdmin bool) (string, error) {
+func GenerateJWT(username string, email string, isAdmin bool) (string, error) {
 	var role string
 	if isAdmin {
 		role = "admin"
@@ -20,6 +20,7 @@ func GenerateJWT(username string, isAdmin bool) (string, error) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
+		"email":    email,
 		"role":     role,
 		"exp":      time.Now().Add(time.Hour * 24).Unix(),
 	})
@@ -27,7 +28,7 @@ func GenerateJWT(username string, isAdmin bool) (string, error) {
 	if isAdmin {
 		secretKey = database.AdminSecrets[username]
 	} else {
-		secretKey = userSecrets[username]
+		secretKey = database.UserSecrets[email]
 	}
 	signalToken, err := token.SignedString([]byte(secretKey))
 	if err != nil {
@@ -63,12 +64,13 @@ func CheckExpiration(token *jwt.Token) bool {
 }
 func extractSecretkeyFromToken(token *jwt.Token) string {
 	username := extractUsernameFromToken(token)
+	Email := extractUsernameFromToken(token)
 	var secretkey string
 	var isOk bool
 	if isAdmin, err := extractIsAdminFromToken(token); err == nil && isAdmin {
 		secretkey, isOk = database.AdminSecrets[username]
 	} else {
-		secretkey, isOk = userSecrets[username]
+		secretkey, isOk = database.UserSecrets[email]
 	}
 	if !isOk {
 		return ""

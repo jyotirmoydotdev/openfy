@@ -3,58 +3,38 @@ package auth
 import (
 	"fmt"
 	"net/http"
-	"regexp"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/copier"
+	database "github.com/jyotirmoydotdev/openfy/Database"
 	"golang.org/x/crypto/bcrypt"
 )
-
-type User struct {
-	ID              string     `json:"id"`
-	Username        string     `json:"username"`
-	Password        string     `json:"password,omitempty"`
-	Email           string     `json:"email"`
-	Phone           int        `json:"phone"`
-	Age             int        `json:"age"`
-	DeliveryAddress []Delivery `json:"deliveryaddress"`
-}
-
-type Delivery struct {
-	Country   string `json:"country"`
-	Address   string `json:"address"`
-	Apartment string `json:"apartment"`
-	City      string `json:"city"`
-	State     string `json:"statte"`
-	PinCode   int    `json:"pincode"`
-}
-
-var users []User
-
-var userSecrets = make(map[string]string)
 
 var userIDCounter int
 
 func RegisterUser(ctx *gin.Context) {
-	var newUser User
+	var newUser struct {
+		Email    string `json:"email"`
+		Password string `json:"password,omitempty"`
+	}
+	var newUserDatabase database.User
 	if err := ctx.ShouldBindJSON(&newUser); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
-	// username can only have letter and number
-	if username := newUser.Username; !isValidUsername(username) {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "username can only contain letter and number",
-		})
+	err := copier.Copy(&newUserDatabase, &newUser)
+	if err != nil {
+		fmt.Println("Error:", err)
 		return
 	}
-	newUser.Username = strings.ToLower(newUser.Username)
-	for _, u := range users {
-		if u.Username == newUser.Username {
+	newUser.Email = strings.ToLower(newUser.Email)
+	for _, u := range database.Users {
+		if u.Email == newUser.Email {
 			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "User name not available",
+				"error": "Email already exist, please login",
 			})
 			return
 		}
@@ -72,17 +52,18 @@ func RegisterUser(ctx *gin.Context) {
 			"error": "Internal Server Error",
 		})
 	}
-	userSecrets[newUser.Username] = secretKey
+	database.UserSecrets[newUser.Email] = secretKey
 	newUser.Password = string(hashPassword)
-	newUser.ID = generateUserID()
-	users = append(users, newUser)
+	newUserDatabase.ID = generateUserID()
+	database.Users = append(database.Users, newUserDatabase)
 	ctx.JSON(http.StatusOK, gin.H{
 		"status": "User registered successfully",
+		"data":   newUserDatabase,
 	})
 }
 func LoginUser(ctx *gin.Context) {
 	var loginRequest struct {
-		Username string `json:"username"`
+		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 	if err := ctx.ShouldBindJSON(&loginRequest); err != nil {
@@ -92,11 +73,11 @@ func LoginUser(ctx *gin.Context) {
 		return
 	}
 	var userOk bool
-	if _, ok := userSecrets[loginRequest.Username]; !ok {
+	if _, ok := database.UserSecrets[loginRequest.Email]; !ok {
 		userOk = false
 	} else {
-		for _, u := range users {
-			if u.Username == loginRequest.Username {
+		for _, u := range database.Users {
+			if u.Email == loginRequest.Email {
 				if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(loginRequest.Password)); err == nil {
 					userOk = true
 					break
@@ -105,7 +86,7 @@ func LoginUser(ctx *gin.Context) {
 		}
 	}
 	if userOk {
-		Token, err := GenerateJWT(loginRequest.Username, false)
+		Token, err := GenerateJWT("", loginRequest.Email, false)
 		if err != nil {
 			ctx.JSON(http.StatusOK, gin.H{
 				"error": "Internal Server error",
@@ -129,10 +110,4 @@ func UpdateUser(ctx *gin.Context) {
 func generateUserID() string {
 	userIDCounter++
 	return fmt.Sprintf("U%d", userIDCounter)
-}
-
-func isValidUsername(username string) bool {
-	patter := "^[A-Za-z0-9]+$"
-	regexPattern := regexp.MustCompile(patter)
-	return regexPattern.MatchString(username)
 }
