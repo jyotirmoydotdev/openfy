@@ -177,7 +177,7 @@ func LoginAdmin(ctx *gin.Context) {
 	}
 	// If a matching admin is found, generate and return a JWT
 	if matchedAdmin.ID != "" {
-		token, err := GenerateJWT(loginRequest.Username, "", true)
+		token, err := GenerateJWT(loginRequest.Username)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{
 				"error":       "INTERNAL_SERVER_ERROR",

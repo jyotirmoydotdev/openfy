@@ -10,16 +10,25 @@ import (
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
 
+	// Public Route
 	router.POST("/signup", auth.RegisterUser)
 	router.POST("/login", auth.LoginUser)
+	router.GET("/products", GetAllActiveProducts)
+
 	router.POST("/admin/signup", hashAdmin(), auth.RegisterAdmin)
 	router.POST("/admin/login", auth.LoginAdmin)
 
-	user := router.Group("/api/v1", auth.AuthenticateUserMiddleware())
+	// User route
+	user := router.Group("/api", auth.AuthenticateUserMiddleware())
 	{
-		user.GET("/products", GetAllProducts)
+		user.GET("/ping", func(ctx *gin.Context) {
+			ctx.JSON(http.StatusOK, gin.H{
+				"message": "pong",
+			})
+		})
 	}
 
+	// Admin Route
 	admin := router.Group("/admin", auth.AuthenticateMiddleware())
 	{
 		admin.GET("/products/:id", GetProduct)

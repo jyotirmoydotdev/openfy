@@ -70,7 +70,7 @@ func TestAdminLogin(t *testing.T) {
 	var response map[string]interface{}
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
-		fmt.Println("Error decoding JSON response:", err)
+		t.Errorf("Error decoding JSON response:%v", err)
 		return
 	}
 	var ok bool

@@ -28,7 +28,7 @@ func ValidateUserToken(tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		return []byte(extractUserSecretKeyFromToken(t)), nil
 	})
-	if err != nil {
+	if err != nil || !token.Valid {
 		return nil, fmt.Errorf("invalid token: %v", err)
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
