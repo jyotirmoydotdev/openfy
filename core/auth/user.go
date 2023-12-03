@@ -53,7 +53,7 @@ func RegisterUser(ctx *gin.Context) {
 		})
 	}
 	database.UserSecrets[newUser.Email] = secretKey
-	newUser.Password = string(hashPassword)
+	newUserDatabase.Password = string(hashPassword)
 	newUserDatabase.ID = generateUserID()
 	database.Users = append(database.Users, newUserDatabase)
 	ctx.JSON(http.StatusOK, gin.H{
@@ -72,6 +72,7 @@ func LoginUser(ctx *gin.Context) {
 		})
 		return
 	}
+	loginRequest.Email = strings.ToLower(loginRequest.Email)
 	var userOk bool
 	if _, ok := database.UserSecrets[loginRequest.Email]; !ok {
 		userOk = false
@@ -86,9 +87,9 @@ func LoginUser(ctx *gin.Context) {
 		}
 	}
 	if userOk {
-		Token, err := GenerateJWT("", loginRequest.Email, false)
+		Token, err := GenerateUserJWT(loginRequest.Email)
 		if err != nil {
-			ctx.JSON(http.StatusOK, gin.H{
+			ctx.JSON(http.StatusInternalServerError, gin.H{
 				"error": "Internal Server error",
 			})
 		}

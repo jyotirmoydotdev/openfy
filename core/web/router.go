@@ -15,7 +15,7 @@ func SetupRouter() *gin.Engine {
 	router.POST("/admin/signup", hashAdmin(), auth.RegisterAdmin)
 	router.POST("/admin/login", auth.LoginAdmin)
 
-	user := router.Group("/user", auth.AuthenticateMiddleware())
+	user := router.Group("/api/v1", auth.AuthenticateUserMiddleware())
 	{
 		user.GET("/products", GetAllProducts)
 	}
