@@ -1,0 +1,74 @@
+{
+    "handle": "running-shoes",
+    "description": "High-performance running shoes for athletes",
+    "status": true,
+    "tags": ["running", "athletic", "shoes"],
+    "collections": ["sports", "running"],
+    "productCategory": "footwear",
+    "options": [
+      {
+        "name": "Color",
+        "position": 1,
+        "values": ["red", "black", "blue"]
+      },
+      {
+        "name": "Size",
+        "position": 2,
+        "values": ["8", "9", "10"]
+      }
+    ],
+    "variants": [
+      {
+        "price": 89.99,
+        "compareAtPrice": 109.99,
+        "costPerItem": 69.99,
+        "taxable": true,
+        "sku": "RUNNING-RED-8",
+        "barcode": "123456789015",
+        "weight": {
+          "value": 350,
+          "unit": "gram"
+        },
+        "selectedOptions": [
+          {"name": "Color", "value": "red"},
+          {"name": "Size", "value": "8"}
+        ],
+        "inventory": {"available": 120}
+      },
+      {
+        "price": 89.99,
+        "compareAtPrice": 109.99,
+        "costPerItem": 69.99,
+        "taxable": true,
+        "sku": "RUNNING-BLK-9",
+        "barcode": "123456789016",
+        "weight": {
+          "value": 350,
+          "unit": "gram"
+        },
+        "selectedOptions": [
+          {"name": "Color", "value": "black"},
+          {"name": "Size", "value": "9"}
+        ],
+        "inventory": {"available": 150}
+      },
+      {
+        "price": 89.99,
+        "compareAtPrice": 109.99,
+        "costPerItem": 69.99,
+        "taxable": true,
+        "sku": "RUNNING-BLU-10",
+        "barcode": "123456789017",
+        "weight": {
+          "value": 350,
+          "unit": "gram"
+        },
+        "selectedOptions": [
+          {"name": "Color", "value": "blue"},
+          {"name": "Size", "value": "10"}
+        ],
+        "inventory": {"available": 100}
+      }
+    ]
+  }
+  
