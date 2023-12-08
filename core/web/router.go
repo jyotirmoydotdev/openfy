@@ -26,6 +26,10 @@ func SetupRouter() *gin.Engine {
 				"message": "pong",
 			})
 		})
+		// user.GET("/orders",GetAllOrders)
+		// user.GET("/orders:id", GetOrder)
+		// user.GET("/profile", profile)
+		// user.PUT("/profile", UpdateProfile)
 	}
 
 	// Admin Route
