@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	database "github.com/jyotirmoydotdev/openfy/Database"
-	"github.com/jyotirmoydotdev/openfy/web"
+	database "github.com/jyotirmoydotdev/openfy/db"
+	web "github.com/jyotirmoydotdev/openfy/internal/web/handlers"
 )
 
 var token string

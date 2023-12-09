@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"testing"
 
-	database "github.com/jyotirmoydotdev/openfy/Database"
+	database "github.com/jyotirmoydotdev/openfy/db"
 )
 
 var UserJWT string

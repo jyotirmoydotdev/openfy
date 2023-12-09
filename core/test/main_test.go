@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/jyotirmoydotdev/openfy/web"
+	"github.com/jyotirmoydotdev/openfy/internal/web"
 )
 
 var server *httptest.Server

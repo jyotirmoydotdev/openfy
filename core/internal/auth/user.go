@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
-	database "github.com/jyotirmoydotdev/openfy/Database"
+	database "github.com/jyotirmoydotdev/openfy/db"
 	"golang.org/x/crypto/bcrypt"
 )
 

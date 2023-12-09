@@ -1,5 +1,3 @@
-// Todo : remove the useless data
-
 package web
 
 import (
@@ -9,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
-	database "github.com/jyotirmoydotdev/openfy/Database"
+	database "github.com/jyotirmoydotdev/openfy/db"
 )
 
 type RequestProduct struct {
@@ -45,7 +43,11 @@ type RequestProduct struct {
 	} `json:"variants"`
 }
 
-func Create(ctx *gin.Context) {
+func NewRequestProductHandlers() *RequestProduct {
+	return &RequestProduct{}
+}
+
+func (rp *RequestProduct) Create(ctx *gin.Context) {
 	var product RequestProduct
 	if err := ctx.ShouldBindJSON(&product); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -127,10 +129,10 @@ func Create(ctx *gin.Context) {
 		"status": "Product add successfully",
 	})
 }
-func GetAllProducts(ctx *gin.Context) {
+func (rp *RequestProduct) GetAllProducts(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, database.ProductList)
 }
-func Update(ctx *gin.Context) {
+func (rp *RequestProduct) Update(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var updatedProduct RequestProduct
 	if err := ctx.ShouldBindJSON(&updatedProduct); err != nil {
@@ -208,7 +210,7 @@ func Update(ctx *gin.Context) {
 		"status": "Product updated successfully",
 	})
 }
-func Delete(ctx *gin.Context) {
+func (rp *RequestProduct) Delete(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var resetProductDetails database.Product
 	database.ProductMapID[id] = resetProductDetails
@@ -225,7 +227,7 @@ func Delete(ctx *gin.Context) {
 		"error": "Product not found",
 	})
 }
-func GetProduct(ctx *gin.Context) {
+func (rp *RequestProduct) GetProduct(ctx *gin.Context) {
 	id := ctx.Param("id")
 	ProductDetail, ok := database.ProductMapID[id]
 	if ok {

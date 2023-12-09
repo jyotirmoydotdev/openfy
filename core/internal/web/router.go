@@ -4,16 +4,17 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jyotirmoydotdev/openfy/auth"
+	"github.com/jyotirmoydotdev/openfy/internal/auth"
+	web "github.com/jyotirmoydotdev/openfy/internal/web/handlers"
 )
 
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
-
+	requestProductHandlers := web.NewRequestProductHandlers()
 	// Public Route
 	router.POST("/signup", auth.RegisterUser)
 	router.POST("/login", auth.LoginUser)
-	router.GET("/products", GetAllActiveProducts)
+	// router.GET("/products", GetAllActiveProducts)
 
 	router.POST("/admin/signup", hashAdmin(), auth.RegisterAdmin)
 	router.POST("/admin/login", auth.LoginAdmin)
@@ -26,20 +27,16 @@ func SetupRouter() *gin.Engine {
 				"message": "pong",
 			})
 		})
-		// user.GET("/orders",GetAllOrders)
-		// user.GET("/orders:id", GetOrder)
-		// user.GET("/profile", profile)
-		// user.PUT("/profile", UpdateProfile)
 	}
 
 	// Admin Route
 	admin := router.Group("/admin", auth.AuthenticateMiddleware())
 	{
-		admin.GET("/products/:id", GetProduct)
-		admin.GET("/products", GetAllProducts)
-		admin.POST("/products/new", Create)
-		admin.PUT("/products/:id", Update)
-		admin.DELETE("/products/:id", Delete)
+		admin.GET("/products/:id", requestProductHandlers.GetProduct)
+		admin.GET("/products", requestProductHandlers.GetAllProducts)
+		admin.POST("/products/new", requestProductHandlers.Create)
+		admin.PUT("/products/:id", requestProductHandlers.Update)
+		admin.DELETE("/products/:id", requestProductHandlers.Delete)
 	}
 	return router
 }
