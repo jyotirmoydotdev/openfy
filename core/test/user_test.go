@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"testing"
 
-	database "github.com/jyotirmoydotdev/openfy/db"
+	"github.com/jyotirmoydotdev/openfy/db/models"
 )
 
 var UserJWT string
@@ -67,7 +67,7 @@ func TestUserLogin(t *testing.T) {
 // Check is same username can signup
 // Expected: 400
 func TestFailSameUsernaem(t *testing.T) {
-	newUser := database.User{
+	newUser := models.User{
 		Email:    "testuser@example.com",
 		Password: "testpassword2",
 	}

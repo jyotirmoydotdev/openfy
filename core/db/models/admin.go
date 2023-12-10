@@ -1,4 +1,4 @@
-package database
+package models
 
 type Admin struct {
 	ID           string `json:"id"`
@@ -112,7 +112,3 @@ type Admin struct {
 		} `json:"storeSettings"`
 	} `json:"permissions"`
 }
-
-var Admins []Admin
-var AdminSecrets = make(map[string]string)
-var AdminIDCounter int

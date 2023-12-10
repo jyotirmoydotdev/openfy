@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	database "github.com/jyotirmoydotdev/openfy/db"
+	database "github.com/jyotirmoydotdev/openfy/db/repositories"
 	web "github.com/jyotirmoydotdev/openfy/internal/web/handlers"
 )
 

@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
-	database "github.com/jyotirmoydotdev/openfy/db"
+	database "github.com/jyotirmoydotdev/openfy/db/repositories"
 )
 
 func GenerateUserJWT(email string) (string, error) {

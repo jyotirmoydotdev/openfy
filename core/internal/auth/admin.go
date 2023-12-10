@@ -7,7 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
-	database "github.com/jyotirmoydotdev/openfy/db"
+	"github.com/jyotirmoydotdev/openfy/db/models"
+	database "github.com/jyotirmoydotdev/openfy/db/repositories"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -21,7 +22,7 @@ func RegisterAdmin(ctx *gin.Context) {
 		Password  string `json:"password"`
 	}
 	// Structure to hold admin data for database storage
-	var newAdminDatabase database.Admin
+	var newAdminDatabase models.Admin
 	// Bind incoming JSON data to the newAdmin structure
 	if err := ctx.ShouldBindJSON(&newAdmin); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -165,7 +166,7 @@ func LoginAdmin(ctx *gin.Context) {
 		return
 	}
 	// Find the admin by username
-	var matchedAdmin database.Admin
+	var matchedAdmin models.Admin
 	for _, a := range database.Admins {
 		if a.Username == loginRequest.Username {
 			// Compare the password hash

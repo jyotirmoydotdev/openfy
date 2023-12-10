@@ -1,37 +1,19 @@
-package database
+package repositories
 
 import (
 	"log"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/jyotirmoydotdev/openfy/db/models"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type User struct {
-	ID              string     `json:"id"`
-	Username        string     `json:"username"`
-	Password        string     `json:"password,omitempty"`
-	Email           string     `json:"email"`
-	Phone           int        `json:"phone"`
-	Age             int        `json:"age"`
-	DeliveryAddress []Delivery `json:"deliveryaddress"`
-}
-
-type Delivery struct {
-	Country   string `json:"country"`
-	Address   string `json:"address"`
-	Apartment string `json:"apartment"`
-	City      string `json:"city"`
-	State     string `json:"statte"`
-	PinCode   int    `json:"pincode"`
-}
-
-var Users []User
+var Users []models.User
 var UserSecrets = make(map[string]string)
 
 func CreateUserDatabase() {
 	// Open SQLite database (create if not exists)
-	db, err := sqlx.Open("sqlite3", "./Database/user.db")
+	db, err := sqlx.Open("sqlite3", "./db/data/user.db")
 	if err != nil {
 		log.Fatal(err)
 	}

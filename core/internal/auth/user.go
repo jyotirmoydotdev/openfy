@@ -7,7 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
-	database "github.com/jyotirmoydotdev/openfy/db"
+	"github.com/jyotirmoydotdev/openfy/db/models"
+	database "github.com/jyotirmoydotdev/openfy/db/repositories"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,18 +19,20 @@ func RegisterUser(ctx *gin.Context) {
 		Email    string `json:"email"`
 		Password string `json:"password,omitempty"`
 	}
-	var newUserDatabase database.User
 	if err := ctx.ShouldBindJSON(&newUser); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
+	// --------
+	var newUserDatabase models.User
 	err := copier.Copy(&newUserDatabase, &newUser)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
+	// --------
 	newUser.Email = strings.ToLower(newUser.Email)
 	for _, u := range database.Users {
 		if u.Email == newUser.Email {

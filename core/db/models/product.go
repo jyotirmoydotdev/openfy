@@ -1,4 +1,4 @@
-package database
+package models
 
 type Product struct {
 	ID                    string   `json:"id"`
@@ -66,9 +66,3 @@ type Variant struct {
 		} `json:"unavailable"`
 	} `json:"inventory"`
 }
-
-var ProductMapID map[string]Product
-var ProductList []Product
-var ProductIDCounter int
-var Tags []string
-var Collections []string

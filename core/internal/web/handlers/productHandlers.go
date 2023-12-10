@@ -1,4 +1,4 @@
-package web
+package handlers
 
 import (
 	"fmt"
@@ -7,7 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
-	database "github.com/jyotirmoydotdev/openfy/db"
+	"github.com/jyotirmoydotdev/openfy/db/models"
+	database "github.com/jyotirmoydotdev/openfy/db/repositories"
 )
 
 type RequestProduct struct {
@@ -53,8 +54,8 @@ func (rp *RequestProduct) Create(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	var productDatabase database.Product
-	database.ProductMapID = make(map[string]database.Product)
+	var productDatabase models.Product
+	database.ProductMapID = make(map[string]models.Product)
 	productDatabase.ID = generateProductID()
 	err := copier.Copy(&productDatabase, &product)
 	if err != nil {
@@ -128,9 +129,6 @@ func (rp *RequestProduct) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"status": "Product add successfully",
 	})
-}
-func (rp *RequestProduct) GetAllProducts(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, database.ProductList)
 }
 func (rp *RequestProduct) Update(ctx *gin.Context) {
 	id := ctx.Param("id")
@@ -210,9 +208,12 @@ func (rp *RequestProduct) Update(ctx *gin.Context) {
 		"status": "Product updated successfully",
 	})
 }
+func (rp *RequestProduct) GetAllProducts(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, database.ProductList)
+}
 func (rp *RequestProduct) Delete(ctx *gin.Context) {
 	id := ctx.Param("id")
-	var resetProductDetails database.Product
+	var resetProductDetails models.Product
 	database.ProductMapID[id] = resetProductDetails
 	for i, p := range database.ProductList {
 		if p.ID == id {
