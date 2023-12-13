@@ -14,7 +14,7 @@ func GetDB() (*gorm.DB, error) {
 	if dbInstance != nil {
 		return dbInstance, nil
 	}
-	db, err := gorm.Open(sqlite.Open("./db/database.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open("./database.db"), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("error opening database: %v", err)
 	}
@@ -27,7 +27,7 @@ func InitializeDatabases() error {
 	if err != nil {
 		return err
 	}
-	err = db.AutoMigrate(&models.User{}, &models.DeliveryAddress{}, &models.ShopDetail{})
+	err = db.AutoMigrate(&models.User{}, &models.UserSecrets{}, &models.DeliveryAddress{}, &models.ShopDetail{})
 	if err != nil {
 		return fmt.Errorf("error auto migrating models: %v", err)
 	}

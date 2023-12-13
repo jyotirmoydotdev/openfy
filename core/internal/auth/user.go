@@ -6,9 +6,8 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/copier"
+	"github.com/jyotirmoydotdev/openfy/db"
 	"github.com/jyotirmoydotdev/openfy/db/models"
-	database "github.com/jyotirmoydotdev/openfy/db/repositories"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -16,8 +15,10 @@ var userIDCounter int
 
 func RegisterUser(ctx *gin.Context) {
 	var newUser struct {
-		Email    string `json:"email"`
-		Password string `json:"password,omitempty"`
+		Email     string `json:"email"`
+		FirstName string `json:"firstName"`
+		LastName  string `json:"lastName"`
+		Password  string `json:"password,omitempty"`
 	}
 	if err := ctx.ShouldBindJSON(&newUser); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -25,23 +26,32 @@ func RegisterUser(ctx *gin.Context) {
 		})
 		return
 	}
-	// --------
-	var newUserDatabase models.User
-	err := copier.Copy(&newUserDatabase, &newUser)
+
+	dbInstance, err := db.GetDB()
 	if err != nil {
-		fmt.Println("Error:", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
 		return
 	}
-	// --------
-	newUser.Email = strings.ToLower(newUser.Email)
-	for _, u := range database.Users {
-		if u.Email == newUser.Email {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "Email already exist, please login",
-			})
-			return
-		}
+
+	// Check if user with the same email already exists
+	exists, err := models.UserExistByEmail(dbInstance, newUser.Email)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
 	}
+
+	if exists {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Email already exists, please login",
+		})
+		return
+	}
+
+	// Create a new user
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -49,21 +59,43 @@ func RegisterUser(ctx *gin.Context) {
 		})
 		return
 	}
-	secretKey, err := generateRandomKey()
-	if err != nil {
+
+	userModel := models.NewUserModel(dbInstance)
+
+	newUserDatabase := models.User{
+		Email:    strings.ToLower(newUser.Email),
+		Password: string(hashPassword),
+		ID:       generateUserID(),
+	}
+	// Save user to the database
+	if err := userModel.Save(&newUserDatabase); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Internal Server Error",
 		})
+		return
 	}
-	database.UserSecrets[newUser.Email] = secretKey
-	newUserDatabase.Password = string(hashPassword)
-	newUserDatabase.ID = generateUserID()
-	database.Users = append(database.Users, newUserDatabase)
+	UserSecret, err := generateRandomKey()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Error while creating secreatKey",
+		})
+	}
+	newUserSecret := models.UserSecrets{
+		Email:  strings.ToLower(newUser.Email),
+		Secret: UserSecret,
+	}
+	if err := userModel.SaveUserSecret(&newUserSecret); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"status": "User registered successfully",
 		"data":   newUserDatabase,
 	})
 }
+
 func LoginUser(ctx *gin.Context) {
 	var loginRequest struct {
 		Email    string `json:"email"`
@@ -75,18 +107,36 @@ func LoginUser(ctx *gin.Context) {
 		})
 		return
 	}
+	dbInstance, err := db.GetDB()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
 	loginRequest.Email = strings.ToLower(loginRequest.Email)
 	var userOk bool
-	if _, ok := database.UserSecrets[loginRequest.Email]; !ok {
+	if _, err := models.GetUserSecretKeyByEmail(dbInstance, loginRequest.Email); err != nil {
 		userOk = false
 	} else {
-		for _, u := range database.Users {
-			if u.Email == loginRequest.Email {
-				if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(loginRequest.Password)); err == nil {
-					userOk = true
-					break
-				}
-			}
+		/* Compare the loginRequest Password and Stored Password*/
+		// for _, u := range models.Users {
+		// 	if u.Email == loginRequest.Email {
+		// 		if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(loginRequest.Password)); err == nil {
+		// 			userOk = true
+		// 			break
+		// 		}
+		// 	}
+		// }
+		userHashedPassword, err := models.GetUserHashedPasswordByEmail(dbInstance, loginRequest.Email)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Internal Server Error",
+			})
+			return
+		}
+		if err := bcrypt.CompareHashAndPassword([]byte(userHashedPassword), []byte(loginRequest.Password)); err == nil {
+			userOk = true
 		}
 	}
 	if userOk {

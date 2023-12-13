@@ -8,7 +8,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
-	database "github.com/jyotirmoydotdev/openfy/db/repositories"
+	"github.com/jyotirmoydotdev/openfy/db"
+	"github.com/jyotirmoydotdev/openfy/db/models"
 )
 
 func GenerateUserJWT(email string) (string, error) {
@@ -16,7 +17,14 @@ func GenerateUserJWT(email string) (string, error) {
 		"email": email,
 		"exp":   time.Now().Add(time.Hour * 24).Unix(),
 	})
-	secretKey := database.UserSecrets[email]
+	dbInstance, err := db.GetDB()
+	if err != nil {
+		return "", err
+	}
+	secretKey, err := models.GetUserSecretKeyByEmail(dbInstance, email)
+	if err != nil {
+		return "", err
+	}
 	signToken, err := token.SignedString([]byte(secretKey))
 	if err != nil {
 		return "Internal server error", err
@@ -54,7 +62,15 @@ func extractUserSecretKeyFromToken(token *jwt.Token) string {
 	if !ok {
 		return ""
 	}
-	return database.UserSecrets[email]
+	dbInstance, err := db.GetDB()
+	if err != nil {
+		return ""
+	}
+	secretKey, err := models.GetUserSecretKeyByEmail(dbInstance, email)
+	if err != nil {
+		return ""
+	}
+	return secretKey
 }
 func AuthenticateUserMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
