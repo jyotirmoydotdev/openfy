@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	database "github.com/jyotirmoydotdev/openfy/db/repositories"
+	"github.com/jyotirmoydotdev/openfy/db/models"
 	web "github.com/jyotirmoydotdev/openfy/internal/web/handlers"
 )
 
@@ -178,7 +178,7 @@ func TestUpdateProduct(t *testing.T) {
 		return
 	}
 	var updatedProduct web.RequestProduct
-	id := database.ProductList[0].ID
+	id := models.ProductList[0].ID
 
 	err = json.Unmarshal(Content, &updatedProduct)
 	if err != nil {

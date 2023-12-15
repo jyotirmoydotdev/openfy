@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 	"github.com/jyotirmoydotdev/openfy/db/models"
-	database "github.com/jyotirmoydotdev/openfy/db/repositories"
 )
 
 type RequestProduct struct {
@@ -55,7 +54,7 @@ func (rp *RequestProduct) Create(ctx *gin.Context) {
 		return
 	}
 	var productDatabase models.Product
-	database.ProductMapID = make(map[string]models.Product)
+	models.ProductMapID = make(map[string]models.Product)
 	productDatabase.ID = generateProductID()
 	err := copier.Copy(&productDatabase, &product)
 	if err != nil {
@@ -110,20 +109,20 @@ func (rp *RequestProduct) Create(ctx *gin.Context) {
 		}
 		productDatabase.Variants[i].Inventory.OnHand = product.Variants[i].Inventory.Available
 	}
-	database.ProductList = append(database.ProductList, productDatabase)
-	database.ProductMapID[productDatabase.ID] = productDatabase
+	models.ProductList = append(models.ProductList, productDatabase)
+	models.ProductMapID[productDatabase.ID] = productDatabase
 	for _, v := range productDatabase.Tags {
-		if slices.Contains(database.Tags, v) {
+		if slices.Contains(models.Tags, v) {
 			continue
 		} else {
-			database.Tags = append(database.Tags, v)
+			models.Tags = append(models.Tags, v)
 		}
 	}
 	for _, v := range productDatabase.Collections {
-		if slices.Contains(database.Collections, v) {
+		if slices.Contains(models.Collections, v) {
 			continue
 		} else {
-			database.Collections = append(database.Collections, v)
+			models.Collections = append(models.Collections, v)
 		}
 	}
 	ctx.JSON(http.StatusOK, gin.H{
@@ -138,7 +137,7 @@ func (rp *RequestProduct) Update(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
-	updatedproductDatabase, ok := database.ProductMapID[id]
+	updatedproductDatabase, ok := models.ProductMapID[id]
 	if !ok {
 		ctx.JSON(http.StatusNotFound, gin.H{
 			"error": "Product not found",
@@ -197,27 +196,27 @@ func (rp *RequestProduct) Update(ctx *gin.Context) {
 		}
 		updatedproductDatabase.Variants[i].Inventory.OnHand = updatedProduct.Variants[i].Inventory.Available
 	}
-	for i := range database.ProductList {
-		if database.ProductList[i].ID == id {
-			database.ProductList[i] = updatedproductDatabase
+	for i := range models.ProductList {
+		if models.ProductList[i].ID == id {
+			models.ProductList[i] = updatedproductDatabase
 			break
 		}
 	}
-	database.ProductMapID[id] = updatedproductDatabase
+	models.ProductMapID[id] = updatedproductDatabase
 	ctx.JSON(http.StatusOK, gin.H{
 		"status": "Product updated successfully",
 	})
 }
 func (rp *RequestProduct) GetAllProducts(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, database.ProductList)
+	ctx.JSON(http.StatusOK, models.ProductList)
 }
 func (rp *RequestProduct) Delete(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var resetProductDetails models.Product
-	database.ProductMapID[id] = resetProductDetails
-	for i, p := range database.ProductList {
+	models.ProductMapID[id] = resetProductDetails
+	for i, p := range models.ProductList {
 		if p.ID == id {
-			database.ProductList = append(database.ProductList[:i], database.ProductList[i+1:]...)
+			models.ProductList = append(models.ProductList[:i], models.ProductList[i+1:]...)
 			ctx.JSON(http.StatusOK, gin.H{
 				"status": "Product deleted successfully",
 			})
@@ -230,7 +229,7 @@ func (rp *RequestProduct) Delete(ctx *gin.Context) {
 }
 func (rp *RequestProduct) GetProduct(ctx *gin.Context) {
 	id := ctx.Param("id")
-	ProductDetail, ok := database.ProductMapID[id]
+	ProductDetail, ok := models.ProductMapID[id]
 	if ok {
 		ctx.JSON(http.StatusOK, ProductDetail)
 		return
@@ -242,6 +241,6 @@ func (rp *RequestProduct) GetProduct(ctx *gin.Context) {
 	}
 }
 func generateProductID() string {
-	database.ProductIDCounter++
-	return fmt.Sprintf("P%d", database.ProductIDCounter)
+	models.ProductIDCounter++
+	return fmt.Sprintf("P%d", models.ProductIDCounter)
 }

@@ -27,10 +27,6 @@ type UserSecrets struct {
 	Secret string `gorm:"column:secret"`
 }
 
-// var Users []User
-
-// var UserSecrets = make(map[string]string)
-
 type UserModel struct {
 	db *gorm.DB
 }
@@ -53,16 +49,15 @@ func GetUserSecretKeyByEmail(db *gorm.DB, email string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	return userSecrets.Secret, nil
 }
+
 func GetUserHashedPasswordByEmail(db *gorm.DB, email string) (string, error) {
 	var UserHashedPasswor User
 	err := db.Model(&User{}).Select("Password").Where("email = ?", email).First(&UserHashedPasswor).Error
 	if err != nil {
 		return "", err
 	}
-
 	return UserHashedPasswor.Password, nil
 }
 

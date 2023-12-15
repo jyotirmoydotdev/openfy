@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/jyotirmoydotdev/openfy/db"
 	"github.com/jyotirmoydotdev/openfy/internal/web"
 )
 
@@ -45,7 +46,12 @@ func resetTestDatabase() error {
 }
 
 func TestMain(m *testing.M) {
-	err := resetTestDatabase()
+	err := db.InitializeDatabases()
+	if err != nil {
+		fmt.Printf("Error cleaning up test database: %v\n", err)
+		os.Exit(1)
+	}
+	err = resetTestDatabase()
 	if err != nil {
 		fmt.Printf("Error cleaning up test database: %v\n", err)
 		os.Exit(1)

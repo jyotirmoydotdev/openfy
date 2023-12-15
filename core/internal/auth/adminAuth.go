@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 	"github.com/jyotirmoydotdev/openfy/db/models"
-	database "github.com/jyotirmoydotdev/openfy/db/repositories"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -64,7 +63,7 @@ func RegisterAdmin(ctx *gin.Context) {
 		}
 	}
 	// Check if the username or email already exists
-	for _, a := range database.Admins {
+	for _, a := range models.Admins {
 		if a.Username == newAdmin.Username {
 			ctx.JSON(http.StatusBadRequest, gin.H{
 				"error":       "INVALID_INPUT",
@@ -115,11 +114,11 @@ func RegisterAdmin(ctx *gin.Context) {
 		return
 	}
 	// Keep the secretKey in the adminSecret map
-	database.AdminSecrets[newAdmin.Username] = secretKey
+	models.AdminSecrets[newAdmin.Username] = secretKey
 	// Generate the Admin ID
 	newAdminDatabase.ID = generateAdminID()
 	// Set AccountOwner flag based on the number of existing admins
-	newAdminDatabase.AccountOwner = len(database.Admins) == 0
+	newAdminDatabase.AccountOwner = len(models.Admins) == 0
 	// Copy data from newAdmin to newAdminDatabase
 	err = copier.Copy(&newAdminDatabase, &newAdmin)
 	if err != nil {
@@ -127,7 +126,7 @@ func RegisterAdmin(ctx *gin.Context) {
 		return
 	}
 	// Add the new Admin to the Admins Array
-	database.Admins = append(database.Admins, newAdminDatabase)
+	models.Admins = append(models.Admins, newAdminDatabase)
 	// Return success message along with the new admin data
 	ctx.JSON(http.StatusOK, gin.H{
 		"error":       "",
@@ -154,7 +153,7 @@ func LoginAdmin(ctx *gin.Context) {
 		})
 		return
 	}
-	_, adminExists := database.AdminSecrets[loginRequest.Username]
+	_, adminExists := models.AdminSecrets[loginRequest.Username]
 	if !adminExists {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":       "INVALID_ADMIN",
@@ -167,7 +166,7 @@ func LoginAdmin(ctx *gin.Context) {
 	}
 	// Find the admin by username
 	var matchedAdmin models.Admin
-	for _, a := range database.Admins {
+	for _, a := range models.Admins {
 		if a.Username == loginRequest.Username {
 			// Compare the password hash
 			if err := bcrypt.CompareHashAndPassword([]byte(a.Password), []byte(loginRequest.Password)); err == nil {
@@ -210,10 +209,10 @@ func LoginAdmin(ctx *gin.Context) {
 }
 
 func generateAdminID() string {
-	database.AdminIDCounter++
-	return fmt.Sprintf("A%d", database.AdminIDCounter)
+	models.AdminIDCounter++
+	return fmt.Sprintf("A%d", models.AdminIDCounter)
 }
 
 func HashAdmin() bool {
-	return len(database.Admins) != 0
+	return len(models.Admins) != 0
 }

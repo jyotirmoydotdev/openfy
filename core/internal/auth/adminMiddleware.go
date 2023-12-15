@@ -10,7 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
-	database "github.com/jyotirmoydotdev/openfy/db/repositories"
+	"github.com/jyotirmoydotdev/openfy/db/models"
 )
 
 func GenerateJWT(username string) (string, error) {
@@ -18,7 +18,7 @@ func GenerateJWT(username string) (string, error) {
 		"username": username,
 		"exp":      time.Now().Add(time.Hour * 24).Unix(),
 	})
-	secretKey := database.AdminSecrets[username]
+	secretKey := models.AdminSecrets[username]
 	signalToken, err := token.SignedString([]byte(secretKey))
 	if err != nil {
 		return "Internal Server error", err
@@ -64,7 +64,7 @@ func extractSecretkeyFromToken(token *jwt.Token) string {
 	if !ok {
 		return ""
 	}
-	return database.AdminSecrets[username]
+	return models.AdminSecrets[username]
 }
 func generateRandomKey() (string, error) {
 	key := make([]byte, 32)
