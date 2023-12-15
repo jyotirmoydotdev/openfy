@@ -4,16 +4,16 @@ import "gorm.io/gorm"
 
 type User struct {
 	ID                string            `gorm:"column:id;primaryKey"`
-	Username          string            `gorm:"column:username, index"`
-	Password          string            `gorm:"column:password,omitempty, uniqueIndex"`
-	Email             string            `gorm:"column:email"`
+	Password          string            `gorm:"column:password;omitempty"`
+	Email             string            `gorm:"column:email;index"`
 	Phone             int               `gorm:"column:phone"`
 	Age               int               `gorm:"column:age"`
-	DeliveryAddresses []DeliveryAddress `gorm:"column:deliveryaddress, foreignKey:UserID"`
+	DeliveryAddresses []DeliveryAddress `gorm:"foreignKey:UserID"`
 }
 
 type DeliveryAddress struct {
-	UserID    string `gorm:"column:id, primaryKey"`
+	ID        string `gorm:"column:id;primaryKey"`
+	UserID    string `gorm:"column:user_id;index"`
 	Country   string `gorm:"column:country"`
 	Address   string `gorm:"column:address"`
 	Apartment string `gorm:"column:apartment"`

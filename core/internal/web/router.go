@@ -15,8 +15,9 @@ func SetupRouter() *gin.Engine {
 		panic(err)
 	}
 	router := gin.Default()
+
 	requestProductHandlers := web.NewRequestProductHandlers()
-	// Public Route
+
 	router.POST("/signup", auth.RegisterUser)
 	router.POST("/login", auth.LoginUser)
 	// router.GET("/products", GetAllActiveProducts)
@@ -34,7 +35,6 @@ func SetupRouter() *gin.Engine {
 		})
 	}
 
-	// Admin Route
 	admin := router.Group("/admin", auth.AuthenticateMiddleware())
 	{
 		admin.GET("/products/:id", requestProductHandlers.GetProduct)
