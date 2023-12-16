@@ -6,6 +6,8 @@ type User struct {
 	ID                string            `gorm:"column:id;primaryKey"`
 	Password          string            `gorm:"column:password;omitempty"`
 	Email             string            `gorm:"column:email;index"`
+	FirstName         string            `gorm:"column:first_name"`
+	LastName          string            `gorm:"column:last_name"`
 	Phone             int               `gorm:"column:phone"`
 	Age               int               `gorm:"column:age"`
 	DeliveryAddresses []DeliveryAddress `gorm:"foreignKey:UserID"`
@@ -23,6 +25,7 @@ type DeliveryAddress struct {
 }
 
 type UserSecrets struct {
+	UserID string `gorm:"column:user_id"`
 	Email  string `gorm:"column:email"`
 	Secret string `gorm:"column:secret"`
 }

@@ -17,8 +17,10 @@ var UserJWT string
 // Expected : 200
 func TestUserSignup(t *testing.T) {
 	newUser := map[string]string{
-		"email":    "testuser@example.com",
-		"password": "testpassword",
+		"email":     "testuser@example.com",
+		"password":  "testpassword",
+		"firstname": "Jyotirmoy",
+		"lastname":  "Barman",
 	}
 
 	jsonUser, err := json.Marshal(newUser)
@@ -89,8 +91,10 @@ func TestNthUserSignup(t *testing.T) {
 	for i := 0; i < testNthUser; i++ {
 		email := strconv.Itoa(i) + "testuser@example.com"
 		newUser := map[string]string{
-			"email":    email,
-			"password": "testpassword",
+			"email":     email,
+			"password":  "testpassword",
+			"firstname": strconv.Itoa(i) + "Jyotirmoy",
+			"lastname":  strconv.Itoa(i) + "Barman",
 		}
 		jsonUser, err := json.Marshal(newUser)
 		if err != nil {

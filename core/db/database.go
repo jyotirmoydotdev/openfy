@@ -27,9 +27,39 @@ func InitializeDatabases() error {
 	if err != nil {
 		return err
 	}
-	err = db.AutoMigrate(&models.User{}, &models.UserSecrets{}, &models.DeliveryAddress{}, &models.ShopDetail{}, &models.Admin{}, &models.AdminSecrets{})
+	err = db.AutoMigrate(
+		&models.User{},
+		&models.UserSecrets{},
+		&models.DeliveryAddress{},
+		&models.ShopDetail{},
+		&models.Admin{},
+		&models.AdminSecrets{},
+		&models.Counter{},
+	)
 	if err != nil {
 		return fmt.Errorf("error auto migrating models: %v", err)
+	}
+	err = preloadData(db)
+	if err != nil {
+		return fmt.Errorf("error preloading data: %v", err)
+	}
+	return nil
+}
+
+func preloadData(db *gorm.DB) error {
+	err := db.Create(&models.Counter{
+		Name:  "admin",
+		Count: 1,
+	}).Error
+	if err != nil {
+		return err
+	}
+	err = db.Create(&models.Counter{
+		Name:  "user",
+		Count: 1,
+	}).Error
+	if err != nil {
+		return err
 	}
 	return nil
 }

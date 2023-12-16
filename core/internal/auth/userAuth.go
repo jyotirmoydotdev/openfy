@@ -63,9 +63,11 @@ func RegisterUser(ctx *gin.Context) {
 	userModel := models.NewUserModel(dbInstance)
 
 	newUserDatabase := models.User{
-		Email:    strings.ToLower(newUser.Email),
-		Password: string(hashPassword),
-		ID:       generateUserID(),
+		ID:        generateUserID(),
+		Email:     strings.ToLower(newUser.Email),
+		Password:  string(hashPassword),
+		FirstName: newUser.FirstName,
+		LastName:  newUser.LastName,
 	}
 	// Save user to the database
 	if err := userModel.Save(&newUserDatabase); err != nil {
@@ -81,6 +83,7 @@ func RegisterUser(ctx *gin.Context) {
 		})
 	}
 	newUserSecret := models.UserSecrets{
+		UserID: newUserDatabase.ID,
 		Email:  strings.ToLower(newUser.Email),
 		Secret: UserSecret,
 	}
@@ -119,15 +122,6 @@ func LoginUser(ctx *gin.Context) {
 	if _, err := models.GetUserSecretKeyByEmail(dbInstance, loginRequest.Email); err != nil {
 		userOk = false
 	} else {
-		/* Compare the loginRequest Password and Stored Password*/
-		// for _, u := range models.Users {
-		// 	if u.Email == loginRequest.Email {
-		// 		if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(loginRequest.Password)); err == nil {
-		// 			userOk = true
-		// 			break
-		// 		}
-		// 	}
-		// }
 		userHashedPassword, err := models.GetUserHashedPasswordByEmail(dbInstance, loginRequest.Email)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -162,6 +156,17 @@ func UpdateUser(ctx *gin.Context) {
 }
 
 func generateUserID() string {
-	userIDCounter++
-	return fmt.Sprintf("U%d", userIDCounter)
+	dbInstance, err := db.GetDB()
+	if err != nil {
+		return ""
+	}
+	count, err := models.GetCountOf(dbInstance, "user")
+	if err != nil {
+		return ""
+	}
+	err = models.Increment(dbInstance, "user")
+	if err != nil {
+		return ""
+	}
+	return fmt.Sprintf("U%d", count)
 }

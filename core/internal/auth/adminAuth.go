@@ -10,7 +10,12 @@ import (
 	"github.com/jyotirmoydotdev/openfy/db"
 	"github.com/jyotirmoydotdev/openfy/db/models"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
+
+type DBInstance struct {
+	DB *gorm.DB
+}
 
 func SignupAdmin(ctx *gin.Context) {
 	var newAdmin struct {
@@ -72,6 +77,9 @@ func SignupAdmin(ctx *gin.Context) {
 		})
 		return
 	}
+	dbConnect := &DBInstance{
+		DB: dbInstance,
+	}
 
 	// Check if a username exist in the database
 	if usernameExist, err := models.AdminExistByUsername(dbInstance, newAdmin.Username); err != nil && !usernameExist {
@@ -126,13 +134,13 @@ func SignupAdmin(ctx *gin.Context) {
 		})
 		return
 	}
+	adminModel := models.NewAdminModel(dbInstance)
+	newAdminDatabase.ID = dbConnect.generateAdminID()
 	newAdminSecret := models.AdminSecrets{
+		AdminID:  newAdminDatabase.ID,
 		Username: newAdmin.Username,
 		Secret:   secretKey,
 	}
-	adminModel := models.NewAdminModel(dbInstance)
-
-	newAdminDatabase.ID = generateAdminID()
 
 	// Check if the admin table id empty
 	AccountOwner, err := models.CheckAdminTableIsEmpty(dbInstance)
@@ -250,9 +258,16 @@ func LoginAdmin(ctx *gin.Context) {
 	})
 }
 
-func generateAdminID() string {
-	models.AdminIDCounter++
-	return fmt.Sprintf("A%d", models.AdminIDCounter)
+func (dbInstance *DBInstance) generateAdminID() string {
+	count, err := models.GetCountOf(dbInstance.DB, "admin")
+	if err != nil {
+		return ""
+	}
+	err = models.Increment(dbInstance.DB, "admin")
+	if err != nil {
+		return ""
+	}
+	return fmt.Sprintf("A%d", count)
 }
 
 func HashAdmin() (bool, error) {
