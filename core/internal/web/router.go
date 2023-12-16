@@ -22,7 +22,7 @@ func SetupRouter() *gin.Engine {
 	router.POST("/login", auth.LoginUser)
 	// router.GET("/products", GetAllActiveProducts)
 
-	router.POST("/admin/signup", hashAdmin(), auth.RegisterAdmin)
+	router.POST("/admin/signup", hashAdmin(), auth.SignupAdmin)
 	router.POST("/admin/login", auth.LoginAdmin)
 
 	// User route
@@ -58,8 +58,15 @@ func SetupRouter() *gin.Engine {
 
 func hashAdmin() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		hashAdmin := auth.HashAdmin()
-		if hashAdmin {
+		hashNoAdmin, err := auth.HashAdmin()
+		if err != nil {
+			ctx.JSON(http.StatusForbidden, gin.H{
+				"error": "Internal Server Error",
+			})
+			ctx.Abort()
+			return
+		}
+		if !hashNoAdmin {
 			ctx.JSON(http.StatusForbidden, gin.H{
 				"error": "Contact Admin for signup",
 			})

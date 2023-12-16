@@ -33,6 +33,8 @@ func resetTestDatabase() error {
 		"DELETE FROM shop_details;",
 		"DELETE FROM delivery_addresses;",
 		"DELETE FROM sqlite_sequence;",
+		"DELETE FROM admin_secrets;",
+		"DELETE FROM admins;",
 	}
 
 	for _, statement := range statements {

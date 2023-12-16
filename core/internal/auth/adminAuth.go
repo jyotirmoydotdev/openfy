@@ -7,12 +7,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
+	"github.com/jyotirmoydotdev/openfy/db"
 	"github.com/jyotirmoydotdev/openfy/db/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func RegisterAdmin(ctx *gin.Context) {
-	// Structure to hold incoming JSON data
+func SignupAdmin(ctx *gin.Context) {
 	var newAdmin struct {
 		Email     string `json:"email"`
 		Username  string `json:"username"`
@@ -20,9 +20,9 @@ func RegisterAdmin(ctx *gin.Context) {
 		LastName  string `json:"lastname"`
 		Password  string `json:"password"`
 	}
-	// Structure to hold admin data for database storage
+
 	var newAdminDatabase models.Admin
-	// Bind incoming JSON data to the newAdmin structure
+
 	if err := ctx.ShouldBindJSON(&newAdmin); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":       "INVALID_JSON",
@@ -33,10 +33,10 @@ func RegisterAdmin(ctx *gin.Context) {
 		})
 		return
 	}
-	// Convert the email and username to lowercase for case-insensitivity
+
 	newAdmin.Email = strings.ToLower(newAdmin.Email)
 	newAdmin.Username = strings.ToLower(newAdmin.Username)
-	// Check the length of username
+
 	if len(newAdmin.Username) < 4 || len(newAdmin.Username) > 16 {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":       "INVALID_INPUT",
@@ -47,7 +47,7 @@ func RegisterAdmin(ctx *gin.Context) {
 		})
 		return
 	}
-	// Check if username is valid (contains only letters and numbers)
+
 	for _, c := range newAdmin.Username {
 		if (97 <= c && c <= 122) || (48 <= c && c <= 57) {
 			continue
@@ -62,32 +62,41 @@ func RegisterAdmin(ctx *gin.Context) {
 			return
 		}
 	}
-	// Check if the username or email already exists
-	for _, a := range models.Admins {
-		if a.Username == newAdmin.Username {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error":       "INVALID_INPUT",
-				"message":     "Invalid input data",
-				"success":     false,
-				"field":       "username",
-				"description": "username not available",
-			})
-			return
-		}
-		if a.Email == newAdmin.Email {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error":       "INVALID_INPUT",
-				"message":     "Invalid input data",
-				"success":     false,
-				"field":       "email",
-				"description": "email already exists",
-			})
-			return
-		}
+
+	dbInstance, err := db.GetDB()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
 	}
-	// Combine First and Last name for the database
+
+	// Check if a username exist
+	if usernameExist, err := models.AdminExistByUsername(dbInstance, newAdmin.Username); err != nil && !usernameExist {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error":       "INVALID_INPUT",
+			"message":     "Invalid input data",
+			"success":     false,
+			"field":       "username",
+			"description": "username not available",
+		})
+		return
+	}
+
+	// Check if a email exist
+	if emailExist, err := models.AdminExistByEmail(dbInstance, newAdmin.Email); err != nil && !emailExist {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error":       "INVALID_INPUT",
+			"message":     "Invalid input data",
+			"success":     false,
+			"field":       "email",
+			"description": "email already exists",
+		})
+		return
+	}
+
 	newAdminDatabase.Name = newAdmin.FirstName + " " + newAdmin.LastName
-	// Hash the password
+
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(newAdmin.Password), bcrypt.DefaultCost)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -99,35 +108,57 @@ func RegisterAdmin(ctx *gin.Context) {
 		})
 		return
 	}
-	// Replace the password with the hash
+
 	newAdmin.Password = string(hashPassword)
-	// Generate a Secret key for the Admin
+
 	secretKey, err := generateRandomKey()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":       "INTERNAL_SERVER_ERROR",
 			"message":     "internal server error",
 			"success":     false,
-			"field":       "secrerKey",
+			"field":       "secrertKey",
 			"description": "An internal server error occurred during generating secreat key",
 		})
 		return
 	}
-	// Keep the secretKey in the adminSecret map
-	models.AdminSecrets[newAdmin.Username] = secretKey
-	// Generate the Admin ID
+	newAdminSecret := models.AdminSecrets{
+		Username: newAdmin.Username,
+		Secret:   secretKey,
+	}
+	adminModel := models.NewAdminModel(dbInstance)
+
 	newAdminDatabase.ID = generateAdminID()
-	// Set AccountOwner flag based on the number of existing admins
-	newAdminDatabase.AccountOwner = len(models.Admins) == 0
-	// Copy data from newAdmin to newAdminDatabase
+
+	// Check if the admin table id empty
+	AccountOwner, err := models.CheckAdminTableIsEmpty(dbInstance)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
+	newAdminDatabase.AccountOwner = AccountOwner
+
 	err = copier.Copy(&newAdminDatabase, &newAdmin)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
-	// Add the new Admin to the Admins Array
-	models.Admins = append(models.Admins, newAdminDatabase)
-	// Return success message along with the new admin data
+	if err := adminModel.Save(&newAdminDatabase); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
+
+	if err := adminModel.SaveAdminSecret(&newAdminSecret); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"error":       "",
 		"message":     "",
@@ -153,8 +184,14 @@ func LoginAdmin(ctx *gin.Context) {
 		})
 		return
 	}
-	_, adminExists := models.AdminSecrets[loginRequest.Username]
-	if !adminExists {
+	dbInstance, err := db.GetDB()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
+	if check, err := models.AdminExistByUsername(dbInstance, loginRequest.Username); err != nil || check {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":       "INVALID_ADMIN",
 			"message":     "Invalid Admin",
@@ -165,19 +202,17 @@ func LoginAdmin(ctx *gin.Context) {
 		return
 	}
 	// Find the admin by username
-	var matchedAdmin models.Admin
-	for _, a := range models.Admins {
-		if a.Username == loginRequest.Username {
-			// Compare the password hash
-			if err := bcrypt.CompareHashAndPassword([]byte(a.Password), []byte(loginRequest.Password)); err == nil {
-				matchedAdmin = a
-				break
-			}
-		}
+	adminHashedPassword, err := models.GetAdminHashedPasswordByUsername(dbInstance, loginRequest.Username)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
 	}
-	// If a matching admin is found, generate and return a JWT
-	if matchedAdmin.ID != "" {
-		token, err := GenerateJWT(loginRequest.Username)
+	// Compare the password hash
+	// If a match admin is found, generate and return a JWT
+	if err := bcrypt.CompareHashAndPassword([]byte(adminHashedPassword), []byte(loginRequest.Password)); err == nil {
+		token, err := GenerateJWT(dbInstance, loginRequest.Username)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{
 				"error":       "INTERNAL_SERVER_ERROR",
@@ -213,6 +248,14 @@ func generateAdminID() string {
 	return fmt.Sprintf("A%d", models.AdminIDCounter)
 }
 
-func HashAdmin() bool {
-	return len(models.Admins) != 0
+func HashAdmin() (bool, error) {
+	dbInstance, err := db.GetDB()
+	if err != nil {
+		return false, err
+	}
+	isEmpty, err := models.CheckAdminTableIsEmpty(dbInstance)
+	if err != nil {
+		return false, err
+	}
+	return isEmpty, nil
 }

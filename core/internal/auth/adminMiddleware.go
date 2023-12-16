@@ -10,15 +10,22 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/jyotirmoydotdev/openfy/db"
 	"github.com/jyotirmoydotdev/openfy/db/models"
+	"gorm.io/gorm"
 )
 
-func GenerateJWT(username string) (string, error) {
+func GenerateJWT(db *gorm.DB, username string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
 		"exp":      time.Now().Add(time.Hour * 24).Unix(),
 	})
-	secretKey := models.AdminSecrets[username]
+	secretKey, err := models.GetSecretKeyByUsername(db, username)
+	if err != nil {
+		if err != nil {
+			return "Internal Server error", err
+		}
+	}
 	signalToken, err := token.SignedString([]byte(secretKey))
 	if err != nil {
 		return "Internal Server error", err
@@ -26,9 +33,13 @@ func GenerateJWT(username string) (string, error) {
 	return signalToken, nil
 }
 func ValidateToken(tokenString string) (jwt.MapClaims, error) {
+	dbInstance, err := db.GetDB()
+	if err != nil {
+		return nil, err
+	}
 	tokenString = strings.TrimPrefix(tokenString, "Bearer ")
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return []byte(extractSecretkeyFromToken(token)), nil
+		return []byte(extractSecretkeyFromToken(dbInstance, token)), nil
 	})
 	if err != nil || !token.Valid {
 		return nil, fmt.Errorf("invalid token: %v", err)
@@ -55,7 +66,7 @@ func CheckExpiration(token *jwt.Token) bool {
 	expiration := time.Unix(int64(expirationTime), 0)
 	return time.Now().Before(expiration)
 }
-func extractSecretkeyFromToken(token *jwt.Token) string {
+func extractSecretkeyFromToken(dbInstance *gorm.DB, token *jwt.Token) string {
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		return ""
@@ -64,7 +75,11 @@ func extractSecretkeyFromToken(token *jwt.Token) string {
 	if !ok {
 		return ""
 	}
-	return models.AdminSecrets[username]
+	secretKey, err := models.GetSecretKeyByUsername(dbInstance, username)
+	if err != nil {
+		return ""
+	}
+	return secretKey
 }
 func generateRandomKey() (string, error) {
 	key := make([]byte, 32)

@@ -1,5 +1,12 @@
 package handlers
 
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jyotirmoydotdev/openfy/db"
+)
+
 func ValidatePermissions(permissions []string) bool {
 	var validPermissions = map[string]bool{
 		"APPLICATIONS":                             true,
@@ -138,4 +145,33 @@ func ValidatePermissions(permissions []string) bool {
 		}
 	}
 	return true
+}
+
+func SavePermission(ctx *gin.Context) {
+	var newRequest struct {
+		ID          string   `json:"id"`
+		Permissions []string `json:"Permissions"`
+	}
+	if err := ctx.ShouldBindJSON(&newRequest); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if !ValidatePermissions(newRequest.Permissions) {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Invalid Permission detected",
+		})
+		return
+	}
+	_, err := db.GetDB()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
+	// TODO: Store the permission in the database
+	// NOTE: If the sender is owner or STAFF_API_PERMISSION_MANAGEMENT
+	//       is in the database before allow to change
 }

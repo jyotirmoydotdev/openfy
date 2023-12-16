@@ -27,7 +27,7 @@ func InitializeDatabases() error {
 	if err != nil {
 		return err
 	}
-	err = db.AutoMigrate(&models.User{}, &models.UserSecrets{}, &models.DeliveryAddress{}, &models.ShopDetail{})
+	err = db.AutoMigrate(&models.User{}, &models.UserSecrets{}, &models.DeliveryAddress{}, &models.ShopDetail{}, &models.Admin{}, &models.AdminSecrets{})
 	if err != nil {
 		return fmt.Errorf("error auto migrating models: %v", err)
 	}
