@@ -11,8 +11,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var userIDCounter int
-
 func RegisterUser(ctx *gin.Context) {
 	var newUser struct {
 		Email     string `json:"email"`
