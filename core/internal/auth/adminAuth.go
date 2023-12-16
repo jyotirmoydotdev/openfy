@@ -21,8 +21,6 @@ func SignupAdmin(ctx *gin.Context) {
 		Password  string `json:"password"`
 	}
 
-	var newAdminDatabase models.Admin
-
 	if err := ctx.ShouldBindJSON(&newAdmin); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":       "INVALID_JSON",
@@ -37,6 +35,8 @@ func SignupAdmin(ctx *gin.Context) {
 	newAdmin.Email = strings.ToLower(newAdmin.Email)
 	newAdmin.Username = strings.ToLower(newAdmin.Username)
 
+	// Validate the username
+	// Check if the username is atleast 4 character or maximum 16 character
 	if len(newAdmin.Username) < 4 || len(newAdmin.Username) > 16 {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":       "INVALID_INPUT",
@@ -48,6 +48,7 @@ func SignupAdmin(ctx *gin.Context) {
 		return
 	}
 
+	// Check if the username is small character and number
 	for _, c := range newAdmin.Username {
 		if (97 <= c && c <= 122) || (48 <= c && c <= 57) {
 			continue
@@ -63,6 +64,7 @@ func SignupAdmin(ctx *gin.Context) {
 		}
 	}
 
+	// Get the Database instance to save the data
 	dbInstance, err := db.GetDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -71,7 +73,7 @@ func SignupAdmin(ctx *gin.Context) {
 		return
 	}
 
-	// Check if a username exist
+	// Check if a username exist in the database
 	if usernameExist, err := models.AdminExistByUsername(dbInstance, newAdmin.Username); err != nil && !usernameExist {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":       "INVALID_INPUT",
@@ -83,7 +85,7 @@ func SignupAdmin(ctx *gin.Context) {
 		return
 	}
 
-	// Check if a email exist
+	// Check if a email exist in the database
 	if emailExist, err := models.AdminExistByEmail(dbInstance, newAdmin.Email); err != nil && !emailExist {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":       "INVALID_INPUT",
@@ -94,6 +96,8 @@ func SignupAdmin(ctx *gin.Context) {
 		})
 		return
 	}
+
+	var newAdminDatabase models.Admin
 
 	newAdminDatabase.Name = newAdmin.FirstName + " " + newAdmin.LastName
 
@@ -145,6 +149,7 @@ func SignupAdmin(ctx *gin.Context) {
 		fmt.Println("Error:", err)
 		return
 	}
+
 	if err := adminModel.Save(&newAdminDatabase); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Internal Server Error",
@@ -184,6 +189,7 @@ func LoginAdmin(ctx *gin.Context) {
 		})
 		return
 	}
+
 	dbInstance, err := db.GetDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -191,7 +197,8 @@ func LoginAdmin(ctx *gin.Context) {
 		})
 		return
 	}
-	if check, err := models.AdminExistByUsername(dbInstance, loginRequest.Username); err != nil || check {
+
+	if check, err := models.AdminExistByUsername(dbInstance, loginRequest.Username); err != nil || !check {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":       "INVALID_ADMIN",
 			"message":     "Invalid Admin",
@@ -238,7 +245,7 @@ func LoginAdmin(ctx *gin.Context) {
 		"error":       "INVALID_ADMIN",
 		"message":     "invalid admin",
 		"success":     false,
-		"field":       "",
+		"field":       "x",
 		"description": "No admin found",
 	})
 }
