@@ -1,7 +1,7 @@
 <p align="center">
-   
-![](src/OpenfyLogo.svg)
-
+<a href="" target="">
+<img src="https://raw.githubusercontent.com/jyotirmoydotdev/Openfy/main/src/OpenfyLogo.svg" width="225" alt="Openfy logo">
+</a>
 </p>
 
 # Openfy - Self-Hosted E-Commerce Platform
