@@ -1,70 +1,94 @@
 package models
 
 type Product struct {
-	ID                    string   `json:"id"`
-	Handle                string   `json:"handle"`
-	Description           string   `json:"description"`
-	Status                bool     `json:"status"`
-	TotalVariants         int      `json:"totalVariants"`
-	TotalInventory        int      `json:"totalInventory"`
-	HasOnlyDefaultVariant bool     `json:"hasOnlyDefaultVariant"`
-	OnlineStoreURL        string   `json:"onlineStoreUrl"`
-	HasSKUs               bool     `json:"hasSkus"`
-	HasBarcodes           bool     `json:"hasBarcodes"`
-	SKURequired           bool     `json:"skuRequired"`
-	Tags                  []string `json:"tags"`
-	Collections           []string `json:"collections"`
-	ProductCategory       string   `json:"productCategory"`
-	Options               []struct {
-		ID       string   `json:"id"`
-		Name     string   `json:"name"`
-		Position int      `json:"position"`
-		Values   []string `json:"values"`
-	} `json:"options"`
-	SEO struct {
-		Title       string `json:"title"`
-		Description string `json:"description"`
-	} `json:"seo"`
-	Variants []Variant `json:"variants"`
+	ID                    string    `gorm:"column:id;primaryKey"`
+	Handle                string    `gorm:"column:handle"`
+	Description           string    `gorm:"column:description"`
+	Status                bool      `gorm:"column:status"`
+	TotalVariants         int       `gorm:"column:totalVariants"`
+	TotalInventory        int       `gorm:"column:totalInventory"`
+	HasOnlyDefaultVariant bool      `gorm:"column:hasOnlyDefaultVariant"`
+	OnlineStoreURL        string    `gorm:"column:onlineStoreUrl"`
+	HasSKUs               bool      `gorm:"column:hasSkus"`
+	HasBarcodes           bool      `gorm:"column:hasBarcodes"`
+	SKURequired           bool      `gorm:"column:skuRequired"`
+	Tags                  []string  `gorm:"column:product_tags;type:json"`
+	Collections           []string  `gorm:"column:product_collections;type:json"`
+	ProductCategory       string    `gorm:"column:productCategory"`
+	Options               []Option  `gorm:"foreignKey:ProductID"`
+	SEO                   SEO       `gorm:"embedded;embeddedPrefix:seo_"`
+	Variants              []Variant `gorm:"foreignKey:ProductID"`
+}
+
+type Option struct {
+	ID        string   `gorm:"column:id;primaryKey"`
+	ProductID string   `gorm:"column:product_id"`
+	Name      string   `gorm:"column:name"`
+	Position  int      `gorm:"column:position"`
+	Values    []string `gorm:"many2many:values;type:json"`
+}
+
+type SEO struct {
+	Title       string `gorm:"column:title"`
+	Description string `gorm:"column:description"`
 }
 
 type Variant struct {
-	Price            float64 `json:"price"`
-	CompareAtPrice   float64 `json:"compareAtPrice"`
-	CostPerItem      float64 `json:"costPerItem"`
-	Taxable          bool    `json:"taxable"`
-	Profit           float64 `json:"profit"`
-	Margin           float64 `json:"margin"`
-	Barcode          string  `json:"barcode"`
-	SKU              string  `json:"sku"`
-	RequiresShipping bool    `json:"requiresShipping"`
-	Weight           struct {
-		Value float64 `json:"value"`
-		Uint  string  `json:"uint"`
-	} `json:"weight"`
-	SelectedOptions []struct {
-		Name  string `json:"name"`
-		Value string `json:"value"`
-	} `json:"selectedOptions"`
-	Inventory struct {
-		Available   int `json:"available"`
-		Committed   int `json:"committed"`
-		OnHand      int `json:"onHand"`
-		Unavailable struct {
-			Damaged struct {
-				Quantity int `json:"quantity"`
-			} `json:"damaged"`
-			QualityControl struct {
-				Quantity int `json:"quantity"`
-			} `json:"qualityControl"`
-			SafetyStock struct {
-				Quantity int `json:"quantity"`
-			} `json:"safetyStock"`
-			Other struct {
-				Quantity int `json:"quantity"`
-			} `json:"other"`
-		} `json:"unavailable"`
-	} `json:"inventory"`
+	ID               string           `gorm:"column:id"`
+	ProductID        string           `gorm:"column:product_id"`
+	Price            float64          `gorm:"column:price"`
+	CompareAtPrice   float64          `gorm:"column:compareAtPrice"`
+	CostPerItem      float64          `gorm:"column:costPerItem"`
+	Taxable          bool             `gorm:"column:taxable"`
+	Profit           float64          `gorm:"column:profit"`
+	Margin           float64          `gorm:"column:margin"`
+	Barcode          string           `gorm:"column:barcode"`
+	SKU              string           `gorm:"column:sku"`
+	RequiresShipping bool             `gorm:"column:requiresShipping"`
+	Weight           Weight           `gorm:"embedded;embeddedPrefix:weight_"`
+	SelectedOptions  []SelectedOption `gorm:"foreignKey:VariantID"`
+	Inventory        Inventory        `gorm:"embedded;embeddedPrefix:inventory_"`
+}
+
+type Weight struct {
+	Value float64 `gorm:"column:value"`
+	Unit  string  `gorm:"column:uint"`
+}
+
+type SelectedOption struct {
+	VariantID string `gorm:"column:variant_id"`
+	Name      string `gorm:"column:name"`
+	Value     string `gorm:"column:value"`
+}
+
+type Inventory struct {
+	Available   int         `gorm:"column:available"`
+	Committed   int         `gorm:"column:committed"`
+	OnHand      int         `gorm:"column:onHand"`
+	Unavailable Unavailable `gorm:"embedded;embeddedPrefix:unavailable_"`
+}
+
+type Unavailable struct {
+	Damaged        Damaged        `gorm:"embedded;embeddedPrefix:damaged_"`
+	QualityControl QualityControl `gorm:"embedded;embeddedPrefix:qc_"`
+	SafetyStock    SafetyStock    `gorm:"embedded;embeddedPrefix:safety_"`
+	Other          Other          `gorm:"embedded;embeddedPrefix:other_"`
+}
+
+type Damaged struct {
+	Quantity int `gorm:"column:quantity"`
+}
+
+type QualityControl struct {
+	Quantity int `gorm:"column:quantity"`
+}
+
+type SafetyStock struct {
+	Quantity int `gorm:"column:quantity"`
+}
+
+type Other struct {
+	Quantity int `gorm:"column:quantity"`
 }
 
 var ProductMapID map[string]Product

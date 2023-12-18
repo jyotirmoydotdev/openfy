@@ -150,7 +150,6 @@ func LoginUser(ctx *gin.Context) {
 	}
 }
 func UpdateUser(ctx *gin.Context) {
-
 }
 
 func generateUserID() string {

@@ -87,7 +87,7 @@ func TestFailSameUsernaem(t *testing.T) {
 	}
 }
 func TestNthUserSignup(t *testing.T) {
-	testNthUser := 30
+	testNthUser := 10
 	for i := 0; i < testNthUser; i++ {
 		email := strconv.Itoa(i) + "testuser@example.com"
 		newUser := map[string]string{

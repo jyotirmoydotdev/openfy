@@ -21,7 +21,7 @@ func teardown() {
 }
 
 func resetTestDatabase() error {
-	dbInstance, err := sql.Open("sqlite3", "database.db")
+	dbInstance, err := sql.Open("sqlite3", "./db/databaseUserAdmin.db")
 	if err != nil {
 		return fmt.Errorf("error opening test database: %v", err)
 	}
@@ -40,6 +40,25 @@ func resetTestDatabase() error {
 
 	for _, statement := range statements {
 		_, err := dbInstance.Exec(statement)
+		if err != nil {
+			return fmt.Errorf("error executing SQL statement: %v", err)
+		}
+	}
+
+	productdbInstance, err := sql.Open("sqlite3", "./db/databaseProduct.db")
+	if err != nil {
+		return fmt.Errorf("error opening test database: %v", err)
+	}
+	defer productdbInstance.Close()
+	statements = []string{
+		"DELETE FROM products;",
+		"DELETE FROM options;",
+		"DELETE FROM variants;",
+		"DELETE FROM selected_options;",
+		"DELETE FROM counters;",
+	}
+	for _, statement := range statements {
+		_, err := productdbInstance.Exec(statement)
 		if err != nil {
 			return fmt.Errorf("error executing SQL statement: %v", err)
 		}

@@ -9,16 +9,29 @@ import (
 )
 
 var dbInstance *gorm.DB
+var productdbInstance *gorm.DB
 
 func GetDB() (*gorm.DB, error) {
 	if dbInstance != nil {
 		return dbInstance, nil
 	}
-	db, err := gorm.Open(sqlite.Open("./database.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open("./db/databaseUserAdmin.db"), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("error opening database: %v", err)
 	}
 	dbInstance = db
+	return db, nil
+}
+
+func GetProductDB() (*gorm.DB, error) {
+	if productdbInstance != nil {
+		return productdbInstance, nil
+	}
+	db, err := gorm.Open(sqlite.Open("./db/databaseProduct.db"), &gorm.Config{})
+	if err != nil {
+		return nil, fmt.Errorf("error opening database: %v", err)
+	}
+	productdbInstance = db
 	return db, nil
 }
 
@@ -42,6 +55,21 @@ func InitializeDatabases() error {
 	err = preloadData(db)
 	if err != nil {
 		return fmt.Errorf("error preloading data: %v", err)
+	}
+
+	productdb, err := GetProductDB()
+	if err != nil {
+		return err
+	}
+	err = productdb.AutoMigrate(
+		&models.Product{},
+		&models.Option{},
+		&models.Variant{},
+		&models.SelectedOption{},
+		&models.Counter{},
+	)
+	if err != nil {
+		return fmt.Errorf("error auto migrating models: %v", err)
 	}
 	return nil
 }
