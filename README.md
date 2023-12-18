@@ -1,6 +1,6 @@
 <p align="center">
 <a href="" target="">
-<img src="https://raw.githubusercontent.com/jyotirmoydotdev/Openfy/main/src/OpenfyLogo.svg" width="225" alt="Openfy logo">
+<img src="https://raw.githubusercontent.com/jyotirmoydotdev/Openfy/main/src/OpenfyLogo.svg" width="50%" alt="Openfy logo">
 </a>
 </p>
 
