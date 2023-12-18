@@ -1,5 +1,7 @@
 package models
 
+import "gorm.io/gorm"
+
 type Product struct {
 	ID                    string    `gorm:"column:id;primaryKey"`
 	Handle                string    `gorm:"column:handle"`
@@ -94,5 +96,17 @@ type Other struct {
 var ProductMapID map[string]Product
 var ProductList []Product
 var ProductIDCounter int
-var Tags []string
-var Collections []string
+
+// var Tags []string
+// var Collections []string
+
+type ProductModel struct {
+	db *gorm.DB
+}
+
+func NewProductModel(db *gorm.DB) *ProductModel {
+	return &ProductModel{db: db}
+}
+func (pd *ProductModel) Save(product *Product) error {
+	return pd.db.Create(product).Error
+}

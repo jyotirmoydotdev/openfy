@@ -51,7 +51,6 @@ func SetupRouter() *gin.Engine {
 		// admin.GET("/:id", view) // view a admin detail
 		// admin.PATCH("/:id", update) // update the admin details
 		// admin.DELETE("/:id", delete) // delete the admin
-
 	}
 	return router
 }

@@ -3,44 +3,46 @@ package handlers
 import (
 	"fmt"
 	"net/http"
-	"slices"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
+	"github.com/jyotirmoydotdev/openfy/db"
 	"github.com/jyotirmoydotdev/openfy/db/models"
 )
 
 type RequestProduct struct {
-	Handle          string   `json:"handle"`
-	Description     string   `json:"description"` // Optional
-	Status          bool     `json:"status"`
-	Tags            []string `json:"tags"`            // Optional
-	Collections     []string `json:"collections"`     // Optional
-	ProductCategory string   `json:"productCategory"` // Optional
-	Options         []struct {
-		Name     string   `json:"name"`
-		Position int      `json:"position"`
-		Values   []string `json:"values"`
-	} `json:"options"`
-	Variants []struct {
-		Price          float64 `json:"price"`
-		CompareAtPrice float64 `json:"compareAtPrice"` // Optional
-		CostPerItem    float64 `json:"costPerItem"`    // Optional
-		Taxable        bool    `json:"taxable"`        // Optional
-		Barcode        string  `json:"barcode"`        // Optional
-		SKU            string  `json:"sku"`            // Optional
-		Weight         struct {
-			Value float64 `json:"value"`
-			Uint  string  `json:"uint"`
-		} `json:"weight"` // Optional
-		SelectedOptions []struct {
-			Name  string `json:"name"`
-			Value string `json:"value"`
-		} `json:"selectedOptions"`
-		Inventory struct {
-			Available int `json:"available"`
-		} `json:"inventory"`
-	} `json:"variants"`
+	Handle          string     `json:"handle"`
+	Description     string     `json:"description"` // Optional
+	Status          bool       `json:"status"`
+	Tags            []string   `json:"tags"`            // Optional
+	Collections     []string   `json:"collections"`     // Optional
+	ProductCategory string     `json:"productCategory"` // Optional
+	Options         []Options  `json:"options"`
+	Variants        []Variants `json:"variants"`
+}
+type Options struct {
+	Name     string   `json:"name"`
+	Position int      `json:"position"`
+	Values   []string `json:"values"`
+}
+type Variants struct {
+	Price          float64 `json:"price"`
+	CompareAtPrice float64 `json:"compareAtPrice"` // Optional
+	CostPerItem    float64 `json:"costPerItem"`    // Optional
+	Taxable        bool    `json:"taxable"`        // Optional
+	Barcode        string  `json:"barcode"`        // Optional
+	SKU            string  `json:"sku"`            // Optional
+	Weight         struct {
+		Value float64 `json:"value"`
+		Uint  string  `json:"uint"`
+	} `json:"weight"` // Optional
+	SelectedOptions []struct {
+		Name  string `json:"name"`
+		Value string `json:"value"`
+	} `json:"selectedOptions"`
+	Inventory struct {
+		Available int `json:"available"`
+	} `json:"inventory"`
 }
 
 func NewRequestProductHandlers() *RequestProduct {
@@ -53,16 +55,18 @@ func (rp *RequestProduct) Create(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	// models.ProductMapID = make(map[string]models.Product)
+
+	// ------------------------------------------------------------
 	var productDatabase models.Product
-	models.ProductMapID = make(map[string]models.Product)
-	productDatabase.ID = generateProductID()
+	productDatabase.ID = generateProductID() // <-----------------
 	err := copier.Copy(&productDatabase, &product)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
+	// ------------------------------------------------------------
 
-	// Handle Should not be empty
 	if product.Handle == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "Title requied",
@@ -109,26 +113,42 @@ func (rp *RequestProduct) Create(ctx *gin.Context) {
 		}
 		productDatabase.Variants[i].Inventory.OnHand = product.Variants[i].Inventory.Available
 	}
-	models.ProductList = append(models.ProductList, productDatabase)
-	models.ProductMapID[productDatabase.ID] = productDatabase
-	for _, v := range productDatabase.Tags {
-		if slices.Contains(models.Tags, v) {
-			continue
-		} else {
-			models.Tags = append(models.Tags, v)
-		}
+
+	// CHECK -> models.ProductList = append(models.ProductList, productDatabase)
+	productdbInstance, err := db.GetProductDB()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
 	}
-	for _, v := range productDatabase.Collections {
-		if slices.Contains(models.Collections, v) {
-			continue
-		} else {
-			models.Collections = append(models.Collections, v)
-		}
+	productModel := models.NewProductModel(productdbInstance)
+	if err := productModel.Save(&productDatabase); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
 	}
+
+	// models.ProductMapID[productDatabase.ID] = productDatabase
+	// for _, v := range productDatabase.Tags {
+	// 	if slices.Contains(models.Tags, v) {
+	// 		continue
+	// 	} else {
+	// 		models.Tags = append(models.Tags, v)
+	// 	}
+	// }
+	// for _, v := range productDatabase.Collections {
+	// 	if slices.Contains(models.Collections, v) {
+	// 		continue
+	// 	} else {
+	// 		models.Collections = append(models.Collections, v)
+	// 	}
+	// }
 	ctx.JSON(http.StatusOK, gin.H{
 		"status": "Product add successfully",
 	})
 }
+
 func (rp *RequestProduct) Update(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var updatedProduct RequestProduct

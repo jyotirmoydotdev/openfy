@@ -19,7 +19,6 @@ func startServer() {
 func teardown() {
 	server.Close()
 }
-
 func resetTestDatabase() error {
 	dbInstance, err := sql.Open("sqlite3", "./db/databaseUserAdmin.db")
 	if err != nil {
@@ -63,10 +62,8 @@ func resetTestDatabase() error {
 			return fmt.Errorf("error executing SQL statement: %v", err)
 		}
 	}
-
 	return nil
 }
-
 func TestMain(m *testing.M) {
 	err := db.InitializeDatabases()
 	if err != nil {
