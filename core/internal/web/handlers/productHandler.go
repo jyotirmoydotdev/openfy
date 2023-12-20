@@ -12,11 +12,11 @@ import (
 
 type RequestProduct struct {
 	Handle          string     `json:"handle"`
-	Description     string     `json:"description"` // Optional
+	Description     string     `json:"description"`
 	Status          bool       `json:"status"`
-	Tags            []string   `json:"tags"`            // Optional
-	Collections     []string   `json:"collections"`     // Optional
-	ProductCategory string     `json:"productCategory"` // Optional
+	Tags            []string   `json:"tags"`
+	Collections     []string   `json:"collections"`
+	ProductCategory string     `json:"productCategory"`
 	Options         []Options  `json:"options"`
 	Variants        []Variants `json:"variants"`
 }
@@ -27,15 +27,15 @@ type Options struct {
 }
 type Variants struct {
 	Price          float64 `json:"price"`
-	CompareAtPrice float64 `json:"compareAtPrice"` // Optional
-	CostPerItem    float64 `json:"costPerItem"`    // Optional
-	Taxable        bool    `json:"taxable"`        // Optional
-	Barcode        string  `json:"barcode"`        // Optional
-	SKU            string  `json:"sku"`            // Optional
+	CompareAtPrice float64 `json:"compareAtPrice"`
+	CostPerItem    float64 `json:"costPerItem"`
+	Taxable        bool    `json:"taxable"`
+	Barcode        string  `json:"barcode"`
+	SKU            string  `json:"sku"`
 	Weight         struct {
 		Value float64 `json:"value"`
 		Uint  string  `json:"uint"`
-	} `json:"weight"` // Optional
+	} `json:"weight"`
 	SelectedOptions []struct {
 		Name  string `json:"name"`
 		Value string `json:"value"`
@@ -55,8 +55,6 @@ func (rp *RequestProduct) Create(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	// models.ProductMapID = make(map[string]models.Product)
-
 	// ------------------------------------------------------------
 	var productDatabase models.Product
 	productDatabase.ID = generateProductID() // <-----------------
@@ -115,6 +113,9 @@ func (rp *RequestProduct) Create(ctx *gin.Context) {
 	}
 
 	// CHECK -> models.ProductList = append(models.ProductList, productDatabase)
+	// ctx.JSON(http.StatusOK, gin.H{
+	// 	"Data": productDatabase,
+	// })
 	productdbInstance, err := db.GetProductDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -128,22 +129,6 @@ func (rp *RequestProduct) Create(ctx *gin.Context) {
 		})
 		return
 	}
-
-	// models.ProductMapID[productDatabase.ID] = productDatabase
-	// for _, v := range productDatabase.Tags {
-	// 	if slices.Contains(models.Tags, v) {
-	// 		continue
-	// 	} else {
-	// 		models.Tags = append(models.Tags, v)
-	// 	}
-	// }
-	// for _, v := range productDatabase.Collections {
-	// 	if slices.Contains(models.Collections, v) {
-	// 		continue
-	// 	} else {
-	// 		models.Collections = append(models.Collections, v)
-	// 	}
-	// }
 	ctx.JSON(http.StatusOK, gin.H{
 		"status": "Product add successfully",
 	})

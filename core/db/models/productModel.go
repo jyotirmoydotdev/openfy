@@ -17,8 +17,8 @@ type Product struct {
 	Tags                  []string  `gorm:"column:product_tags;type:json"`
 	Collections           []string  `gorm:"column:product_collections;type:json"`
 	ProductCategory       string    `gorm:"column:productCategory"`
-	Options               []Option  `gorm:"foreignKey:ProductID"`
 	SEO                   SEO       `gorm:"embedded;embeddedPrefix:seo_"`
+	Options               []Option  `gorm:"foreignKey:ProductID"`
 	Variants              []Variant `gorm:"foreignKey:ProductID"`
 }
 
