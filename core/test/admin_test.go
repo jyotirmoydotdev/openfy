@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/jyotirmoydotdev/openfy/db/models"
 	web "github.com/jyotirmoydotdev/openfy/internal/web/handlers"
 )
 
@@ -159,51 +158,51 @@ func TestAddProduct(t *testing.T) {
 	resp2.Body.Close()
 }
 
-func TestUpdateProduct(t *testing.T) {
-	currentDir, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	jsonFilePath := filepath.Join(currentDir, "jsonExample", "updateProduct1.json")
-	file, err := os.Open(jsonFilePath)
-	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return
-	}
-	defer file.Close()
+// func TestUpdateProduct(t *testing.T) {
+// 	currentDir, err := os.Getwd()
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	jsonFilePath := filepath.Join(currentDir, "jsonExample", "updateProduct1.json")
+// 	file, err := os.Open(jsonFilePath)
+// 	if err != nil {
+// 		fmt.Println("Error opening file:", err)
+// 		return
+// 	}
+// 	defer file.Close()
 
-	Content, err := io.ReadAll(file)
-	if err != nil {
-		fmt.Println("Error reading file:", err)
-		return
-	}
-	var updatedProduct web.RequestProduct
-	id := models.ProductList[0].ID
+// 	Content, err := io.ReadAll(file)
+// 	if err != nil {
+// 		fmt.Println("Error reading file:", err)
+// 		return
+// 	}
+// 	var updatedProduct web.RequestProduct
+// 	id := models.ProductList[0].ID
 
-	err = json.Unmarshal(Content, &updatedProduct)
-	if err != nil {
-		fmt.Println("Error unmarshaling JSON:", err)
-		return
-	}
-	jsonProduct, err := json.Marshal(updatedProduct)
-	if err != nil {
-		t.Fatal(err)
-	}
-	req, err := http.NewRequest("PUT", server.URL+"/admin/products/"+id, bytes.NewBuffer(jsonProduct))
-	if err != nil {
-		t.Fatal(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+token)
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		fmt.Println("Error making request:", err)
-	}
-	if status := resp.StatusCode; status != http.StatusOK {
-		t.Errorf("handler returned wrong staus code: got %v want %v", status, http.StatusOK)
-	}
-	resp.Body.Close()
-}
+// 	err = json.Unmarshal(Content, &updatedProduct)
+// 	if err != nil {
+// 		fmt.Println("Error unmarshaling JSON:", err)
+// 		return
+// 	}
+// 	jsonProduct, err := json.Marshal(updatedProduct)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	req, err := http.NewRequest("PUT", server.URL+"/admin/products/"+id, bytes.NewBuffer(jsonProduct))
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	req.Header.Set("Content-Type", "application/json")
+// 	req.Header.Set("Authorization", "Bearer "+token)
+// 	resp, err := http.DefaultClient.Do(req)
+// 	if err != nil {
+// 		fmt.Println("Error making request:", err)
+// 	}
+// 	if status := resp.StatusCode; status != http.StatusOK {
+// 		t.Errorf("handler returned wrong staus code: got %v want %v", status, http.StatusOK)
+// 	}
+// 	resp.Body.Close()
+// }
 
 func TestGetAllProducts(t *testing.T) {
 	var emptyJson []byte

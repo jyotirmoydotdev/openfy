@@ -1,73 +1,75 @@
 {
-    "handle": "comfort-shoes",
-    "description": "A pair of comfortable shoes for everyday use",
-    "status": true,
-    "tags": ["comfortable", "everyday", "shoes"],
-    "collections": ["spring", "casual"],
-    "productCategory": "footwear",
-    "options": [
-      {
-        "name": "Color",
-        "position": 1,
-        "values": ["black", "white", "blue"]
-      },
-      {
-        "name": "Size",
-        "position": 2,
-        "values": ["7"]
-      }
-    ],
-    "variants": [
-      {
-        "price": 59.99,
-        "compareAtPrice": 79.99,
-        "costPerItem": 39.99,
-        "taxable": true,
-        "sku": "COMFORT-BLK-7",
-        "barcode": "123456789012",
-        "weight":{
-            "value": 300,
-            "uint":"gram"
-        },
-        "selectedOptions": [
-          {"name": "Color", "value": "black"},
-          {"name": "Size", "value": "7"}
-        ],
-        "inventory": {"available": 150}
-      },
-      {
-        "price": 59.99,
-        "compareAtPrice": 79.99,
-        "costPerItem": 49.99,
-        "taxable": true,
-        "sku": "COMFORT-WHT-8",
-        "barcode": "123456789013",
-        "weight":{
-            "value":300,
-            "uint":"gram"
-        },
-        "selectedOptions": [
-          {"name": "Color", "value": "white"},
-          {"name": "Size", "value": "7"}
-        ],
-        "inventory": {"available": 180}
-      },
-      {
-        "price": 59.99,
-        "compareAtPrice": 79.99,
-        "costPerItem": 49.99,
-        "taxable": true,
-        "sku": "COMFORT-BLU-9",
-        "barcode": "123456789014",
-        "weight":{
-            "value":300,
-            "uint":"gram"
-        },
-        "selectedOptions": [
-            {"name": "Color", "value": "blue"},
-            {"name": "Size", "value": "7"}
-        ],
-        "inventory": {"available": 200}
-      }
-    ]
-}  
+  "handle": "comfort-shoes",
+  "description": "A pair of comfortable shoes for everyday use",
+  "status": true,
+  "tags": ["comfortable", "everyday", "shoes"],
+  "collections": ["spring", "casual"],
+  "productCategory": "footwear",
+  "options": [
+    {
+      "name": "Size",
+      "position": 1,
+      "values": ["Small", "Medium", "Large"]
+    },
+    {
+      "name": "Color",
+      "position": 2,
+      "values": ["Red", "Blue", "Green"]
+    },
+    {
+      "name": "Material",
+      "position": 3,
+      "values": ["Leather", "Synthetic"]
+    }
+  ],
+  "variants": [
+    {
+      "price": 49.99,
+      "compareAtPrice": 69.99,
+      "costPerItem": 30.0,
+      "taxable": true,
+      "barcode": "123456789",
+      "sku": "CSM001",
+      "weightValue": 0.75,
+      "weightUnit": "kg",
+      "selectedOptions": [
+        {"name": "Size", "value": "Small"},
+        {"name": "Color", "value": "Red"},
+        {"name": "Material", "value": "Leather"}
+      ],
+      "inventoryAvailable": 100
+    },
+    {
+      "price": 54.99,
+      "compareAtPrice": 74.99,
+      "costPerItem": 35.0,
+      "taxable": true,
+      "barcode": "987654321",
+      "sku": "CSL002",
+      "weightValue": 0.85,
+      "weightUnit": "kg",
+      "selectedOptions": [
+        {"name": "Size", "value": "Small"},
+        {"name": "Color", "value": "Blue"},
+        {"name": "Material", "value": "Synthetic"}
+      ],
+      "inventoryAvailable": 75
+    },
+    {
+      "price": 54.99,
+      "compareAtPrice": 74.99,
+      "costPerItem": 35.0,
+      "taxable": true,
+      "barcode": "987654321",
+      "sku": "CSL002",
+      "weightValue": 0.85,
+      "weightUnit": "kg",
+      "selectedOptions": [
+        {"name": "Size", "value": "Small"},
+        {"name": "Color", "value": "Green"},
+        {"name": "Material", "value": "Synthetic"}
+      ],
+      "inventoryAvailable": 75
+    }
+  ]
+}

@@ -40,7 +40,7 @@ func SetupRouter() *gin.Engine {
 		admin.GET("/products/:id", requestProductHandlers.GetProduct)
 		admin.GET("/products", requestProductHandlers.GetAllProducts)
 		admin.POST("/products/new", requestProductHandlers.Create)
-		admin.PUT("/products/:id", requestProductHandlers.Update)
+		// admin.PUT("/products/:id", requestProductHandlers.Update)
 		admin.DELETE("/products/:id", requestProductHandlers.Delete)
 		// admin.POST("/auth-with-password", AuthWithPassword)
 		// admin.POST("/request-password-reset", RequestPasswordReset)
