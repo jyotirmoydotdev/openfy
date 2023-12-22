@@ -35,6 +35,7 @@ func resetTestDatabase() error {
 		"DELETE FROM admin_secrets;",
 		"DELETE FROM admins;",
 		"DELETE FROM counters;",
+		"DELETE FROM user_tokens;",
 	}
 
 	for _, statement := range statements {

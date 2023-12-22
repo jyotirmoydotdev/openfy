@@ -16,8 +16,8 @@ type Product struct {
 	HasSKUs               bool      `gorm:"column:hasSkus"`
 	HasBarcodes           bool      `gorm:"column:hasBarcodes"`
 	SKURequired           bool      `gorm:"column:skuRequired"`
-	Tags                  string    `gorm:"column:product_tags"`
-	Collections           string    `gorm:"column:product_collections"`
+	Tags                  string    `gorm:"column:tags"`
+	Collections           string    `gorm:"column:collections"`
 	ProductCategory       string    `gorm:"column:productCategory"`
 	SEOTitle              string    `gorm:"column:SEOTitle"`
 	SEODescription        string    `gorm:"column:SEODescription"`

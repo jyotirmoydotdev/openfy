@@ -14,12 +14,12 @@
     {
       "name": "Color",
       "position": 2,
-      "values": ["Red", "Blue", "Green"]
+      "values": ["Red"]
     },
     {
       "name": "Material",
       "position": 3,
-      "values": ["Leather", "Synthetic"]
+      "values": ["Leather"]
     }
   ],
   "variants": [

@@ -15,8 +15,8 @@ type RequestProduct struct {
 	Handle          string     `json:"handle"`
 	Description     string     `json:"description"`
 	Status          bool       `json:"status"`
-	Tags            []string   `json:"product_tags"`
-	Collections     []string   `json:"product_collections"`
+	Tags            []string   `json:"tags"`
+	Collections     []string   `json:"collections"`
 	ProductCategory string     `json:"productCategory"`
 	Options         []Options  `json:"options"`
 	Variants        []Variants `json:"variants"`
@@ -44,9 +44,6 @@ type Variants struct {
 
 func NewRequestProductHandlers() *RequestProduct {
 	return &RequestProduct{}
-}
-func concatenateStrings(slice []string) string {
-	return strings.Join(slice, ",")
 }
 
 // Create a new product
@@ -86,6 +83,23 @@ func (rp *RequestProduct) Create(ctx *gin.Context) {
 	// Status shoule be True by default
 	productDatabase.Status = true
 
+	// Add Total Variants
+	productDatabase.TotalVariants = 1
+	for i := range product.Options {
+		productDatabase.TotalVariants *= len(product.Options[i].Values)
+	}
+	if productDatabase.TotalVariants != len(productDatabase.Variants) {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Not enough variants",
+		})
+		return
+	}
+	if productDatabase.TotalVariants == 1 {
+		productDatabase.HasOnlyDefaultVariant = true
+	} else {
+		productDatabase.HasOnlyDefaultVariant = false
+	}
+
 	// Format the data related to variants
 	for i := range productDatabase.Variants {
 		if productDatabase.Variants[i].Price == 0.0 {
@@ -103,7 +117,7 @@ func (rp *RequestProduct) Create(ctx *gin.Context) {
 		productDatabase.TotalInventory += productDatabase.Variants[i].InventoryAvailable
 		if productDatabase.Variants[i].CostPerItem != 0.0 {
 			productDatabase.Variants[i].Profit = productDatabase.Variants[i].Price - productDatabase.Variants[i].CostPerItem
-			productDatabase.Variants[i].Margin = (((productDatabase.Variants[i].Price - productDatabase.Variants[i].Price) / productDatabase.Variants[i].Price) * 100)
+			productDatabase.Variants[i].Margin = (((productDatabase.Variants[i].Price - productDatabase.Variants[i].CostPerItem) / productDatabase.Variants[i].Price) * 100)
 		}
 		if productDatabase.Variants[i].WeightValue != 0.0 {
 			productDatabase.Variants[i].RequiresShipping = true
@@ -246,7 +260,6 @@ func (rp *RequestProduct) GetProduct(ctx *gin.Context) {
 		return
 	}
 }
-func generateProductID() string {
-	models.ProductIDCounter++
-	return fmt.Sprintf("P%d", models.ProductIDCounter)
+func concatenateStrings(slice []string) string {
+	return strings.Join(slice, ",")
 }

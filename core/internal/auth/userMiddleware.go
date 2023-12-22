@@ -29,6 +29,33 @@ func GenerateUserJWT(email string) (string, error) {
 	if err != nil {
 		return "Internal server error", err
 	}
+	userToken := models.UserToken{
+		Email:             email,
+		Token:             signToken,
+		LastUsed:          time.Now(),
+		TokenExpiry:       time.Now().Add(time.Hour * 24),
+		IsActive:          true,
+		IPAddresses:       "",
+		UserAgent:         "",
+		DeviceInformation: "",
+		RevocationReason:  "",
+	}
+	if check, err := models.CheckEmailExist(dbInstance, email); err != nil && check {
+		err := models.UpdateToken(dbInstance, &userToken)
+		if err != nil {
+			return "Internal Server error in UpdateToken", err
+		}
+	} else {
+		err := models.SaveToken(dbInstance, &userToken)
+		if err != nil {
+			return "Internal Server error in SaveToken", err
+		}
+	}
+	// err = models.SaveToken(dbInstance, &userToken)
+	// if err != nil {
+	// 	fmt.Println("Internal Server error", err)
+	// 	return "Internal Server error", err
+	// }
 	return signToken, nil
 }
 func ValidateUserToken(tokenString string) (jwt.MapClaims, error) {

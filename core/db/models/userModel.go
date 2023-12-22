@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type User struct {
 	ID                string            `gorm:"column:id;primaryKey"`
@@ -28,6 +32,18 @@ type UserSecrets struct {
 	UserID string `gorm:"column:user_id"`
 	Email  string `gorm:"column:email"`
 	Secret string `gorm:"column:secret"`
+}
+
+type UserToken struct {
+	Email             string    `gorm:"column:email;primaryKey"`
+	Token             string    `gorm:"column:token"`
+	LastUsed          time.Time `gorm:"column:last_used"`
+	TokenExpiry       time.Time `gorm:"column:token_expiry"`
+	IsActive          bool      `gorm:"column:is_active"`
+	IPAddresses       string    `gorm:"column:ip_addresses"`
+	UserAgent         string    `gorm:"column:user_agent"`
+	DeviceInformation string    `gorm:"column:device_information"`
+	RevocationReason  string    `gorm:"column:revocation_reason"`
 }
 
 type UserModel struct {
@@ -70,4 +86,26 @@ func UserExistByEmail(db *gorm.DB, email string) (bool, error) {
 		return false, err
 	}
 	return count > 0, nil
+}
+
+func SaveToken(db *gorm.DB, userToken *UserToken) error {
+	return db.Create(userToken).Error
+}
+
+func CheckEmailExist(db *gorm.DB, email string) (bool, error) {
+	var count int64
+	if err := db.Model(&UserToken{}).Where("email = ?", email).Count(&count).Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+func UpdateToken(db *gorm.DB, userToken *UserToken) error {
+	updatedValues := map[string]interface{}{
+		"token":        userToken.Token,
+		"last_used":    userToken.LastUsed,
+		"token_expiry": userToken.TokenExpiry,
+		"is_active":    userToken.IsActive,
+		"ip_addresses": userToken.IPAddresses,
+	}
+	return db.Model(&UserToken{}).Where("email = ?", userToken.Email).Updates(updatedValues).Error
 }

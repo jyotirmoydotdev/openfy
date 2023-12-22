@@ -48,6 +48,7 @@ func InitializeDatabases() error {
 		&models.Admin{},
 		&models.AdminSecrets{},
 		&models.Counter{},
+		&models.UserToken{},
 	)
 	if err != nil {
 		return fmt.Errorf("error auto migrating models: %v", err)
