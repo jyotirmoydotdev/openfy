@@ -137,6 +137,7 @@ func LoginUser(ctx *gin.Context) {
 			ctx.JSON(http.StatusInternalServerError, gin.H{
 				"error": "Internal Server error",
 			})
+			return
 		}
 		ctx.JSON(http.StatusOK, gin.H{
 			"token": Token,
@@ -149,6 +150,7 @@ func LoginUser(ctx *gin.Context) {
 		return
 	}
 }
+
 func UpdateUser(ctx *gin.Context) {
 }
 

@@ -3,7 +3,6 @@ package test
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"testing"
@@ -63,7 +62,40 @@ func TestUserLogin(t *testing.T) {
 		t.Errorf("Error decoding JSON response:%v", err)
 		return
 	}
-	UserJWT, _ = reponse["token"].(string)
+	UserJWTfetch, ok := reponse["token"].(string)
+	if !ok {
+		t.Errorf("Something went wrrong while fetching token from the reponse")
+	}
+	UserJWT = UserJWTfetch
+}
+func TestUserLogin2(t *testing.T) {
+	loginCredentials := map[string]string{
+		"email":    "testuser@example.com",
+		"password": "testpassword",
+	}
+	jsonCredentials, err := json.Marshal(loginCredentials)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp, err := http.Post(server.URL+"/login", "application/json", bytes.NewBuffer(jsonCredentials))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	if status := resp.StatusCode; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+	}
+	var reponse map[string]interface{}
+	err = json.NewDecoder(resp.Body).Decode(&reponse)
+	if err != nil {
+		t.Errorf("Error decoding JSON response:%v", err)
+		return
+	}
+	UserJWTfetch, ok := reponse["token"].(string)
+	if !ok {
+		t.Errorf("Something went wrrong while fetching token from the reponse")
+	}
+	UserJWT = UserJWTfetch
 }
 
 // Check is same username can signup
@@ -146,7 +178,8 @@ func TestUserPingPong(t *testing.T) {
 	message, ok := response["message"].(string)
 	if !ok {
 		t.Error("Expected 'message' field in response, but it was not found")
-	} else {
-		fmt.Println(message)
+	}
+	if message != "pong" {
+		t.Error("Message does not match")
 	}
 }

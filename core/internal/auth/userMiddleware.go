@@ -27,7 +27,7 @@ func GenerateUserJWT(email string) (string, error) {
 	}
 	signToken, err := token.SignedString([]byte(secretKey))
 	if err != nil {
-		return "Internal server error", err
+		return "", err
 	}
 	userToken := models.UserToken{
 		Email:             email,
@@ -40,15 +40,15 @@ func GenerateUserJWT(email string) (string, error) {
 		DeviceInformation: "",
 		RevocationReason:  "",
 	}
-	if check, err := models.CheckEmailExist(dbInstance, email); err != nil && check {
-		err := models.UpdateToken(dbInstance, &userToken)
-		if err != nil {
-			return "Internal Server error in UpdateToken", err
+	if exist, err := models.CheckEmailExist(dbInstance, email); err != nil {
+		return "", err
+	} else if !exist {
+		if err := models.SaveToken(dbInstance, &userToken); err != nil {
+			return "", err
 		}
 	} else {
-		err := models.SaveToken(dbInstance, &userToken)
-		if err != nil {
-			return "Internal Server error in SaveToken", err
+		if err := models.UpdateToken(dbInstance, &userToken); err != nil {
+			return "", err
 		}
 	}
 	// err = models.SaveToken(dbInstance, &userToken)
@@ -69,6 +69,22 @@ func ValidateUserToken(tokenString string) (jwt.MapClaims, error) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		return nil, fmt.Errorf("something went wrong at 'claims'")
+	}
+	email, ok := claims["email"].(string)
+	if !ok {
+		return nil, fmt.Errorf("something went wrong while extracting `email`")
+	}
+	dbInstance, err := db.GetDB()
+	if err != nil {
+		return nil, err
+	}
+	// Check if the token exist in the database
+	databaseToken, err := models.GetTokenByEmail(dbInstance, email)
+	if err != nil {
+		return nil, err
+	}
+	if databaseToken != tokenString {
+		return nil, fmt.Errorf("not a valid token, not exist in the database")
 	}
 	expirationTime, ok := token.Claims.(jwt.MapClaims)["exp"].(float64)
 	if !ok {

@@ -99,13 +99,25 @@ func CheckEmailExist(db *gorm.DB, email string) (bool, error) {
 	}
 	return count > 0, nil
 }
+func GetTokenByEmail(db *gorm.DB, email string) (string, error) {
+	var userToken UserToken
+	err := db.Model(&UserToken{}).Select("token").Where("email = ?", email).First(&userToken).Error
+	if err != nil {
+		return "", err
+	}
+	return userToken.Token, nil
+}
 func UpdateToken(db *gorm.DB, userToken *UserToken) error {
 	updatedValues := map[string]interface{}{
-		"token":        userToken.Token,
-		"last_used":    userToken.LastUsed,
-		"token_expiry": userToken.TokenExpiry,
-		"is_active":    userToken.IsActive,
-		"ip_addresses": userToken.IPAddresses,
+		"email":              userToken.Email,
+		"token":              userToken.Token,
+		"last_used":          userToken.LastUsed,
+		"token_expiry":       userToken.TokenExpiry,
+		"is_active":          userToken.IsActive,
+		"ip_addresses":       userToken.IPAddresses,
+		"user_agent":         userToken.UserAgent,
+		"device_information": userToken.DeviceInformation,
+		"revocation_reason":  userToken.RevocationReason,
 	}
 	return db.Model(&UserToken{}).Where("email = ?", userToken.Email).Updates(updatedValues).Error
 }
