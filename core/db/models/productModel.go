@@ -1,6 +1,9 @@
 package models
 
 import (
+	"errors"
+	"strconv"
+
 	"gorm.io/gorm"
 )
 
@@ -80,4 +83,34 @@ func NewProductModel(db *gorm.DB) *ProductModel {
 }
 func (pd *ProductModel) Save(product *Product) error {
 	return pd.db.Create(&product).Error
+}
+
+func (pd *ProductModel) GetProduct(id string) (*Product, error) {
+	var existingProduct Product
+	uintID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return nil, errors.New("invalid ID format")
+	}
+	if err := pd.db.Preload("Options").Preload("Variants").First(&existingProduct, uintID).Error; err != nil {
+		return nil, err
+	}
+	return &existingProduct, nil
+}
+
+// TODO : fix update product
+func (pd *ProductModel) Update(id string, product *Product) error {
+	uintID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return errors.New("invalid ID format")
+	}
+	// var existingProduct Product
+	// if err := pd.db.First(&existingProduct, "id = ?", uintID).Error; err != nil {
+	// 	return errors.New("product not found")
+	// }
+	product.ID = uint(uintID)
+	return pd.db.Model(&Product{}).Where("id = ?", uint(uintID)).Updates(product).Error
+}
+
+func (pd *ProductModel) Delete(id string, product *Product) error {
+	return nil
 }

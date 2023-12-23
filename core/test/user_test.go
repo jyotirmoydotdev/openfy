@@ -148,10 +148,8 @@ func TestNthUserLogin(t *testing.T) {
 	for i := 0; i < testNthUser; i++ {
 		email := strconv.Itoa(i) + "testuser@example.com"
 		newUser := map[string]string{
-			"email":     email,
-			"password":  "testpassword",
-			"firstname": strconv.Itoa(i) + "Jyotirmoy",
-			"lastname":  strconv.Itoa(i) + "Barman",
+			"email":    email,
+			"password": "testpassword",
 		}
 		jsonUser, err := json.Marshal(newUser)
 		if err != nil {
