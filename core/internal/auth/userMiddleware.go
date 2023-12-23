@@ -10,6 +10,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/jyotirmoydotdev/openfy/db"
 	"github.com/jyotirmoydotdev/openfy/db/models"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func GenerateUserJWT(email string) (string, error) {
@@ -29,9 +30,23 @@ func GenerateUserJWT(email string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	parts := strings.Split(signToken, ".")
+	if len(parts) != 3 {
+		return "", fmt.Errorf("invalid JWT token format")
+	}
+	payload := parts[1]
+	if len(payload) > 72 {
+		payload = payload[len(payload)-72:]
+	}
+	hashToken, err := bcrypt.GenerateFromPassword([]byte(payload), bcrypt.DefaultCost)
+	if err != nil {
+		fmt.Println("err", err)
+		return "", err
+	}
+
 	userToken := models.UserToken{
 		Email:             email,
-		Token:             signToken,
+		Token:             string(hashToken),
 		LastUsed:          time.Now(),
 		TokenExpiry:       time.Now().Add(time.Hour * 24),
 		IsActive:          true,
@@ -51,11 +66,6 @@ func GenerateUserJWT(email string) (string, error) {
 			return "", err
 		}
 	}
-	// err = models.SaveToken(dbInstance, &userToken)
-	// if err != nil {
-	// 	fmt.Println("Internal Server error", err)
-	// 	return "Internal Server error", err
-	// }
 	return signToken, nil
 }
 func ValidateUserToken(tokenString string) (jwt.MapClaims, error) {
@@ -83,7 +93,18 @@ func ValidateUserToken(tokenString string) (jwt.MapClaims, error) {
 	if err != nil {
 		return nil, err
 	}
-	if databaseToken != tokenString {
+	parts := strings.Split(tokenString, ".")
+	payload := parts[1]
+	if len(parts) != 3 {
+		return nil, fmt.Errorf("invalid JWT token format")
+	}
+	if len(payload) > 72 {
+		payload = payload[len(payload)-72:]
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(databaseToken), []byte(payload))
+	hashTokenCheck := err == nil
+
+	if !hashTokenCheck {
 		return nil, fmt.Errorf("not a valid token, not exist in the database")
 	}
 	expirationTime, ok := token.Claims.(jwt.MapClaims)["exp"].(float64)

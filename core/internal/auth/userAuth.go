@@ -49,7 +49,7 @@ func RegisterUser(ctx *gin.Context) {
 		return
 	}
 
-	// Create a new user
+	// Create a new user hash password
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{

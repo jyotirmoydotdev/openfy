@@ -143,6 +143,31 @@ func TestNthUserSignup(t *testing.T) {
 		}
 	}
 }
+func TestNthUserLogin(t *testing.T) {
+	testNthUser := 10
+	for i := 0; i < testNthUser; i++ {
+		email := strconv.Itoa(i) + "testuser@example.com"
+		newUser := map[string]string{
+			"email":     email,
+			"password":  "testpassword",
+			"firstname": strconv.Itoa(i) + "Jyotirmoy",
+			"lastname":  strconv.Itoa(i) + "Barman",
+		}
+		jsonUser, err := json.Marshal(newUser)
+		if err != nil {
+			t.Fatal(err)
+		}
+		resp, err := http.Post(server.URL+"/login", "application/json", bytes.NewBuffer(jsonUser))
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer resp.Body.Close()
+
+		if status := resp.StatusCode; status != http.StatusOK {
+			t.Errorf("handler returned wrong staus code: got %v want %v", status, http.StatusOK)
+		}
+	}
+}
 
 func TestUserPingPong(t *testing.T) {
 	// Create a request with the correct endpoint
