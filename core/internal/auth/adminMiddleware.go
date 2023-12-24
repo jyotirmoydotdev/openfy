@@ -18,7 +18,7 @@ import (
 func GenerateJWT(db *gorm.DB, username string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
-		"exp":      time.Now().Add(time.Hour * 24).Unix(),
+		"exp":      time.Now().Add(time.Hour * 336).Unix(),
 	})
 	secretKey, err := models.GetSecretKeyByUsername(db, username)
 	if err != nil {

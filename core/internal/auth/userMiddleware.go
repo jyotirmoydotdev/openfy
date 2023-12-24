@@ -16,7 +16,7 @@ import (
 func GenerateUserJWT(email string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": email,
-		"exp":   time.Now().Add(time.Hour * 24).Unix(),
+		"exp":   time.Now().Add(time.Hour * 336).Unix(), // Token Valid for 14 Days
 	})
 	dbInstance, err := db.GetDB()
 	if err != nil {
