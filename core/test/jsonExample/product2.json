@@ -12,14 +12,12 @@
         "compareAtPrice": 109.99,
         "costPerItem": 69.99,
         "taxable": true,
-        "sku": "RUNNING-RED-8",
         "barcode": "123456789015",
-        "weight": {
-          "value": 350,
-          "unit": "gram"
-        },
+        "sku": "RUNNING-RED-8",
+        "weightValue": 350,
+        "weightUnit": "gram",
         "selectedOptions": [],
-        "inventory": {"available": 120}
+        "inventoryAvailable": 100
       }
     ]
   }
