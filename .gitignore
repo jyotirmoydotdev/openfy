@@ -1,0 +1,32 @@
+# Ignore database files
+core/db/databaseProduct.db
+core/db/databaseUserAdmin.db
+core/test/db/databaseProduct.db
+core/test/db/databaseUserAdmin.db
+
+# Ignore backup directory
+core/db/backup/
+
+# Ignore any file in the migrations directory
+core/db/migrations/*
+
+
+# # Ignore binaries
+# *.exe
+# *.out
+
+# # Ignore generated files
+# bin/
+# vendor/
+# *.log
+
+# # Ignore test-specific files
+# test/*.log
+# test/*.out
+
+# # Ignore Go module cache
+# go.sum
+# go.mod
+
+# # Ignore JSON example files in test directory
+# test/jsonExample/*.json
