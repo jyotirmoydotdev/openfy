@@ -8,10 +8,23 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"reflect"
+	"strconv"
 	"testing"
 
+	"github.com/jyotirmoydotdev/openfy/db/models"
 	web "github.com/jyotirmoydotdev/openfy/internal/web/handlers"
 )
+
+type ProductResponses struct {
+	Data []models.Product `json:"data"`
+}
+type ProductResponse struct {
+	Data models.Product `json:"data"`
+}
+
+var productResponse ProductResponses
+var singleProductResponse ProductResponse
 
 func TestAddProduct(t *testing.T) {
 	currentDir, err := os.Getwd()
@@ -50,14 +63,15 @@ func TestAddProduct(t *testing.T) {
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+token)
-	resp2, err := http.DefaultClient.Do(req)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		fmt.Println("Error making request:", err)
 	}
-	if status2 := resp2.StatusCode; status2 != http.StatusOK {
+	defer resp.Body.Close()
+
+	if status2 := resp.StatusCode; status2 != http.StatusOK {
 		t.Errorf("handler returned wrong staus code: got %v want %v", status2, http.StatusOK)
 	}
-	resp2.Body.Close()
 }
 func TestAddProduct2(t *testing.T) {
 	currentDir, err := os.Getwd()
@@ -100,10 +114,11 @@ func TestAddProduct2(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error making request:%v", err)
 	}
+	defer resp2.Body.Close()
+
 	if status2 := resp2.StatusCode; status2 != http.StatusOK {
 		t.Errorf("handler returned wrong staus code: got %v want %v", status2, http.StatusOK)
 	}
-	resp2.Body.Close()
 }
 func TestGetAllProduct(t *testing.T) {
 	req, err := http.NewRequest("GET", server.URL+"/admin/products", bytes.NewBuffer(nil))
@@ -118,7 +133,49 @@ func TestGetAllProduct(t *testing.T) {
 	}
 	defer resp.Body.Close()
 
-	if status2 := resp.StatusCode; status2 != http.StatusOK {
-		t.Errorf("handler returned wrong staus code: got %v want %v", status2, http.StatusOK)
+	if status := resp.StatusCode; status != http.StatusOK {
+		t.Errorf("handler returned wrong staus code: got %v want %v", status, http.StatusOK)
+	}
+
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal("Error reading response body:", err)
+	}
+
+	if err := json.Unmarshal([]byte(string(body)), &productResponse); err != nil {
+		t.Fatalf("Error unmarshalling JSON:%v", err)
+		return
+	}
+}
+func TestGetProduct(t *testing.T) {
+	product := productResponse.Data[1]
+	req, err := http.NewRequest("GET", server.URL+"/admin/products/"+strconv.FormatUint(uint64(product.ID), 10), bytes.NewBuffer(nil))
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("Error making request:%v", err)
+	}
+	defer resp.Body.Close()
+
+	if status := resp.StatusCode; status != http.StatusOK {
+		t.Errorf("handler returned wrong staus code: got %v want %v", status, http.StatusOK)
+	}
+
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal("Error reading response body:", err)
+	}
+
+	if err := json.Unmarshal([]byte(string(body)), &singleProductResponse); err != nil {
+		t.Fatalf("Error unmarshalling JSON:%v", err)
+		return
+	}
+	if !reflect.DeepEqual(singleProductResponse.Data, product) {
+		t.Errorf("The Product is not same")
 	}
 }
