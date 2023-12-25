@@ -105,3 +105,20 @@ func TestAddProduct2(t *testing.T) {
 	}
 	resp2.Body.Close()
 }
+func TestGetAllProduct(t *testing.T) {
+	req, err := http.NewRequest("GET", server.URL+"/admin/products", bytes.NewBuffer(nil))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	req.Header.Set("Authorization", "Bearer "+token)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("Error making request:%v", err)
+	}
+	defer resp.Body.Close()
+
+	if status2 := resp.StatusCode; status2 != http.StatusOK {
+		t.Errorf("handler returned wrong staus code: got %v want %v", status2, http.StatusOK)
+	}
+}
