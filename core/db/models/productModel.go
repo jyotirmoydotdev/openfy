@@ -95,6 +95,13 @@ func (pd *ProductModel) GetProduct(id string) (*Product, error) {
 	}
 	return &existingProduct, nil
 }
+func (pd *ProductModel) GetAllProducts() ([]Product, error) {
+	var existingProducts []Product
+	if err := pd.db.Preload("Options").Preload("Variants").Preload("Variants.SelectedOptions").Find(&existingProducts).Error; err != nil {
+		return nil, err
+	}
+	return existingProducts, nil
+}
 
 func (pd *ProductModel) Update(id string, updatedProduct *Product) error {
 	uintID, err := strconv.ParseInt(id, 10, 64)

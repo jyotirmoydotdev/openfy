@@ -12,7 +12,6 @@ import (
 )
 
 type RequestProduct struct {
-	ID              uint       `json:"id"`
 	Handle          string     `json:"handle"`
 	Description     string     `json:"description"`
 	Status          bool       `json:"status"`
@@ -133,8 +132,24 @@ func (rp *RequestProduct) Update(ctx *gin.Context) {
 	})
 }
 func (rp *RequestProduct) GetAllProducts(ctx *gin.Context) {
-
-	ctx.JSON(http.StatusOK, models.ProductList)
+	productdbInstance, err := db.GetProductDB()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
+	productModel := models.NewProductModel(productdbInstance)
+	allProduct, err := productModel.GetAllProducts()
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": allProduct,
+	})
 }
 func (rp *RequestProduct) Delete(ctx *gin.Context) {
 	id := ctx.Param("id")
