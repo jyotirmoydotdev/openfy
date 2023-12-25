@@ -91,7 +91,7 @@ func (pd *ProductModel) GetProduct(id string) (*Product, error) {
 	if err != nil {
 		return nil, errors.New("invalid ID format")
 	}
-	if err := pd.db.Preload("Options").Preload("Variants").First(&existingProduct, uintID).Error; err != nil {
+	if err := pd.db.Preload("Options").Preload("Variants").Preload("Variants.SelectedOptions").First(&existingProduct, uintID).Error; err != nil {
 		return nil, err
 	}
 	return &existingProduct, nil
