@@ -131,7 +131,7 @@ func (pd *ProductModel) Update(id string, updatedProduct *Product) error {
 	existingProduct.SEODescription = updatedProduct.SEODescription
 
 	for _, Variant := range existingProduct.Variants {
-		if err := pd.DeleteSelectedOptionsForVariant(Variant.ID); err != nil {
+		if err := pd.deleteSelectedOptionsForVariant(Variant.ID); err != nil {
 			return err
 		}
 	}
@@ -264,7 +264,7 @@ func (pd *ProductModel) DeleteProduct(id string) error {
 		return errors.New("error deleting product's options: " + err.Error())
 	}
 	for _, variant := range existingProduct.Variants {
-		if err := pd.DeleteSelectedOptionsForVariant(variant.ID); err != nil {
+		if err := pd.deleteSelectedOptionsForVariant(variant.ID); err != nil {
 			return errors.New("error deleting variant's seclected_Options: " + err.Error())
 		}
 	}
@@ -274,7 +274,49 @@ func (pd *ProductModel) DeleteProduct(id string) error {
 	return nil
 }
 
-func (pd *ProductModel) DeleteSelectedOptionsForVariant(variantID uint) error {
+func (pd *ProductModel) DeleteProductVarient(id string, vid string) error {
+	uintID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return errors.New("invalid ID format")
+	}
+	uintVID, err := strconv.ParseUint(vid, 10, 64)
+	if err != nil {
+		return errors.New("invalid VID format")
+	}
+	var existingProduct Product
+	if err := pd.db.Preload("Options").Preload("Variants").Preload("Variants.SelectedOptions").First(&existingProduct, uint(uintID)).Error; err != nil {
+		return errors.New("product not found")
+	}
+	// Find the index of the variant with the given ID
+	var variantIndex int
+	for i, variant := range existingProduct.Variants {
+		if variant.ID == uint(uintVID) {
+			variantIndex = i
+			break
+		}
+	}
+	// Delete the variant and its associated selected options
+	pd.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Delete(&existingProduct.Variants[variantIndex]).Error; err != nil {
+			return err
+		}
+
+		// Delete the selected options associated with the variant
+		if err := tx.Delete(&existingProduct.Variants[variantIndex].SelectedOptions).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	// Check if the variant with the given ID exists
+	if variantIndex >= len(existingProduct.Variants) {
+		return errors.New("variant not found")
+	}
+	return nil
+}
+
+func (pd *ProductModel) deleteSelectedOptionsForVariant(variantID uint) error {
 	// Find the variant
 	var variant Variant
 	if err := pd.db.First(&variant, "id = ?", variantID).Error; err != nil {

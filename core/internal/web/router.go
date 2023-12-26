@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jyotirmoydotdev/openfy/db"
 	"github.com/jyotirmoydotdev/openfy/internal/auth"
-	web "github.com/jyotirmoydotdev/openfy/internal/web/handlers"
+	"github.com/jyotirmoydotdev/openfy/internal/web/handlers"
 )
 
 func SetupRouter() *gin.Engine {
@@ -15,8 +15,6 @@ func SetupRouter() *gin.Engine {
 		panic(err)
 	}
 	router := gin.Default()
-
-	requestProductHandlers := web.NewRequestProductHandlers()
 
 	router.POST("/signup", auth.RegisterUser)
 	router.POST("/login", auth.LoginUser)
@@ -37,12 +35,12 @@ func SetupRouter() *gin.Engine {
 
 	admin := router.Group("/admin", auth.AuthenticateMiddleware())
 	{
-		admin.GET("/products/:id", requestProductHandlers.GetProduct)
-		admin.GET("/products", requestProductHandlers.GetAllProducts)
-		admin.POST("/products/new", requestProductHandlers.Create)
-		admin.PUT("/products/:id", requestProductHandlers.Update)
-		admin.DELETE("/products/:id", requestProductHandlers.DeleteProduct)
-		// admin.DELETE("/product/:id/:vid", requestProductHandlers.DeleteProductVarient)
+		admin.GET("/products/:id", handlers.GetProduct)
+		admin.GET("/products", handlers.GetAllProducts)
+		admin.POST("/products/new", handlers.Create)
+		admin.PUT("/products/:id", handlers.Update)
+		admin.DELETE("/products/:id", handlers.DeleteProduct)
+		admin.DELETE("/products/:id/:vid", handlers.DeleteProductVarient)
 		// admin.POST("/auth-with-password", AuthWithPassword)
 		// admin.POST("/request-password-reset", RequestPasswordReset)
 		// admin.POST("/confirm-password-reset", ConfirmPasswordReset)

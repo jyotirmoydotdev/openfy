@@ -42,13 +42,9 @@ type Variants struct {
 	InventoryAvailable int `json:"inventoryAvailable"`
 }
 
-func NewRequestProductHandlers() *RequestProduct {
-	return &RequestProduct{}
-}
-
 // Create a new product
 // Expected : 200
-func (rp *RequestProduct) Create(ctx *gin.Context) {
+func Create(ctx *gin.Context) {
 	var createProduct RequestProduct
 
 	// Bind the request body to the RequestProduct struct
@@ -87,7 +83,7 @@ func (rp *RequestProduct) Create(ctx *gin.Context) {
 		"status": "Product add successfully",
 	})
 }
-func (rp *RequestProduct) Update(ctx *gin.Context) {
+func Update(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -131,7 +127,7 @@ func (rp *RequestProduct) Update(ctx *gin.Context) {
 		"status": "Product updated successfully",
 	})
 }
-func (rp *RequestProduct) GetAllProducts(ctx *gin.Context) {
+func GetAllProducts(ctx *gin.Context) {
 	productdbInstance, err := db.GetProductDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -151,7 +147,7 @@ func (rp *RequestProduct) GetAllProducts(ctx *gin.Context) {
 		"data": allProduct,
 	})
 }
-func (rp *RequestProduct) DeleteProduct(ctx *gin.Context) {
+func DeleteProduct(ctx *gin.Context) {
 	id := ctx.Param("id")
 	productdbInstance, err := db.GetProductDB()
 	if err != nil {
@@ -172,7 +168,29 @@ func (rp *RequestProduct) DeleteProduct(ctx *gin.Context) {
 		"status": "product deleted succesfully",
 	})
 }
-func (rp *RequestProduct) GetProduct(ctx *gin.Context) {
+func DeleteProductVarient(ctx *gin.Context) {
+	id := ctx.Param("id")
+	vid := ctx.Param("vid")
+	productdbInstance, err := db.GetProductDB()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
+	productModel := models.NewProductModel(productdbInstance)
+	err = productModel.DeleteProductVarient(id, vid)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "varient deleted succesfully",
+	})
+}
+func GetProduct(ctx *gin.Context) {
 	id := ctx.Param("id")
 	productdbInstance, err := db.GetProductDB()
 	if err != nil {
