@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -84,11 +85,12 @@ func Create(ctx *gin.Context) {
 	})
 }
 func Update(ctx *gin.Context) {
-	id := ctx.Param("id")
-	if id == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "id is missing",
+	id, err := strconv.Atoi(ctx.Query("id"))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
 		})
+		return
 	}
 	var updateProduct RequestProduct
 
@@ -148,7 +150,13 @@ func GetAllProducts(ctx *gin.Context) {
 	})
 }
 func DeleteProduct(ctx *gin.Context) {
-	id := ctx.Param("id")
+	id, err := strconv.Atoi(ctx.Query("id"))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
 	productdbInstance, err := db.GetProductDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -168,9 +176,15 @@ func DeleteProduct(ctx *gin.Context) {
 		"status": "product deleted succesfully",
 	})
 }
-func DeleteProductVarient(ctx *gin.Context) {
-	id := ctx.Param("id")
-	vid := ctx.Param("vid")
+func DeleteProductVariant(ctx *gin.Context) {
+	id, err1 := strconv.Atoi(ctx.Query("id"))
+	vid, err2 := strconv.Atoi(ctx.Query("vid"))
+	if err1 != nil || err2 != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
 	productdbInstance, err := db.GetProductDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -179,7 +193,7 @@ func DeleteProductVarient(ctx *gin.Context) {
 		return
 	}
 	productModel := models.NewProductModel(productdbInstance)
-	err = productModel.DeleteProductVarient(id, vid)
+	err = productModel.DeleteProductVariant(id, vid)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Internal Server Error",
@@ -191,7 +205,13 @@ func DeleteProductVarient(ctx *gin.Context) {
 	})
 }
 func GetProduct(ctx *gin.Context) {
-	id := ctx.Param("id")
+	id, err := strconv.Atoi(ctx.Query("id"))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
 	productdbInstance, err := db.GetProductDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -209,6 +229,34 @@ func GetProduct(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": product,
+	})
+}
+
+func GetAllActiveProducts(ctx *gin.Context) {
+	page, _ := strconv.Atoi(ctx.Query("page"))
+	limit, _ := strconv.Atoi(ctx.Query("limit"))
+
+	productdbInstance, err := db.GetProductDB()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
+	productModel := models.NewProductModel(productdbInstance)
+	products, err := productModel.GetPaginatedActiveProducts(page, limit)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+		return
+	}
+	var userProduct []UserProduct
+	for i := range products {
+		userProduct = append(userProduct, ConvertToUserProduct(products[i]))
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": userProduct,
 	})
 }
 
@@ -234,9 +282,6 @@ func validateProduct(product RequestProduct) (*models.Product, error) {
 	if productDatabase.Handle == "" {
 		return nil, fmt.Errorf("title required")
 	}
-
-	// Status shoule be True by default
-	productDatabase.Status = true
 
 	// Add Total Variants
 	productDatabase.TotalVariants = 1
@@ -274,4 +319,78 @@ func validateProduct(product RequestProduct) (*models.Product, error) {
 		productDatabase.Variants[i].InventoryOnHand = productDatabase.Variants[i].InventoryAvailable
 	}
 	return &productDatabase, nil
+}
+
+type UserOption struct {
+	ID     uint   `json:"id"`
+	Name   string `json:"name"`
+	Values string `json:"values"`
+}
+
+type UserVariant struct {
+	ID                 uint    `json:"id"`
+	Price              float64 `json:"price"`
+	CompareAtPrice     float64 `json:"compareAtPrice"`
+	CostPerItem        float64 `json:"costPerItem"`
+	Taxable            bool    `json:"taxable"`
+	RequiresShipping   bool    `json:"requiresShipping"`
+	WeightValue        float64 `json:"weightValue"`
+	WeightUnit         string  `json:"weightUnit"`
+	InventoryAvailable int     `json:"inventoryAvailable"`
+}
+
+type UserProduct struct {
+	ID              uint          `json:"id"`
+	Handle          string        `json:"handle"`
+	Description     string        `json:"description"`
+	TotalVariants   int           `json:"totalVariants"`
+	TotalInventory  int           `json:"totalInventory"`
+	OnlineStoreURL  string        `json:"onlineStoreUrl"`
+	HasSKUs         bool          `json:"hasSkus"`
+	HasBarcodes     bool          `json:"hasBarcodes"`
+	ProductCategory string        `json:"productCategory"`
+	Options         []UserOption  `json:"options"`
+	Variants        []UserVariant `json:"variants"`
+}
+
+func ConvertToUserProduct(adminProduct models.Product) UserProduct {
+	userProduct := UserProduct{
+		ID:              adminProduct.ID,
+		Handle:          adminProduct.Handle,
+		Description:     adminProduct.Description,
+		TotalVariants:   adminProduct.TotalVariants,
+		TotalInventory:  adminProduct.TotalInventory,
+		OnlineStoreURL:  adminProduct.OnlineStoreURL,
+		HasSKUs:         adminProduct.HasSKUs,
+		HasBarcodes:     adminProduct.HasBarcodes,
+		ProductCategory: adminProduct.ProductCategory,
+		Options:         make([]UserOption, len(adminProduct.Options)),
+		Variants:        make([]UserVariant, len(adminProduct.Variants)),
+	}
+
+	// Convert Options
+	for i, adminOption := range adminProduct.Options {
+		userProduct.Options[i] = UserOption{
+			ID:     adminOption.ID,
+			Name:   adminOption.Name,
+			Values: adminOption.Values,
+		}
+	}
+
+	// Convert Variants
+	for i, adminVariant := range adminProduct.Variants {
+		userProduct.Variants[i] = UserVariant{
+			ID:                 adminVariant.ID,
+			Price:              adminVariant.Price,
+			CompareAtPrice:     adminVariant.CompareAtPrice,
+			CostPerItem:        adminVariant.CostPerItem,
+			Taxable:            adminVariant.Taxable,
+			RequiresShipping:   adminVariant.RequiresShipping,
+			WeightValue:        adminVariant.WeightValue,
+			WeightUnit:         adminVariant.WeightUnit,
+			InventoryAvailable: adminVariant.InventoryAvailable,
+		}
+	}
+
+	return userProduct
 }

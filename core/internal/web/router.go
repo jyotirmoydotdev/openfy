@@ -18,13 +18,13 @@ func SetupRouter() *gin.Engine {
 
 	router.POST("/signup", auth.RegisterUser)
 	router.POST("/login", auth.LoginUser)
-	// router.GET("/products", GetAllActiveProducts)
+	router.GET("/products", handlers.GetAllActiveProducts)
 
 	router.POST("/admin/signup", hashAdmin(), auth.SignupAdmin)
 	router.POST("/admin/login", auth.LoginAdmin)
 
 	// User route
-	user := router.Group("/api", auth.AuthenticateUserMiddleware())
+	user := router.Group("/user", auth.AuthenticateUserMiddleware())
 	{
 		user.GET("/ping", func(ctx *gin.Context) {
 			ctx.JSON(http.StatusOK, gin.H{
@@ -35,12 +35,20 @@ func SetupRouter() *gin.Engine {
 
 	admin := router.Group("/admin", auth.AuthenticateMiddleware())
 	{
-		admin.GET("/products/:id", handlers.GetProduct)
+		// GET example.com/admin/product?id=x
+		admin.GET("/product", handlers.GetProduct)
+
 		admin.GET("/products", handlers.GetAllProducts)
-		admin.POST("/products/new", handlers.Create)
-		admin.PUT("/products/:id", handlers.Update)
-		admin.DELETE("/products/:id", handlers.DeleteProduct)
-		admin.DELETE("/products/:id/:vid", handlers.DeleteProductVarient)
+		admin.POST("/product/new", handlers.Create)
+
+		// PUT example.com/admin/product?id=x
+		admin.PUT("/product", handlers.Update)
+
+		// DELETE example.com/admin/product?id=x
+		admin.DELETE("/product", handlers.DeleteProduct)
+
+		// DELETE example.com/admin/product?id=x&vid=x
+		admin.DELETE("/variant", handlers.DeleteProductVariant)
 		// admin.POST("/auth-with-password", AuthWithPassword)
 		// admin.POST("/request-password-reset", RequestPasswordReset)
 		// admin.POST("/confirm-password-reset", ConfirmPasswordReset)

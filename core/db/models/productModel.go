@@ -3,7 +3,6 @@ package models
 import (
 	"errors"
 	"fmt"
-	"strconv"
 
 	"gorm.io/gorm"
 )
@@ -84,13 +83,9 @@ func (pd *ProductModel) Save(product *Product) error {
 	return pd.db.Create(&product).Error
 }
 
-func (pd *ProductModel) GetProduct(id string) (*Product, error) {
+func (pd *ProductModel) GetProduct(id int) (*Product, error) {
 	var existingProduct Product
-	uintID, err := strconv.ParseUint(id, 10, 64)
-	if err != nil {
-		return nil, errors.New("invalid ID format")
-	}
-	if err := pd.db.Preload("Options").Preload("Variants").Preload("Variants.SelectedOptions").First(&existingProduct, uintID).Error; err != nil {
+	if err := pd.db.Preload("Options").Preload("Variants").Preload("Variants.SelectedOptions").First(&existingProduct, uint(id)).Error; err != nil {
 		return nil, err
 	}
 	return &existingProduct, nil
@@ -103,14 +98,9 @@ func (pd *ProductModel) GetAllProducts() ([]Product, error) {
 	return existingProducts, nil
 }
 
-func (pd *ProductModel) Update(id string, updatedProduct *Product) error {
-	uintID, err := strconv.ParseInt(id, 10, 64)
-	if err != nil {
-		return errors.New("invalid ID format")
-	}
-
+func (pd *ProductModel) Update(id int, updatedProduct *Product) error {
 	var existingProduct Product
-	if err := pd.db.Preload("Options").Preload("Variants").Preload("Variants.SelectedOptions").First(&existingProduct, "id = ?", uint(uintID)).Error; err != nil {
+	if err := pd.db.Preload("Options").Preload("Variants").Preload("Variants.SelectedOptions").First(&existingProduct, "id = ?", uint(id)).Error; err != nil {
 		return errors.New("product not found")
 	}
 
@@ -246,13 +236,9 @@ func (pd *ProductModel) Update(id string, updatedProduct *Product) error {
 	return nil
 }
 
-func (pd *ProductModel) DeleteProduct(id string) error {
-	uintID, err := strconv.ParseUint(id, 10, 64)
-	if err != nil {
-		return errors.New("invalid ID format")
-	}
+func (pd *ProductModel) DeleteProduct(id int) error {
 	var existingProduct Product
-	if err := pd.db.Preload("Options").Preload("Variants").Preload("Variants.SelectedOptions").First(&existingProduct, uint(uintID)).Error; err != nil {
+	if err := pd.db.Preload("Options").Preload("Variants").Preload("Variants.SelectedOptions").First(&existingProduct, uint(id)).Error; err != nil {
 		return errors.New("product not found")
 	}
 
@@ -274,23 +260,15 @@ func (pd *ProductModel) DeleteProduct(id string) error {
 	return nil
 }
 
-func (pd *ProductModel) DeleteProductVarient(id string, vid string) error {
-	uintID, err := strconv.ParseUint(id, 10, 64)
-	if err != nil {
-		return errors.New("invalid ID format")
-	}
-	uintVID, err := strconv.ParseUint(vid, 10, 64)
-	if err != nil {
-		return errors.New("invalid VID format")
-	}
+func (pd *ProductModel) DeleteProductVariant(id int, vid int) error {
 	var existingProduct Product
-	if err := pd.db.Preload("Options").Preload("Variants").Preload("Variants.SelectedOptions").First(&existingProduct, uint(uintID)).Error; err != nil {
+	if err := pd.db.Preload("Options").Preload("Variants").Preload("Variants.SelectedOptions").First(&existingProduct, uint(id)).Error; err != nil {
 		return errors.New("product not found")
 	}
 	// Find the index of the variant with the given ID
 	var variantIndex int
 	for i, variant := range existingProduct.Variants {
-		if variant.ID == uint(uintVID) {
+		if variant.ID == uint(vid) {
 			variantIndex = i
 			break
 		}
@@ -314,6 +292,24 @@ func (pd *ProductModel) DeleteProductVarient(id string, vid string) error {
 		return errors.New("variant not found")
 	}
 	return nil
+}
+
+func (pd *ProductModel) GetPaginatedActiveProducts(page, limit int) ([]Product, error) {
+	var offset int
+	if page > 1 {
+		offset = (page - 1) * limit
+	}
+
+	var existingProducts []Product
+	if err := pd.db.Preload("Options").
+		Preload("Variants").
+		Preload("Variants.SelectedOptions").
+		Offset(offset).
+		Limit(limit).
+		Find(&existingProducts, "status = ?", true).Error; err != nil {
+		return nil, err
+	}
+	return existingProducts, nil
 }
 
 func (pd *ProductModel) deleteSelectedOptionsForVariant(variantID uint) error {
