@@ -225,3 +225,44 @@ func TestUpdateProduct(t *testing.T) {
 		t.Errorf("handler returned wrong staus code: got %v want %v", status, http.StatusOK)
 	}
 }
+
+func TestDeleteProduct(t *testing.T) {
+	product := productResponse.Data[0]
+	req, err := http.NewRequest("DELETE", server.URL+"/admin/products/"+strconv.FormatUint(uint64(product.ID), 10), bytes.NewBuffer(nil))
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("Error making request:%v", err)
+	}
+	defer resp.Body.Close()
+
+	if status := resp.StatusCode; status != http.StatusOK {
+		t.Errorf("handler returned wrong staus code: got %v want %v", status, http.StatusOK)
+	}
+}
+
+func TestDeleteProductVarient(t *testing.T) {
+	product := productResponse.Data[1]
+	req, err := http.NewRequest(
+		"DELETE",
+		server.URL+"/admin/products/"+
+			strconv.FormatUint(uint64(product.ID), 10)+"/"+
+			strconv.FormatUint(uint64(product.Variants[0].ID), 10),
+		bytes.NewBuffer(nil))
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("Error making request:%v", err)
+	}
+	defer resp.Body.Close()
+
+	if status := resp.StatusCode; status != http.StatusOK {
+		t.Errorf("handler returned wrong staus code: got %v want %v", status, http.StatusOK)
+	}
+}
