@@ -151,21 +151,25 @@ func (rp *RequestProduct) GetAllProducts(ctx *gin.Context) {
 		"data": allProduct,
 	})
 }
-func (rp *RequestProduct) Delete(ctx *gin.Context) {
+func (rp *RequestProduct) DeleteProduct(ctx *gin.Context) {
 	id := ctx.Param("id")
-	var resetProductDetails models.Product
-	models.ProductMapID[id] = resetProductDetails
-	for i, p := range models.ProductList {
-		if string(p.ID) == id {
-			models.ProductList = append(models.ProductList[:i], models.ProductList[i+1:]...)
-			ctx.JSON(http.StatusOK, gin.H{
-				"status": "Product deleted successfully",
-			})
-			return
-		}
+	productdbInstance, err := db.GetProductDB()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
 	}
-	ctx.JSON(http.StatusNotFound, gin.H{
-		"error": "Product not found",
+	productModel := models.NewProductModel(productdbInstance)
+	err = productModel.DeleteProduct(id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "product deleted succesfully",
 	})
 }
 func (rp *RequestProduct) GetProduct(ctx *gin.Context) {

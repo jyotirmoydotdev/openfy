@@ -246,7 +246,31 @@ func (pd *ProductModel) Update(id string, updatedProduct *Product) error {
 	return nil
 }
 
-func (pd *ProductModel) Delete(id string, product *Product) error {
+func (pd *ProductModel) DeleteProduct(id string) error {
+	uintID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return errors.New("invalid ID format")
+	}
+	var existingProduct Product
+	if err := pd.db.Preload("Options").Preload("Variants").Preload("Variants.SelectedOptions").First(&existingProduct, uint(uintID)).Error; err != nil {
+		return errors.New("product not found")
+	}
+
+	// Delete the product and associated data
+	if err := pd.db.Delete(&existingProduct).Error; err != nil {
+		return errors.New("error deleting product: " + err.Error())
+	}
+	if err := pd.db.Delete(&existingProduct.Options).Error; err != nil {
+		return errors.New("error deleting product's options: " + err.Error())
+	}
+	for _, variant := range existingProduct.Variants {
+		if err := pd.DeleteSelectedOptionsForVariant(variant.ID); err != nil {
+			return errors.New("error deleting variant's seclected_Options: " + err.Error())
+		}
+	}
+	if err := pd.db.Delete(&existingProduct.Variants).Error; err != nil {
+		return errors.New("error deleting products's variants: " + err.Error())
+	}
 	return nil
 }
 
