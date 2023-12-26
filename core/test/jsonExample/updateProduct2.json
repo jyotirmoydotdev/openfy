@@ -1,0 +1,43 @@
+{
+  "handle": "running-shoes Update",
+  "description": "High-performance running shoes for athletes",
+  "status": true,
+  "tags": [
+    "running",
+    "athletic",
+    "shoes"
+  ],
+  "collections": [
+    "sports",
+    "running"
+  ],
+  "productCategory": "footwear",
+  "options": [
+    {
+      "name": "Size",
+      "position": 1,
+      "values": [
+        "Small"
+      ]
+    }
+  ],
+  "variants": [
+    {
+      "price": 89.99,
+      "compareAtPrice": 109.99,
+      "costPerItem": 69.99,
+      "taxable": true,
+      "barcode": "123456789015",
+      "sku": "RUNNING-RED-8",
+      "weightValue": 350,
+      "weightUnit": "gram",
+      "selectedOptions": [
+        {
+          "name": "Size",
+          "value": "Small"
+        }
+      ],
+      "inventoryAvailable": 100
+    }
+  ]
+}
