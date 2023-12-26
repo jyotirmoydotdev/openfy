@@ -57,7 +57,7 @@ func TestAddProduct(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	req, err := http.NewRequest("POST", server.URL+"/admin/products/new", bytes.NewBuffer(jsonProduct))
+	req, err := http.NewRequest("POST", server.URL+"/admin/product/new", bytes.NewBuffer(jsonProduct))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,7 +104,7 @@ func TestAddProduct2(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	req, err := http.NewRequest("POST", server.URL+"/admin/products/new", bytes.NewBuffer(jsonProduct))
+	req, err := http.NewRequest("POST", server.URL+"/admin/product/new", bytes.NewBuffer(jsonProduct))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -150,7 +150,7 @@ func TestGetAllProduct(t *testing.T) {
 }
 func TestGetProduct(t *testing.T) {
 	product := productResponse.Data[1]
-	req, err := http.NewRequest("GET", server.URL+"/admin/products/"+strconv.FormatUint(uint64(product.ID), 10), bytes.NewBuffer(nil))
+	req, err := http.NewRequest("GET", server.URL+"/admin/product?id="+strconv.FormatUint(uint64(product.ID), 10), bytes.NewBuffer(nil))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -209,7 +209,7 @@ func TestUpdateProduct(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	req, err := http.NewRequest("PUT", server.URL+"/admin/products/"+strconv.FormatUint(uint64(id), 10), bytes.NewBuffer(jsonProduct))
+	req, err := http.NewRequest("PUT", server.URL+"/admin/product?id="+strconv.FormatUint(uint64(id), 10), bytes.NewBuffer(jsonProduct))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -228,7 +228,7 @@ func TestUpdateProduct(t *testing.T) {
 
 func TestDeleteProduct(t *testing.T) {
 	product := productResponse.Data[0]
-	req, err := http.NewRequest("DELETE", server.URL+"/admin/products/"+strconv.FormatUint(uint64(product.ID), 10), bytes.NewBuffer(nil))
+	req, err := http.NewRequest("DELETE", server.URL+"/admin/product?id="+strconv.FormatUint(uint64(product.ID), 10), bytes.NewBuffer(nil))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -244,18 +244,34 @@ func TestDeleteProduct(t *testing.T) {
 	}
 }
 
-func TestDeleteProductVarient(t *testing.T) {
+func TestDeleteProductVariant(t *testing.T) {
 	product := productResponse.Data[1]
 	req, err := http.NewRequest(
 		"DELETE",
-		server.URL+"/admin/products/"+
-			strconv.FormatUint(uint64(product.ID), 10)+"/"+
+		server.URL+"/admin/variant?id="+
+			strconv.FormatUint(uint64(product.ID), 10)+"&vid="+
 			strconv.FormatUint(uint64(product.Variants[0].ID), 10),
 		bytes.NewBuffer(nil))
 	if err != nil {
 		t.Fatal(err)
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("Error making request:%v", err)
+	}
+	defer resp.Body.Close()
+
+	if status := resp.StatusCode; status != http.StatusOK {
+		t.Errorf("handler returned wrong staus code: got %v want %v", status, http.StatusOK)
+	}
+}
+
+func TestGetAllActiveProduct(t *testing.T) {
+	req, err := http.NewRequest("GET", server.URL+"/products", bytes.NewBuffer(nil))
+	if err != nil {
+		t.Fatal(err)
+	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatalf("Error making request:%v", err)

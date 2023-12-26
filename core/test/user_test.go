@@ -169,7 +169,7 @@ func TestNthUserLogin(t *testing.T) {
 
 func TestUserPingPong(t *testing.T) {
 	// Create a request with the correct endpoint
-	req, err := http.NewRequest("GET", server.URL+"/api/ping", nil)
+	req, err := http.NewRequest("GET", server.URL+"/user/ping", nil)
 	if err != nil {
 		t.Fatal("Error creating request:", err)
 	}
