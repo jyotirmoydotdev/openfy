@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -61,6 +62,14 @@ func Create(ctx *gin.Context) {
 		return
 	}
 
+	err = validateSelectedOptions(productData)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
 	// Connect to the database
 	productdbInstance, err := db.GetProductDB()
 	if err != nil {
@@ -99,7 +108,7 @@ func Update(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	// TODO: replace the _ with productData and save it to database
+
 	productDatabase, err := validateProduct(updateProduct)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -193,6 +202,8 @@ func DeleteProductVariant(ctx *gin.Context) {
 		return
 	}
 	productModel := models.NewProductModel(productdbInstance)
+
+	// Delete the Variant
 	err = productModel.DeleteProductVariant(id, vid)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -200,10 +211,14 @@ func DeleteProductVariant(ctx *gin.Context) {
 		})
 		return
 	}
+
+	// return 200 OK
 	ctx.JSON(http.StatusOK, gin.H{
 		"status": "varient deleted succesfully",
 	})
 }
+
+// TODO: split the options[x].values, tags, and collections
 func GetProduct(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Query("id"))
 	if err != nil {
@@ -232,6 +247,7 @@ func GetProduct(ctx *gin.Context) {
 	})
 }
 
+// TODO: split the options[x].values, tags, and collections
 func GetAllActiveProducts(ctx *gin.Context) {
 	page, _ := strconv.Atoi(ctx.Query("page"))
 	limit, _ := strconv.Atoi(ctx.Query("limit"))
@@ -291,6 +307,8 @@ func validateProduct(product RequestProduct) (*models.Product, error) {
 	if productDatabase.TotalVariants != len(productDatabase.Variants) {
 		return nil, fmt.Errorf("not enough variants")
 	}
+
+	// Chnage HasOnlyDefaultVariant to true if there is only one varient
 	if productDatabase.TotalVariants == 1 {
 		productDatabase.HasOnlyDefaultVariant = true
 	} else {
@@ -393,4 +411,37 @@ func ConvertToUserProduct(adminProduct models.Product) UserProduct {
 	}
 
 	return userProduct
+}
+
+func validateSelectedOptions(productData *models.Product) error {
+	optionValues := make(map[string][]string)
+
+	// Populate optionValues map with option names and their values
+	for _, option := range productData.Options {
+		optionValues[option.Name] = splitValues(option.Values)
+	}
+
+	// Validate that the values in SelectedOptions exist in Options
+	for _, variant := range productData.Variants {
+		for _, selectedOption := range variant.SelectedOptions {
+			if !contains(optionValues[selectedOption.Name], selectedOption.Value) {
+				return errors.New("invalid value in SelectedOptions")
+			}
+		}
+	}
+
+	return nil
+}
+
+func contains(arr []string, value string) bool {
+	for _, v := range arr {
+		if v == value {
+			return true
+		}
+	}
+	return false
+}
+
+func splitValues(values string) []string {
+	return strings.Split(values, ",")
 }
