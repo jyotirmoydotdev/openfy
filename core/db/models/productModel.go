@@ -67,10 +67,6 @@ type SelectedOption struct {
 	Value     string `gorm:"column:value" json:"value"`
 }
 
-var ProductMapID map[string]Product
-var ProductList []Product
-var ProductIDCounter int
-
 type ProductModel struct {
 	db *gorm.DB
 }
@@ -265,13 +261,20 @@ func (pd *ProductModel) DeleteProductVariant(id int, vid int) error {
 	if err := pd.db.Preload("Options").Preload("Variants").Preload("Variants.SelectedOptions").First(&existingProduct, uint(id)).Error; err != nil {
 		return errors.New("product not found")
 	}
+	if len(existingProduct.Variants) == 1 {
+		return errors.New("has only one varient")
+	}
 	// Find the index of the variant with the given ID
-	var variantIndex int
+	variantIndex := -1
 	for i, variant := range existingProduct.Variants {
 		if variant.ID == uint(vid) {
 			variantIndex = i
 			break
 		}
+	}
+	// Check if the variant with the given ID exists
+	if variantIndex == -1 {
+		return errors.New("variant not found")
 	}
 	// Delete the variant and its associated selected options
 	pd.db.Transaction(func(tx *gorm.DB) error {
@@ -286,11 +289,6 @@ func (pd *ProductModel) DeleteProductVariant(id int, vid int) error {
 
 		return nil
 	})
-
-	// Check if the variant with the given ID exists
-	if variantIndex >= len(existingProduct.Variants) {
-		return errors.New("variant not found")
-	}
 	return nil
 }
 

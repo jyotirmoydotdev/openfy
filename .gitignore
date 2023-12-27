@@ -10,6 +10,7 @@ core/db/backup/
 # Ignore any file in the migrations directory
 core/db/migrations/*
 
+core/test/jsonExample/other
 
 # # Ignore binaries
 # *.exe
