@@ -212,6 +212,30 @@ func DeleteProductVariant(ctx *gin.Context) {
 		return
 	}
 
+	// TODO:
+	//	- Delete the unused options
+	//	- Recalculate the total variant
+	//	- Validate all sected options
+	//	- Recalculate total inventory
+	//	- Check has only one variant
+	//	- Recheck SKUS, Barcode
+
+	product, err := productModel.GetProduct(id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
+
+	product = deleteUnusedOptions(product)
+
+	product.TotalVariants = 1
+	for i := range product.Options {
+		values := splitValues(product.Options[i].Values)
+		product.TotalVariants *= len(values)
+	}
+
 	// return 200 OK
 	ctx.JSON(http.StatusOK, gin.H{
 		"status": "varient deleted succesfully",
@@ -444,4 +468,32 @@ func contains(arr []string, value string) bool {
 
 func splitValues(values string) []string {
 	return strings.Split(values, ",")
+}
+func deleteUnusedOptions(productData *models.Product) *models.Product {
+	usedOptionValues := make(map[string]map[string]struct{})
+
+	for _, variant := range productData.Variants {
+		for _, selectedOption := range variant.SelectedOptions {
+			if _, ok := usedOptionValues[selectedOption.Name]; !ok {
+				usedOptionValues[selectedOption.Name] = make(map[string]struct{})
+			}
+			usedOptionValues[selectedOption.Name][selectedOption.Value] = struct{}{}
+		}
+	}
+
+	for index := range productData.Options {
+		valuesMap, exists := usedOptionValues[productData.Options[index].Name]
+		if exists {
+			var values []string
+			for value := range valuesMap {
+				values = append(values, value)
+			}
+			productData.Options[index].Values = strings.Join(values, ",")
+		} else {
+			// If there are no used values, set an empty string
+			productData.Options[index].Values = ""
+		}
+	}
+
+	return productData
 }
