@@ -4,7 +4,7 @@
 </a>
 </p>
 
-# Openfy - Self-Hosted E-Commerce Platform
+# Openfy
 
 Openfy is a self-hosted e-commerce platform built with Go and Gin, providing a flexible and customizable solution for managing products and handling user authentication.
 
