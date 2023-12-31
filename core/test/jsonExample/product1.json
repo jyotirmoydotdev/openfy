@@ -49,9 +49,9 @@
       "weightValue": 0.85,
       "weightUnit": "kg",
       "selectedOptions": [
-        {"name": "Size", "value": "Small"},
-        {"name": "Color", "value": "Blue"},
-        {"name": "Material", "value": "Synthetic"}
+        {"name": "Size", "value": "Medium"},
+        {"name": "Color", "value": "Red"},
+        {"name": "Material", "value": "Leather"}
       ],
       "inventoryAvailable": 75
     },
@@ -65,9 +65,9 @@
       "weightValue": 0.85,
       "weightUnit": "kg",
       "selectedOptions": [
-        {"name": "Size", "value": "Small"},
-        {"name": "Color", "value": "Green"},
-        {"name": "Material", "value": "Synthetic"}
+        {"name": "Size", "value": "Large"},
+        {"name": "Color", "value": "Red"},
+        {"name": "Material", "value": "Leather"}
       ],
       "inventoryAvailable": 75
     }
