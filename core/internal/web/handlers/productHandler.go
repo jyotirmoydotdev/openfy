@@ -212,15 +212,15 @@ func DeleteProductVariant(ctx *gin.Context) {
 		return
 	}
 
-	// TODO:
-	//	- Delete the unused options
-	//	- Recalculate the total variant
-	//	- Validate all sected options
-	//	- Recalculate total inventory
-	//	- Check has only one variant
-	//	- Recheck SKUS, Barcode
-
 	product, err := productModel.GetProduct(id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
+
+	err = validateSelectedOptions(product)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Internal Server Error",
@@ -480,20 +480,21 @@ func deleteUnusedOptions(productData *models.Product) *models.Product {
 			usedOptionValues[selectedOption.Name][selectedOption.Value] = struct{}{}
 		}
 	}
-
-	for index := range productData.Options {
-		valuesMap, exists := usedOptionValues[productData.Options[index].Name]
+	var updatedOptions []models.Option
+	for _, option := range productData.Options {
+		valuesMap, exists := usedOptionValues[option.Name]
 		if exists {
 			var values []string
 			for value := range valuesMap {
 				values = append(values, value)
 			}
-			productData.Options[index].Values = strings.Join(values, ",")
-		} else {
-			// If there are no used values, set an empty string
-			productData.Options[index].Values = ""
+			option.Values = strings.Join(values, ",")
+			updatedOptions = append(updatedOptions, option)
 		}
 	}
+
+	// Update the productData.Options with the filtered options
+	productData.Options = updatedOptions
 
 	return productData
 }
