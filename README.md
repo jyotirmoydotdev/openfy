@@ -4,6 +4,8 @@
 </a>
 </p>
 
+> ⚠️ Note: This project is currently under development and may not be fully functional. Feel free to explore the code, but be aware that some features may not work as intended.
+
 # Openfy
 
 Openfy is a self-hosted e-commerce platform built with Go and Gin, providing a flexible and customizable solution for managing products and handling user authentication.
@@ -20,7 +22,6 @@ Openfy is a self-hosted e-commerce platform built with Go and Gin, providing a f
 Before running Openfy, ensure you have the following installed:
 
 - Go (1.15 or higher)
-- Gin (Golang web framework)
 
 ## Getting Started
 
@@ -51,15 +52,26 @@ Before running Openfy, ensure you have the following installed:
 
 ## Routes
 
-- **Public Routes**:
-  - `GET /products`: Retrieve a list of products.
-  - `GET /products/:id`: Retrieve details of a specific product.
+- **User Routes**:
+  - `POST /signup`: Register a new user.
+  - `POST /login`: User login.
+  - `GET /products`: Retrieve details of all active products.
 
-- **Admin Routes** (Protected by JWT):
-  - `POST /product/new`: Create a new product.
-  - `PUT /product/:id`: Update an existing product.
-  - `DELETE /product/:id`: Delete a product.
-  - `GET /admin`: Admin-specific endpoint.
+- **Admin Routes**:
+  - `POST /admin/signup`: Register a new admin user.
+  - `POST /admin/login`: Admin login.
+
+- **Authenticated User Routes** (Protected by JWT):
+  - `GET /user/ping`: Test endpoint for authenticated users.
+
+- **Authenticated Admin Routes** (Protected by JWT):
+  - `GET /admin/product`: Retrieve details of a specific product.
+  - `GET /admin/products`: Retrieve details of all products.
+  - `POST /admin/product/new`: Create a new product.
+  - `PUT /admin/product`: Update an existing product.
+  - `DELETE /admin/product`: Delete a product.
+  - `DELETE /admin/variant`: Delete a product variant.
+
 
 ## Authentication
 
