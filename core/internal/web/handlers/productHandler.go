@@ -57,7 +57,7 @@ func Create(ctx *gin.Context) {
 	productData, err := validateProduct(createProduct)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err,
+			"error": err.Error(),
 		})
 		return
 	}
@@ -65,7 +65,7 @@ func Create(ctx *gin.Context) {
 	err = validateSelectedOptions(productData)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err,
+			"error": err.Error(),
 		})
 		return
 	}
@@ -87,7 +87,8 @@ func Create(ctx *gin.Context) {
 	productdbInstance, err := db.GetProductDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -96,7 +97,8 @@ func Create(ctx *gin.Context) {
 	// Save the product to the database
 	if err := productModel.Save(productData); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -110,7 +112,8 @@ func Update(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Query("id"))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -134,7 +137,8 @@ func Update(ctx *gin.Context) {
 	productdbInstance, err := db.GetProductDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -142,7 +146,8 @@ func Update(ctx *gin.Context) {
 	// Save the product to the database
 	if err := productModel.Update(id, productDatabase); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -155,7 +160,8 @@ func GetAllProducts(ctx *gin.Context) {
 	productdbInstance, err := db.GetProductDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -175,14 +181,16 @@ func DeleteProduct(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Query("id"))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
 	productdbInstance, err := db.GetProductDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -190,7 +198,8 @@ func DeleteProduct(ctx *gin.Context) {
 	err = productModel.DeleteProduct(id)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -232,7 +241,8 @@ func DeleteProductVariant(ctx *gin.Context) {
 	product, err := productModel.GetProduct(id)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -246,6 +256,34 @@ func DeleteProductVariant(ctx *gin.Context) {
 	}
 
 	err = validateSelectedOptions(product)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Internal Server Error",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	product.TotalInventory = 0
+	product.HasBarcodes = false
+	product.HasSKUs = false
+	for i := range product.Variants {
+		if product.Variants[i].SKU != "" {
+			product.HasSKUs = true
+		}
+		if product.Variants[i].Barcode != "" {
+			product.HasBarcodes = true
+		}
+		product.TotalInventory += product.Variants[i].InventoryAvailable
+	}
+	if len(product.Variants) == 1 {
+		product.HasOnlyDefaultVariant = true
+	} else {
+		product.HasOnlyDefaultVariant = false
+	}
+
+	// Update the product data in the database
+	err = productModel.Update(id, product)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
@@ -299,7 +337,8 @@ func GetAllActiveProducts(ctx *gin.Context) {
 	productdbInstance, err := db.GetProductDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}

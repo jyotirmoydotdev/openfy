@@ -73,7 +73,8 @@ func SignupAdmin(ctx *gin.Context) {
 	dbInstance, err := db.GetDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -146,7 +147,8 @@ func SignupAdmin(ctx *gin.Context) {
 	AccountOwner, err := models.CheckAdminTableIsEmpty(dbInstance)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -160,14 +162,16 @@ func SignupAdmin(ctx *gin.Context) {
 
 	if err := adminModel.Save(&newAdminDatabase); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
 
 	if err := adminModel.SaveAdminSecret(&newAdminSecret); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -201,7 +205,8 @@ func LoginAdmin(ctx *gin.Context) {
 	dbInstance, err := db.GetDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -220,7 +225,8 @@ func LoginAdmin(ctx *gin.Context) {
 	adminHashedPassword, err := models.GetAdminHashedPasswordByUsername(dbInstance, loginRequest.Username)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}

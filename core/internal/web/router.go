@@ -67,14 +67,16 @@ func hashAdmin() gin.HandlerFunc {
 		hashNoAdmin, err := auth.HashAdmin()
 		if err != nil {
 			ctx.JSON(http.StatusForbidden, gin.H{
-				"error": "Internal Server Error",
+				"error":   "Internal Server Error",
+				"message": err.Error(),
 			})
 			ctx.Abort()
 			return
 		}
 		if !hashNoAdmin {
 			ctx.JSON(http.StatusForbidden, gin.H{
-				"error": "Contact Admin for signup",
+				"error":   "Contact Admin for signup",
+				"message": err.Error(),
 			})
 			ctx.Abort()
 			return

@@ -167,7 +167,8 @@ func SavePermission(ctx *gin.Context) {
 	_, err := db.GetDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}

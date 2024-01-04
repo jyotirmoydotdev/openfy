@@ -28,7 +28,8 @@ func RegisterUser(ctx *gin.Context) {
 	dbInstance, err := db.GetDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -37,7 +38,8 @@ func RegisterUser(ctx *gin.Context) {
 	exists, err := models.UserExistByEmail(dbInstance, newUser.Email)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -53,7 +55,8 @@ func RegisterUser(ctx *gin.Context) {
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -70,7 +73,8 @@ func RegisterUser(ctx *gin.Context) {
 	// Save user to the database
 	if err := userModel.Save(&newUserDatabase); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -87,7 +91,8 @@ func RegisterUser(ctx *gin.Context) {
 	}
 	if err := userModel.SaveUserSecret(&newUserSecret); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -111,7 +116,8 @@ func LoginUser(ctx *gin.Context) {
 	dbInstance, err := db.GetDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error":   "Internal Server Error",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -123,7 +129,8 @@ func LoginUser(ctx *gin.Context) {
 		userHashedPassword, err := models.GetUserHashedPasswordByEmail(dbInstance, loginRequest.Email)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Internal Server Error",
+				"error":   "Internal Server Error",
+				"message": err.Error(),
 			})
 			return
 		}
@@ -135,7 +142,8 @@ func LoginUser(ctx *gin.Context) {
 		Token, err := GenerateUserJWT(loginRequest.Email)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Internal Server error",
+				"error":   "Internal Server error",
+				"message": err.Error(),
 			})
 			return
 		}
