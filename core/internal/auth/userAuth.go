@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -64,11 +63,20 @@ func RegisterUser(ctx *gin.Context) {
 	userModel := models.NewUserModel(dbInstance)
 
 	newUserDatabase := models.User{
-		ID:        generateUserID(),
 		Email:     strings.ToLower(newUser.Email),
 		Password:  string(hashPassword),
 		FirstName: newUser.FirstName,
 		LastName:  newUser.LastName,
+		DeliveryAddresses: []models.DeliveryAddress{
+			{
+				Country:   "",
+				Address:   "",
+				Apartment: "",
+				City:      "",
+				State:     "",
+				PinCode:   0,
+			},
+		},
 	}
 	// Save user to the database
 	if err := userModel.Save(&newUserDatabase); err != nil {
@@ -84,8 +92,15 @@ func RegisterUser(ctx *gin.Context) {
 			"error": "Error while creating secreatKey",
 		})
 	}
+	userID, err := userModel.GetUserID(strings.ToLower(newUser.Email))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Internal server error",
+			"message": err.Error(),
+		})
+	}
 	newUserSecret := models.UserSecrets{
-		UserID: newUserDatabase.ID,
+		UserID: userID,
 		Email:  strings.ToLower(newUser.Email),
 		Secret: UserSecret,
 	}
@@ -98,7 +113,6 @@ func RegisterUser(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"status": "User registered successfully",
-		"data":   newUserDatabase,
 	})
 }
 
@@ -160,20 +174,4 @@ func LoginUser(ctx *gin.Context) {
 }
 
 func UpdateUser(ctx *gin.Context) {
-}
-
-func generateUserID() string {
-	dbInstance, err := db.GetDB()
-	if err != nil {
-		return ""
-	}
-	count, err := models.GetCountOf(dbInstance, "user")
-	if err != nil {
-		return ""
-	}
-	err = models.Increment(dbInstance, "user")
-	if err != nil {
-		return ""
-	}
-	return fmt.Sprintf("U%d", count)
 }

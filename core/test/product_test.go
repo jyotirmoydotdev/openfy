@@ -226,9 +226,14 @@ func TestUpdateProduct(t *testing.T) {
 	}
 }
 
-func TestDeleteProduct(t *testing.T) {
+func TestDeleteProductVariant(t *testing.T) {
 	product := productResponse.Data[0]
-	req, err := http.NewRequest("DELETE", server.URL+"/admin/product?id="+strconv.FormatUint(uint64(product.ID), 10), bytes.NewBuffer(nil))
+	req, err := http.NewRequest(
+		"DELETE",
+		server.URL+"/admin/variant?id="+
+			strconv.FormatUint(uint64(product.ID), 10)+"&vid="+
+			strconv.FormatUint(uint64(product.Variants[0].ID), 10),
+		bytes.NewBuffer(nil))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -244,14 +249,9 @@ func TestDeleteProduct(t *testing.T) {
 	}
 }
 
-func TestDeleteProductVariant(t *testing.T) {
-	product := productResponse.Data[1]
-	req, err := http.NewRequest(
-		"DELETE",
-		server.URL+"/admin/variant?id="+
-			strconv.FormatUint(uint64(product.ID), 10)+"&vid="+
-			strconv.FormatUint(uint64(product.Variants[0].ID), 10),
-		bytes.NewBuffer(nil))
+func TestDeleteProduct(t *testing.T) {
+	product := productResponse.Data[0]
+	req, err := http.NewRequest("DELETE", server.URL+"/admin/product?id="+strconv.FormatUint(uint64(product.ID), 10), bytes.NewBuffer(nil))
 	if err != nil {
 		t.Fatal(err)
 	}

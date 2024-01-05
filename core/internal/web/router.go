@@ -75,8 +75,7 @@ func hashAdmin() gin.HandlerFunc {
 		}
 		if !hashNoAdmin {
 			ctx.JSON(http.StatusForbidden, gin.H{
-				"error":   "Contact Admin for signup",
-				"message": err.Error(),
+				"error": "Contact Admin for signup",
 			})
 			ctx.Abort()
 			return

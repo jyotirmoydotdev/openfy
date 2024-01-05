@@ -1,13 +1,14 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
 )
 
 type User struct {
-	ID                string            `gorm:"column:id;primaryKey"`
+	ID                uint              `gorm:"column:id;primaryKey"`
 	Password          string            `gorm:"column:password;omitempty"`
 	Email             string            `gorm:"column:email;index"`
 	FirstName         string            `gorm:"column:first_name"`
@@ -18,8 +19,8 @@ type User struct {
 }
 
 type DeliveryAddress struct {
-	ID        string `gorm:"column:id;primaryKey"`
-	UserID    string `gorm:"column:user_id;index"`
+	ID        uint   `gorm:"column:id;primaryKey"`
+	UserID    uint   `gorm:"column:user_id;index"`
 	Country   string `gorm:"column:country"`
 	Address   string `gorm:"column:address"`
 	Apartment string `gorm:"column:apartment"`
@@ -29,12 +30,14 @@ type DeliveryAddress struct {
 }
 
 type UserSecrets struct {
-	UserID string `gorm:"column:user_id"`
+	ID     uint   `gorm:"primaryKey" json:"id" `
+	UserID uint   `gorm:"column:user_id"`
 	Email  string `gorm:"column:email"`
 	Secret string `gorm:"column:secret"`
 }
 
 type UserToken struct {
+	ID                uint      `gorm:"primaryKey" json:"id" `
 	Email             string    `gorm:"column:email;primaryKey"`
 	Token             string    `gorm:"column:token"`
 	LastUsed          time.Time `gorm:"column:last_used"`
@@ -120,4 +123,15 @@ func UpdateToken(db *gorm.DB, userToken *UserToken) error {
 		"revocation_reason":  userToken.RevocationReason,
 	}
 	return db.Model(&UserToken{}).Where("email = ?", userToken.Email).Updates(updatedValues).Error
+}
+
+func (ad *UserModel) GetUserID(email string) (uint, error) {
+	var user User
+	if err := ad.db.Model(&User{}).Where("email = ?", email).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return 0, fmt.Errorf("user not found")
+		}
+		return 0, fmt.Errorf("error fetching user: %v", err)
+	}
+	return user.ID, nil
 }

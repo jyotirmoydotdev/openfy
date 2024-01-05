@@ -7,7 +7,7 @@ import (
 )
 
 type Admin struct {
-	ID           string   `gorm:"column:id;primaryKey"`
+	ID           uint     `gorm:"column:id;primaryKey"`
 	Username     string   `gorm:"column:username;index"`
 	Password     string   `gorm:"column:password"`
 	Email        string   `gorm:"column:email"`
@@ -20,7 +20,7 @@ type Admin struct {
 }
 
 type AdminSecrets struct {
-	AdminID  string `gorm:"column:admin_id"`
+	AdminID  uint   `gorm:"column:admin_id"`
 	Username string `gorm:"column:username"`
 	Secret   string `gorm:"column:secret"`
 }
@@ -81,4 +81,14 @@ func GetSecretKeyByUsername(db *gorm.DB, username string) (string, error) {
 	}
 
 	return admin.Secret, nil
+}
+func (ad *AdminModel) GetAdminID(username string) (uint, error) {
+	var admin Admin
+	if err := ad.db.Model(&Admin{}).Where("username = ?", username).First(&admin).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return 0, fmt.Errorf("admin not found")
+		}
+		return 0, fmt.Errorf("error fetching user: %v", err)
+	}
+	return admin.ID, nil
 }

@@ -78,9 +78,6 @@ func SignupAdmin(ctx *gin.Context) {
 		})
 		return
 	}
-	dbConnect := &DBInstance{
-		DB: dbInstance,
-	}
 
 	// Check if a username exist in the database
 	if usernameExist, err := models.AdminExistByUsername(dbInstance, newAdmin.Username); err != nil && !usernameExist {
@@ -136,12 +133,6 @@ func SignupAdmin(ctx *gin.Context) {
 		return
 	}
 	adminModel := models.NewAdminModel(dbInstance)
-	newAdminDatabase.ID = dbConnect.generateAdminID()
-	newAdminSecret := models.AdminSecrets{
-		AdminID:  newAdminDatabase.ID,
-		Username: newAdmin.Username,
-		Secret:   secretKey,
-	}
 
 	// Check if the admin table id empty
 	AccountOwner, err := models.CheckAdminTableIsEmpty(dbInstance)
@@ -168,6 +159,20 @@ func SignupAdmin(ctx *gin.Context) {
 		return
 	}
 
+	newAdminId, err := adminModel.GetAdminID(newAdmin.Username)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Internal Server Error",
+			"message": err.Error(),
+		})
+		return
+	}
+	newAdminSecret := models.AdminSecrets{
+		AdminID:  newAdminId,
+		Username: newAdmin.Username,
+		Secret:   secretKey,
+	}
+
 	if err := adminModel.SaveAdminSecret(&newAdminSecret); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
@@ -177,10 +182,7 @@ func SignupAdmin(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"error":       "",
-		"message":     "",
 		"success":     true,
-		"field":       "",
 		"description": "Admin Registered Successfully",
 	})
 }
@@ -262,18 +264,6 @@ func LoginAdmin(ctx *gin.Context) {
 		"field":       "x",
 		"description": "No admin found",
 	})
-}
-
-func (dbInstance *DBInstance) generateAdminID() string {
-	count, err := models.GetCountOf(dbInstance.DB, "admin")
-	if err != nil {
-		return ""
-	}
-	err = models.Increment(dbInstance.DB, "admin")
-	if err != nil {
-		return ""
-	}
-	return fmt.Sprintf("A%d", count)
 }
 
 func HashAdmin() (bool, error) {

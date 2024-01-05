@@ -47,15 +47,10 @@ func InitializeDatabases() error {
 		&models.ShopDetail{},
 		&models.Admin{},
 		&models.AdminSecrets{},
-		&models.Counter{},
 		&models.UserToken{},
 	)
 	if err != nil {
 		return fmt.Errorf("error auto migrating models: %v", err)
-	}
-	err = preloadData(db)
-	if err != nil {
-		return fmt.Errorf("error preloading data: %v", err)
 	}
 
 	productdb, err := GetProductDB()
@@ -67,28 +62,9 @@ func InitializeDatabases() error {
 		&models.Option{},
 		&models.Variant{},
 		&models.SelectedOption{},
-		&models.Counter{},
 	)
 	if err != nil {
 		return fmt.Errorf("error auto migrating models: %v", err)
-	}
-	return nil
-}
-
-func preloadData(db *gorm.DB) error {
-	err := db.Create(&models.Counter{
-		Name:  "admin",
-		Count: 1,
-	}).Error
-	if err != nil {
-		return err
-	}
-	err = db.Create(&models.Counter{
-		Name:  "user",
-		Count: 1,
-	}).Error
-	if err != nil {
-		return err
 	}
 	return nil
 }

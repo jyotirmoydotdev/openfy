@@ -34,7 +34,6 @@ func resetTestDatabase() error {
 		"DELETE FROM sqlite_sequence;",
 		"DELETE FROM admin_secrets;",
 		"DELETE FROM admins;",
-		"DELETE FROM counters;",
 		"DELETE FROM user_tokens;",
 	}
 
@@ -55,7 +54,6 @@ func resetTestDatabase() error {
 		"DELETE FROM options;",
 		"DELETE FROM variants;",
 		"DELETE FROM selected_options;",
-		"DELETE FROM counters;",
 	}
 	for _, statement := range statements {
 		_, err := productdbInstance.Exec(statement)
