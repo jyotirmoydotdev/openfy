@@ -8,25 +8,44 @@ import (
 )
 
 type User struct {
-	ID                uint              `gorm:"column:id;primaryKey"`
-	Password          string            `gorm:"column:password;omitempty"`
-	Email             string            `gorm:"column:email;index"`
-	FirstName         string            `gorm:"column:first_name"`
-	LastName          string            `gorm:"column:last_name"`
-	Phone             int               `gorm:"column:phone"`
-	Age               int               `gorm:"column:age"`
-	DeliveryAddresses []DeliveryAddress `gorm:"foreignKey:UserID"`
+	ID                            uint              `gorm:"column:id;primaryKey"`
+	Password                      string            `gorm:"column:password;omitempty"`
+	DisplayName                   string            `gorm:"column:display_name"`
+	FirstName                     string            `gorm:"column:firstName"`
+	LastName                      string            `gorm:"column:lastName"`
+	Email                         string            `gorm:"column:email;index"`
+	Locale                        string            `gorm:"column:locale"`
+	TaxExempt                     bool              `gorm:"column:taxExempt"`
+	EmailMarketingConsentUpdateAt string            `gorm:"column:emailMarketingConsentUpdateAt"`
+	EmailMarketingConsentState    string            `gorm:"column:emailMarketingConsentState"`
+	Phone                         int               `gorm:"column:phone"`
+	State                         string            `gorm:"column:state"`
+	Age                           int               `gorm:"column:age"`
+	DeliveryAddresses             []DeliveryAddress `gorm:"foreignKey:UserID"`
+	UserCreatTime                 string            `gorm:"column:userCreateTime"`
+	LifetimeDuration              string            `gorm:"column:lifetimeDuration"`
+	TotalSpentAmount              float64           `gorm:"column:totalSpentAmount"`
+	TotalSpentCurrencyCode        string            `gorm:"column:totalSpentCurrencyCode"`
+	NumberOfOrders                int               `gorm:"column:numberOfOrders"`
+	LastOrderId                   uint              `gorm:"column:lastOrderId"`
+	LastOrderCreatedAt            string            `gorm:"column:lastOrderCreatedAt"`
 }
 
 type DeliveryAddress struct {
-	ID        uint   `gorm:"column:id;primaryKey"`
-	UserID    uint   `gorm:"column:user_id;index"`
-	Country   string `gorm:"column:country"`
-	Address   string `gorm:"column:address"`
-	Apartment string `gorm:"column:apartment"`
-	City      string `gorm:"column:city"`
-	State     string `gorm:"column:state"`
-	PinCode   int    `gorm:"column:pincode"`
+	ID            uint   `gorm:"column:id;primaryKey"`
+	UserID        uint   `gorm:"column:user_id;index"`
+	FormattedArea string `gorm:"column:formattedArea"`
+	FirstName     string `gorm:"column:firstName"`
+	LastName      string `gorm:"column:lastName"`
+	Company       string `gorm:"column:company"`
+	Address1      string `gorm:"column:address1"`
+	Address2      string `gorm:"column:address2"`
+	Apartment     string `gorm:"column:apartment"`
+	City          string `gorm:"column:city"`
+	Province      string `gorm:"column:province"`
+	Country       string `gorm:"column:country"`
+	Phone         int    `gorm:"column:phone"`
+	Zip           int    `gorm:"column:zip"`
 }
 
 type UserSecrets struct {
