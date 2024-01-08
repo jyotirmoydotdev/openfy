@@ -62,7 +62,7 @@ func RegisterUser(ctx *gin.Context) {
 
 	userModel := models.NewUserModel(dbInstance)
 
-	newUserDatabase := models.User{
+	newUserDatabase := models.Customer{
 		Email:     strings.ToLower(newUser.Email),
 		Password:  string(hashPassword),
 		FirstName: newUser.FirstName,
@@ -70,11 +70,11 @@ func RegisterUser(ctx *gin.Context) {
 		DeliveryAddresses: []models.DeliveryAddress{
 			{
 				Country:   "",
-				Address:   "",
+				Address1:  "",
 				Apartment: "",
 				City:      "",
-				State:     "",
-				PinCode:   0,
+				Province:  "",
+				Zip:       0,
 			},
 		},
 	}

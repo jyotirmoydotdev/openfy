@@ -100,8 +100,8 @@ func TestUserLogin2(t *testing.T) {
 
 // Check is same username can signup
 // Expected: 400
-func TestFailSameUsernaem(t *testing.T) {
-	newUser := models.User{
+func TestFailSameUsername(t *testing.T) {
+	newUser := models.Customer{
 		Email:    "testuser@example.com",
 		Password: "testpassword2",
 	}

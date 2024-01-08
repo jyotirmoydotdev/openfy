@@ -103,7 +103,7 @@ func SignupAdmin(ctx *gin.Context) {
 		return
 	}
 
-	var newAdminDatabase models.Admin
+	var newAdminDatabase models.StaffMember
 
 	newAdminDatabase.Name = newAdmin.FirstName + " " + newAdmin.LastName
 

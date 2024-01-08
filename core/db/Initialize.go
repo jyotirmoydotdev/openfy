@@ -41,7 +41,7 @@ func InitializeDatabases() error {
 		return err
 	}
 	err = db.AutoMigrate(
-		&models.User{},
+		&models.Customer{},
 		&models.UserSecrets{},
 		&models.DeliveryAddress{},
 		&models.ShopDetail{},
