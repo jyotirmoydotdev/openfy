@@ -45,7 +45,7 @@ func InitializeDatabases() error {
 		&models.UserSecrets{},
 		&models.DeliveryAddress{},
 		&models.ShopDetail{},
-		&models.Admin{},
+		&models.StaffMember{},
 		&models.AdminSecrets{},
 		&models.UserToken{},
 	)

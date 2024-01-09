@@ -27,13 +27,13 @@ func resetTestDatabase() error {
 	defer dbInstance.Close()
 
 	statements := []string{
-		"DELETE FROM users;",
+		"DELETE FROM customers;",
 		"DELETE FROM user_secrets;",
 		"DELETE FROM shop_details;",
 		"DELETE FROM delivery_addresses;",
 		"DELETE FROM sqlite_sequence;",
 		"DELETE FROM admin_secrets;",
-		"DELETE FROM admins;",
+		"DELETE FROM staff_members;",
 		"DELETE FROM user_tokens;",
 	}
 
