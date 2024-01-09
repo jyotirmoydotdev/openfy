@@ -14,18 +14,18 @@ var token string
 // Expected : 200
 func TestAdminSignup(t *testing.T) {
 	type NewAdminStruct struct {
-		Email        string
-		Customername string
-		FirstName    string
-		LastName     string
-		Password     string
+		Email     string
+		Username  string
+		FirstName string
+		LastName  string
+		Password  string
 	}
 	newAdmin := NewAdminStruct{
-		Email:        "test@example.com",
-		Customername: "testadmin",
-		FirstName:    "Test",
-		LastName:     "Admin",
-		Password:     "testpassword",
+		Email:     "test@example.com",
+		Username:  "testadmin",
+		FirstName: "Test",
+		LastName:  "Admin",
+		Password:  "testpassword",
 	}
 	jsonAdmin, err := json.Marshal(newAdmin)
 	if err != nil {
@@ -45,8 +45,8 @@ func TestAdminSignup(t *testing.T) {
 // Expected : 200
 func TestAdminLogin(t *testing.T) {
 	loginCredentials := map[string]string{
-		"customername": "testadmin",
-		"password":     "testpassword",
+		"username": "testadmin",
+		"password": "testpassword",
 	}
 	jsonCredentials, err := json.Marshal(loginCredentials)
 	if err != nil {
@@ -79,18 +79,18 @@ func TestAdminLogin(t *testing.T) {
 // Expected : 403
 func TestFailAdminSignup(t *testing.T) {
 	type NewAdminStruct struct {
-		Customername string
-		Password     string
-		Email        string
-		FirstName    string
-		LastName     string
+		Username  string
+		Password  string
+		Email     string
+		FirstName string
+		LastName  string
 	}
 	newAdmin := NewAdminStruct{
-		Customername: "testadmin1",
-		Password:     "testpassword",
-		Email:        "test@example.com",
-		FirstName:    "Test",
-		LastName:     "Admin",
+		Username:  "testadmin1",
+		Password:  "testpassword",
+		Email:     "test@example.com",
+		FirstName: "Test",
+		LastName:  "Admin",
 	}
 	jsonAdmin, err := json.Marshal(newAdmin)
 	if err != nil {

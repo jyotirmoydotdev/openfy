@@ -98,9 +98,9 @@ func TestCustomerLogin2(t *testing.T) {
 	CustomerJWT = CustomerJWTfetch
 }
 
-// Check is same customername can signup
+// Check is same username can signup
 // Expected: 400
-func TestFailSameCustomername(t *testing.T) {
+func TestFailSameUsername(t *testing.T) {
 	newCustomer := models.Customer{
 		Email:    "testcustomer@example.com",
 		Password: "testpassword2",

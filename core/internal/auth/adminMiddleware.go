@@ -15,12 +15,12 @@ import (
 	"gorm.io/gorm"
 )
 
-func GenerateJWT(db *gorm.DB, customername string) (string, error) {
+func GenerateJWT(db *gorm.DB, username string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"customername": customername,
-		"exp":          time.Now().Add(time.Hour * 336).Unix(),
+		"username": username,
+		"exp":      time.Now().Add(time.Hour * 336).Unix(),
 	})
-	secretKey, err := models.GetSecretKeyByCustomername(db, customername)
+	secretKey, err := models.GetSecretKeyByUsername(db, username)
 	if err != nil {
 		if err != nil {
 			return "Internal Server error", err
@@ -71,11 +71,11 @@ func extractSecretkeyFromToken(dbInstance *gorm.DB, token *jwt.Token) string {
 	if !ok {
 		return ""
 	}
-	customername, ok := claims["customername"].(string)
+	username, ok := claims["username"].(string)
 	if !ok {
 		return ""
 	}
-	secretKey, err := models.GetSecretKeyByCustomername(dbInstance, customername)
+	secretKey, err := models.GetSecretKeyByUsername(dbInstance, username)
 	if err != nil {
 		return ""
 	}

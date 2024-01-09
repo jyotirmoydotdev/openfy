@@ -8,7 +8,7 @@ import (
 
 type StaffMember struct {
 	ID           uint     `gorm:"column:id;primaryKey"`
-	Customername string   `gorm:"column:customername;index"`
+	Username     string   `gorm:"column:username;index"`
 	Password     string   `gorm:"column:password"`
 	Email        string   `gorm:"column:email"`
 	Name         string   `gorm:"column:name"`
@@ -20,9 +20,9 @@ type StaffMember struct {
 }
 
 type AdminSecrets struct {
-	AdminID      uint   `gorm:"column:admin_id"`
-	Customername string `gorm:"column:customername"`
-	Secret       string `gorm:"column:secret"`
+	AdminID  uint   `gorm:"column:admin_id"`
+	Username string `gorm:"column:username"`
+	Secret   string `gorm:"column:secret"`
 }
 
 type AdminModel struct {
@@ -46,9 +46,9 @@ func AdminExistByEmail(db *gorm.DB, email string) (bool, error) {
 	}
 	return count > 0, nil
 }
-func AdminExistByCustomername(db *gorm.DB, customername string) (bool, error) {
+func AdminExistByUsername(db *gorm.DB, username string) (bool, error) {
 	var count int64
-	if err := db.Model(&StaffMember{}).Where("customername = ?", customername).Count(&count).Error; err != nil {
+	if err := db.Model(&StaffMember{}).Where("username = ?", username).Count(&count).Error; err != nil {
 		return false, err
 	}
 	return count > 0, nil
@@ -60,9 +60,9 @@ func CheckAdminTableIsEmpty(db *gorm.DB) (bool, error) {
 	}
 	return count == 0, nil
 }
-func GetAdminHashedPasswordByCustomername(db *gorm.DB, customername string) (string, error) {
+func GetAdminHashedPasswordByUsername(db *gorm.DB, username string) (string, error) {
 	var admin StaffMember
-	if err := db.Model(&StaffMember{}).Where("customername = ?", customername).First(&admin).Error; err != nil {
+	if err := db.Model(&StaffMember{}).Where("username = ?", username).First(&admin).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return "", fmt.Errorf("admin not found")
 		}
@@ -71,9 +71,9 @@ func GetAdminHashedPasswordByCustomername(db *gorm.DB, customername string) (str
 
 	return admin.Password, nil
 }
-func GetSecretKeyByCustomername(db *gorm.DB, customername string) (string, error) {
+func GetSecretKeyByUsername(db *gorm.DB, username string) (string, error) {
 	var admin AdminSecrets
-	if err := db.Model(&AdminSecrets{}).Where("customername = ?", customername).First(&admin).Error; err != nil {
+	if err := db.Model(&AdminSecrets{}).Where("username = ?", username).First(&admin).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return "", fmt.Errorf("admin not found")
 		}
@@ -82,9 +82,9 @@ func GetSecretKeyByCustomername(db *gorm.DB, customername string) (string, error
 
 	return admin.Secret, nil
 }
-func (ad *AdminModel) GetAdminID(customername string) (uint, error) {
+func (ad *AdminModel) GetAdminID(username string) (uint, error) {
 	var admin StaffMember
-	if err := ad.db.Model(&StaffMember{}).Where("customername = ?", customername).First(&admin).Error; err != nil {
+	if err := ad.db.Model(&StaffMember{}).Where("username = ?", username).First(&admin).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return 0, fmt.Errorf("admin not found")
 		}
