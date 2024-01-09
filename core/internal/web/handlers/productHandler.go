@@ -9,8 +9,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
-	"github.com/jyotirmoydotdev/openfy/db"
-	"github.com/jyotirmoydotdev/openfy/db/models"
+	db "github.com/jyotirmoydotdev/openfy/database"
+	"github.com/jyotirmoydotdev/openfy/database/models"
 )
 
 type RequestProduct struct {

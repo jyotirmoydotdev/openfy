@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/jyotirmoydotdev/openfy/db/models"
+	"github.com/jyotirmoydotdev/openfy/database/models"
 	web "github.com/jyotirmoydotdev/openfy/internal/web/handlers"
 )
 
@@ -68,7 +68,12 @@ func TestAddProduct(t *testing.T) {
 		fmt.Println("Error making request:", err)
 	}
 	defer resp.Body.Close()
-
+	var response map[string]interface{}
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		t.Errorf("Error decoding JSON response:%v", err)
+		return
+	}
 	if status2 := resp.StatusCode; status2 != http.StatusOK {
 		t.Errorf("handler returned wrong staus code: got %v want %v", status2, http.StatusOK)
 	}

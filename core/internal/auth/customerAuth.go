@@ -5,8 +5,9 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jyotirmoydotdev/openfy/db"
-	"github.com/jyotirmoydotdev/openfy/db/models"
+	"github.com/jyotirmoydotdev/openfy/database"
+	"github.com/jyotirmoydotdev/openfy/database/models"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -24,7 +25,7 @@ func RegisterCustomer(ctx *gin.Context) {
 		return
 	}
 
-	dbInstance, err := db.GetDB()
+	dbInstance, err := database.GetCustomerDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
@@ -127,7 +128,7 @@ func LoginCustomer(ctx *gin.Context) {
 		})
 		return
 	}
-	dbInstance, err := db.GetDB()
+	dbInstance, err := database.GetCustomerDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",

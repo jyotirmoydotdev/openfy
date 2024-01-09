@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jyotirmoydotdev/openfy/db"
+	db "github.com/jyotirmoydotdev/openfy/database"
 	"github.com/jyotirmoydotdev/openfy/internal/auth"
 	"github.com/jyotirmoydotdev/openfy/internal/web/handlers"
 )

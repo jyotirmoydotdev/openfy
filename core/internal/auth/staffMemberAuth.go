@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
-	"github.com/jyotirmoydotdev/openfy/db"
-	"github.com/jyotirmoydotdev/openfy/db/models"
+	"github.com/jyotirmoydotdev/openfy/database"
+	"github.com/jyotirmoydotdev/openfy/database/models"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -70,7 +70,7 @@ func SignupStaffMember(ctx *gin.Context) {
 	}
 
 	// Get the Database instance to save the data
-	dbInstance, err := db.GetDB()
+	dbInstance, err := database.GetCustomerDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
@@ -205,7 +205,7 @@ func LoginStaffMember(ctx *gin.Context) {
 	}
 	loginRequest.Username = strings.ToLower(loginRequest.Username)
 
-	dbInstance, err := db.GetDB()
+	dbInstance, err := database.GetCustomerDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
@@ -268,7 +268,7 @@ func LoginStaffMember(ctx *gin.Context) {
 }
 
 func HashStaffMember() (bool, error) {
-	dbInstance, err := db.GetDB()
+	dbInstance, err := database.GetCustomerDB()
 	if err != nil {
 		return false, err
 	}

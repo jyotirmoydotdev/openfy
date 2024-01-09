@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/jyotirmoydotdev/openfy/db"
+	db "github.com/jyotirmoydotdev/openfy/database"
 	"github.com/jyotirmoydotdev/openfy/internal/web"
 )
 
@@ -20,7 +20,7 @@ func teardown() {
 	server.Close()
 }
 func resetTestDatabase() error {
-	dbInstance, err := sql.Open("sqlite3", "./db/databaseCustomerStaffMember.db")
+	dbInstance, err := sql.Open("sqlite3", "./database/databaseCustomerStaffMember.db")
 	if err != nil {
 		return fmt.Errorf("error opening test database: %v", err)
 	}
@@ -44,7 +44,7 @@ func resetTestDatabase() error {
 		}
 	}
 
-	productdbInstance, err := sql.Open("sqlite3", "./db/databaseProduct.db")
+	productdbInstance, err := sql.Open("sqlite3", "./database/databaseProduct.db")
 	if err != nil {
 		return fmt.Errorf("error opening test database: %v", err)
 	}

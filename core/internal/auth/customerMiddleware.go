@@ -8,8 +8,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/jyotirmoydotdev/openfy/db"
-	"github.com/jyotirmoydotdev/openfy/db/models"
+	"github.com/jyotirmoydotdev/openfy/database"
+	"github.com/jyotirmoydotdev/openfy/database/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,7 +18,7 @@ func GenerateCustomerJWT(email string) (string, error) {
 		"email": email,
 		"exp":   time.Now().Add(time.Hour * 336).Unix(), // Token Valid for 14 Days
 	})
-	dbInstance, err := db.GetDB()
+	dbInstance, err := database.GetCustomerDB()
 	if err != nil {
 		return "", err
 	}
@@ -84,7 +84,7 @@ func ValidateCustomerToken(tokenString string) (jwt.MapClaims, error) {
 	if !ok {
 		return nil, fmt.Errorf("something went wrong while extracting `email`")
 	}
-	dbInstance, err := db.GetDB()
+	dbInstance, err := database.GetCustomerDB()
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func extractCustomerSecretKeyFromToken(token *jwt.Token) string {
 	if !ok {
 		return ""
 	}
-	dbInstance, err := db.GetDB()
+	dbInstance, err := database.GetCustomerDB()
 	if err != nil {
 		return ""
 	}
