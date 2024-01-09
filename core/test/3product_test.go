@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/jyotirmoydotdev/openfy/db/models"
+	"github.com/jyotirmoydotdev/openfy/database/models"
 	web "github.com/jyotirmoydotdev/openfy/internal/web/handlers"
 )
 
@@ -57,7 +57,7 @@ func TestAddProduct(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	req, err := http.NewRequest("POST", server.URL+"/admin/product/new", bytes.NewBuffer(jsonProduct))
+	req, err := http.NewRequest("POST", server.URL+"/staffMember/product/new", bytes.NewBuffer(jsonProduct))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -68,7 +68,12 @@ func TestAddProduct(t *testing.T) {
 		fmt.Println("Error making request:", err)
 	}
 	defer resp.Body.Close()
-
+	var response map[string]interface{}
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		t.Errorf("Error decoding JSON response:%v", err)
+		return
+	}
 	if status2 := resp.StatusCode; status2 != http.StatusOK {
 		t.Errorf("handler returned wrong staus code: got %v want %v", status2, http.StatusOK)
 	}
@@ -104,7 +109,7 @@ func TestAddProduct2(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	req, err := http.NewRequest("POST", server.URL+"/admin/product/new", bytes.NewBuffer(jsonProduct))
+	req, err := http.NewRequest("POST", server.URL+"/staffMember/product/new", bytes.NewBuffer(jsonProduct))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -121,7 +126,7 @@ func TestAddProduct2(t *testing.T) {
 	}
 }
 func TestGetAllProduct(t *testing.T) {
-	req, err := http.NewRequest("GET", server.URL+"/admin/products", bytes.NewBuffer(nil))
+	req, err := http.NewRequest("GET", server.URL+"/staffMember/products", bytes.NewBuffer(nil))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -150,7 +155,7 @@ func TestGetAllProduct(t *testing.T) {
 }
 func TestGetProduct(t *testing.T) {
 	product := productResponse.Data[1]
-	req, err := http.NewRequest("GET", server.URL+"/admin/product?id="+strconv.FormatUint(uint64(product.ID), 10), bytes.NewBuffer(nil))
+	req, err := http.NewRequest("GET", server.URL+"/staffMember/product?id="+strconv.FormatUint(uint64(product.ID), 10), bytes.NewBuffer(nil))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -209,7 +214,7 @@ func TestUpdateProduct(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	req, err := http.NewRequest("PUT", server.URL+"/admin/product?id="+strconv.FormatUint(uint64(id), 10), bytes.NewBuffer(jsonProduct))
+	req, err := http.NewRequest("PUT", server.URL+"/staffMember/product?id="+strconv.FormatUint(uint64(id), 10), bytes.NewBuffer(jsonProduct))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -230,7 +235,7 @@ func TestDeleteProductVariant(t *testing.T) {
 	product := productResponse.Data[0]
 	req, err := http.NewRequest(
 		"DELETE",
-		server.URL+"/admin/variant?id="+
+		server.URL+"/staffMember/variant?id="+
 			strconv.FormatUint(uint64(product.ID), 10)+"&vid="+
 			strconv.FormatUint(uint64(product.Variants[0].ID), 10),
 		bytes.NewBuffer(nil))
@@ -251,7 +256,7 @@ func TestDeleteProductVariant(t *testing.T) {
 
 func TestDeleteProduct(t *testing.T) {
 	product := productResponse.Data[0]
-	req, err := http.NewRequest("DELETE", server.URL+"/admin/product?id="+strconv.FormatUint(uint64(product.ID), 10), bytes.NewBuffer(nil))
+	req, err := http.NewRequest("DELETE", server.URL+"/staffMember/product?id="+strconv.FormatUint(uint64(product.ID), 10), bytes.NewBuffer(nil))
 	if err != nil {
 		t.Fatal(err)
 	}

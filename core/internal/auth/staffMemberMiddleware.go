@@ -10,8 +10,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/jyotirmoydotdev/openfy/db"
-	"github.com/jyotirmoydotdev/openfy/db/models"
+	"github.com/jyotirmoydotdev/openfy/database"
+	"github.com/jyotirmoydotdev/openfy/database/models"
 	"gorm.io/gorm"
 )
 
@@ -33,7 +33,7 @@ func GenerateJWT(db *gorm.DB, username string) (string, error) {
 	return signalToken, nil
 }
 func ValidateToken(tokenString string) (jwt.MapClaims, error) {
-	dbInstance, err := db.GetDB()
+	dbInstance, err := database.GetStaffMemberDB()
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,8 @@ func AuthenticateMiddleware() gin.HandlerFunc {
 		tokenString := ctx.GetHeader("Authorization")
 		if tokenString == "" {
 			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized ",
+				"error":  "Unauthorized ",
+				"reason": "token not found",
 			})
 			ctx.Abort()
 			return
@@ -102,7 +103,8 @@ func AuthenticateMiddleware() gin.HandlerFunc {
 		claims, err := ValidateToken(tokenString)
 		if err != nil {
 			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized",
+				"error":  "Unauthorized",
+				"reason": err.Error(),
 			})
 			ctx.Abort()
 			return

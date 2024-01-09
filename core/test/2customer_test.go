@@ -7,26 +7,26 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/jyotirmoydotdev/openfy/db/models"
+	"github.com/jyotirmoydotdev/openfy/database/models"
 )
 
-var UserJWT string
+var CustomerJWT string
 
-// Check it a new user can signup or not
+// Check it a new customer can signup or not
 // Expected : 200
-func TestUserSignup(t *testing.T) {
-	newUser := map[string]string{
-		"email":     "testuser@example.com",
+func TestCustomerSignup(t *testing.T) {
+	newCustomer := map[string]string{
+		"email":     "testcustomer@example.com",
 		"password":  "testpassword",
 		"firstname": "Jyotirmoy",
 		"lastname":  "Barman",
 	}
 
-	jsonUser, err := json.Marshal(newUser)
+	jsonCustomer, err := json.Marshal(newCustomer)
 	if err != nil {
 		t.Fatal(err)
 	}
-	resp, err := http.Post(server.URL+"/signup", "application/json", bytes.NewBuffer(jsonUser))
+	resp, err := http.Post(server.URL+"/signup", "application/json", bytes.NewBuffer(jsonCustomer))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -37,11 +37,11 @@ func TestUserSignup(t *testing.T) {
 	}
 }
 
-// Check if a new user can login or not
+// Check if a new customer can login or not
 // Expected : 200
-func TestUserLogin(t *testing.T) {
+func TestCustomerLogin(t *testing.T) {
 	loginCredentials := map[string]string{
-		"email":    "testuser@example.com",
+		"email":    "testcustomer@example.com",
 		"password": "testpassword",
 	}
 	jsonCredentials, err := json.Marshal(loginCredentials)
@@ -62,15 +62,15 @@ func TestUserLogin(t *testing.T) {
 		t.Errorf("Error decoding JSON response:%v", err)
 		return
 	}
-	UserJWTfetch, ok := reponse["token"].(string)
+	CustomerJWTfetch, ok := reponse["token"].(string)
 	if !ok {
 		t.Errorf("Something went wrrong while fetching token from the reponse")
 	}
-	UserJWT = UserJWTfetch
+	CustomerJWT = CustomerJWTfetch
 }
-func TestUserLogin2(t *testing.T) {
+func TestCustomerLogin2(t *testing.T) {
 	loginCredentials := map[string]string{
-		"email":    "testuser@example.com",
+		"email":    "testcustomer@example.com",
 		"password": "testpassword",
 	}
 	jsonCredentials, err := json.Marshal(loginCredentials)
@@ -91,25 +91,25 @@ func TestUserLogin2(t *testing.T) {
 		t.Errorf("Error decoding JSON response:%v", err)
 		return
 	}
-	UserJWTfetch, ok := reponse["token"].(string)
+	CustomerJWTfetch, ok := reponse["token"].(string)
 	if !ok {
 		t.Errorf("Something went wrrong while fetching token from the reponse")
 	}
-	UserJWT = UserJWTfetch
+	CustomerJWT = CustomerJWTfetch
 }
 
 // Check is same username can signup
 // Expected: 400
 func TestFailSameUsername(t *testing.T) {
-	newUser := models.Customer{
-		Email:    "testuser@example.com",
+	newCustomer := models.Customer{
+		Email:    "testcustomer@example.com",
 		Password: "testpassword2",
 	}
-	jsonUser, err := json.Marshal(newUser)
+	jsonCustomer, err := json.Marshal(newCustomer)
 	if err != nil {
 		t.Fatal(err)
 	}
-	resp, err := http.Post(server.URL+"/signup", "application/json", bytes.NewBuffer(jsonUser))
+	resp, err := http.Post(server.URL+"/signup", "application/json", bytes.NewBuffer(jsonCustomer))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,21 +118,21 @@ func TestFailSameUsername(t *testing.T) {
 		t.Errorf("handler returned wrong staus code: got %v want %v", status, http.StatusBadRequest)
 	}
 }
-func TestNthUserSignup(t *testing.T) {
-	testNthUser := 10
-	for i := 0; i < testNthUser; i++ {
-		email := strconv.Itoa(i) + "testuser@example.com"
-		newUser := map[string]string{
+func TestNthCustomerSignup(t *testing.T) {
+	testNthCustomer := 10
+	for i := 0; i < testNthCustomer; i++ {
+		email := strconv.Itoa(i) + "testcustomer@example.com"
+		newCustomer := map[string]string{
 			"email":     email,
 			"password":  "testpassword",
 			"firstname": strconv.Itoa(i) + "Jyotirmoy",
 			"lastname":  strconv.Itoa(i) + "Barman",
 		}
-		jsonUser, err := json.Marshal(newUser)
+		jsonCustomer, err := json.Marshal(newCustomer)
 		if err != nil {
 			t.Fatal(err)
 		}
-		resp, err := http.Post(server.URL+"/signup", "application/json", bytes.NewBuffer(jsonUser))
+		resp, err := http.Post(server.URL+"/signup", "application/json", bytes.NewBuffer(jsonCustomer))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -143,19 +143,19 @@ func TestNthUserSignup(t *testing.T) {
 		}
 	}
 }
-func TestNthUserLogin(t *testing.T) {
-	testNthUser := 10
-	for i := 0; i < testNthUser; i++ {
-		email := strconv.Itoa(i) + "testuser@example.com"
-		newUser := map[string]string{
+func TestNthCustomerLogin(t *testing.T) {
+	testNthCustomer := 10
+	for i := 0; i < testNthCustomer; i++ {
+		email := strconv.Itoa(i) + "testcustomer@example.com"
+		newCustomer := map[string]string{
 			"email":    email,
 			"password": "testpassword",
 		}
-		jsonUser, err := json.Marshal(newUser)
+		jsonCustomer, err := json.Marshal(newCustomer)
 		if err != nil {
 			t.Fatal(err)
 		}
-		resp, err := http.Post(server.URL+"/login", "application/json", bytes.NewBuffer(jsonUser))
+		resp, err := http.Post(server.URL+"/login", "application/json", bytes.NewBuffer(jsonCustomer))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -167,15 +167,15 @@ func TestNthUserLogin(t *testing.T) {
 	}
 }
 
-func TestUserPingPong(t *testing.T) {
+func TestCustomerPingPong(t *testing.T) {
 	// Create a request with the correct endpoint
-	req, err := http.NewRequest("GET", server.URL+"/user/ping", nil)
+	req, err := http.NewRequest("GET", server.URL+"/customer/ping", nil)
 	if err != nil {
 		t.Fatal("Error creating request:", err)
 	}
 
-	// Set the Authorization header with the UserJWT
-	req.Header.Set("Authorization", "Bearer "+UserJWT)
+	// Set the Authorization header with the CustomerJWT
+	req.Header.Set("Authorization", "Bearer "+CustomerJWT)
 
 	// Make the request
 	resp, err := http.DefaultClient.Do(req)

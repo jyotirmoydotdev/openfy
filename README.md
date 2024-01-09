@@ -1,6 +1,6 @@
 <p align="center">
 <a href="" target="">
-<img src="https://raw.githubusercontent.com/jyotirmoydotdev/Openfy/main/src/OpenfyLogo.svg" alt="Openfy logo">
+<img src="https://raw.githubcustomercontent.com/jyotirmoydotdev/Openfy/main/src/OpenfyLogo.svg" alt="Openfy logo">
 </a>
 </p>
 
@@ -8,13 +8,13 @@
 
 # Openfy
 
-Openfy is a self-hosted e-commerce platform built with Go and Gin, providing a flexible and customizable solution for managing products and handling user authentication.
+Openfy is a self-hosted e-commerce platform built with Go and Gin, providing a flexible and customizable solution for managing products and handling customer authentication.
 
 ## Features
 
 - **Product Management**: Easily create, update, and delete products.
-- **User Authentication**: Secure user authentication with JWT tokens.
-- **Admin Panel**: Admin-specific routes for managing products.
+- **Customer Authentication**: Secure customer authentication with JWT tokens.
+- **StaffMember Panel**: StaffMember-specific routes for managing products.
 - **Flexible and Extendable**: Built with Go and Gin for flexibility and extensibility.
 
 ## Prerequisites
@@ -52,30 +52,30 @@ Before running Openfy, ensure you have the following installed:
 
 ## Routes
 
-- **User Routes**:
-  - `POST /signup`: Register a new user.
-  - `POST /login`: User login.
+- **Customer Routes**:
+  - `POST /signup`: Register a new customer.
+  - `POST /login`: Customer login.
   - `GET /products`: Retrieve details of all active products.
 
-- **Admin Routes**:
-  - `POST /admin/signup`: Register a new admin user.
-  - `POST /admin/login`: Admin login.
+- **StaffMember Routes**:
+  - `POST /staffMember/signup`: Register a new staffMember customer.
+  - `POST /staffMember/login`: StaffMember login.
 
-- **Authenticated User Routes** (Protected by JWT):
-  - `GET /user/ping`: Test endpoint for authenticated users.
+- **Authenticated Customer Routes** (Protected by JWT):
+  - `GET /customer/ping`: Test endpoint for authenticated customers.
 
-- **Authenticated Admin Routes** (Protected by JWT):
-  - `GET /admin/product`: Retrieve details of a specific product.
-  - `GET /admin/products`: Retrieve details of all products.
-  - `POST /admin/product/new`: Create a new product.
-  - `PUT /admin/product`: Update an existing product.
-  - `DELETE /admin/product`: Delete a product.
-  - `DELETE /admin/variant`: Delete a product variant.
+- **Authenticated StaffMember Routes** (Protected by JWT):
+  - `GET /staffMember/product`: Retrieve details of a specific product.
+  - `GET /staffMember/products`: Retrieve details of all products.
+  - `POST /staffMember/product/new`: Create a new product.
+  - `PUT /staffMember/product`: Update an existing product.
+  - `DELETE /staffMember/product`: Delete a product.
+  - `DELETE /staffMember/variant`: Delete a product variant.
 
 
 ## Authentication
 
-- User authentication is implemented using JWT tokens.
+- Customer authentication is implemented using JWT tokens.
 - To authenticate, include the JWT token in the "Authorization" header using the "Bearer" scheme.
 
 ## Preview

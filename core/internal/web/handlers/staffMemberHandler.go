@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jyotirmoydotdev/openfy/db"
+	db "github.com/jyotirmoydotdev/openfy/database"
 )
 
 func ValidatePermissions(permissions []string) bool {
@@ -164,7 +164,7 @@ func SavePermission(ctx *gin.Context) {
 		})
 		return
 	}
-	_, err := db.GetDB()
+	_, err := db.GetStaffMemberDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",

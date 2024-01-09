@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/jyotirmoydotdev/openfy/db"
+	db "github.com/jyotirmoydotdev/openfy/database"
 	"github.com/jyotirmoydotdev/openfy/internal/web"
 )
 
@@ -20,7 +20,7 @@ func teardown() {
 	server.Close()
 }
 func resetTestDatabase() error {
-	dbInstance, err := sql.Open("sqlite3", "./db/databaseUserAdmin.db")
+	dbInstance, err := sql.Open("sqlite3", "./database/databaseCustomer.db")
 	if err != nil {
 		return fmt.Errorf("error opening test database: %v", err)
 	}
@@ -28,25 +28,41 @@ func resetTestDatabase() error {
 
 	statements := []string{
 		"DELETE FROM customers;",
-		"DELETE FROM user_secrets;",
+		"DELETE FROM customer_secrets;",
 		"DELETE FROM shop_details;",
 		"DELETE FROM delivery_addresses;",
 		"DELETE FROM sqlite_sequence;",
-		"DELETE FROM admin_secrets;",
-		"DELETE FROM staff_members;",
-		"DELETE FROM user_tokens;",
+		"DELETE FROM customer_tokens;",
 	}
 
 	for _, statement := range statements {
 		_, err := dbInstance.Exec(statement)
 		if err != nil {
-			return fmt.Errorf("error executing SQL statement: %v", err)
+			return fmt.Errorf("error executing SQL statement databaseCustomer: %v", err)
 		}
 	}
 
-	productdbInstance, err := sql.Open("sqlite3", "./db/databaseProduct.db")
+	staffMemberDBInstance, err := sql.Open("sqlite3", "./database/databaseStaffMember.db")
 	if err != nil {
-		return fmt.Errorf("error opening test database: %v", err)
+		return fmt.Errorf("error opening test databaseStaffMember: %v", err)
+	}
+	defer staffMemberDBInstance.Close()
+
+	statements = []string{
+		"DELETE FROM staff_member_secrets;",
+		"DELETE FROM staff_members;",
+	}
+
+	for _, statement := range statements {
+		_, err := staffMemberDBInstance.Exec(statement)
+		if err != nil {
+			return fmt.Errorf("error executing SQL statement of databaseStaffMember: %v", err)
+		}
+	}
+
+	productdbInstance, err := sql.Open("sqlite3", "./database/databaseProduct.db")
+	if err != nil {
+		return fmt.Errorf("error opening test database databaseProduct: %v", err)
 	}
 	defer productdbInstance.Close()
 	statements = []string{

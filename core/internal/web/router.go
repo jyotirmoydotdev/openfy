@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jyotirmoydotdev/openfy/db"
+	db "github.com/jyotirmoydotdev/openfy/database"
 	"github.com/jyotirmoydotdev/openfy/internal/auth"
 	"github.com/jyotirmoydotdev/openfy/internal/web/handlers"
 )
@@ -16,55 +16,55 @@ func SetupRouter() *gin.Engine {
 	}
 	router := gin.Default()
 
-	router.POST("/signup", auth.RegisterUser)
-	router.POST("/login", auth.LoginUser)
+	router.POST("/signup", auth.RegisterCustomer)
+	router.POST("/login", auth.LoginCustomer)
 	router.GET("/products", handlers.GetAllActiveProducts)
 
-	router.POST("/admin/signup", hashAdmin(), auth.SignupAdmin)
-	router.POST("/admin/login", auth.LoginAdmin)
+	router.POST("/staffMember/signup", hashStaffMember(), auth.SignupStaffMember)
+	router.POST("/staffMember/login", auth.LoginStaffMember)
 
-	// User route
-	user := router.Group("/user", auth.AuthenticateUserMiddleware())
+	// Customer route
+	customer := router.Group("/customer", auth.AuthenticateCustomerMiddleware())
 	{
-		user.GET("/ping", func(ctx *gin.Context) {
+		customer.GET("/ping", func(ctx *gin.Context) {
 			ctx.JSON(http.StatusOK, gin.H{
 				"message": "pong",
 			})
 		})
 	}
 
-	admin := router.Group("/admin", auth.AuthenticateMiddleware())
+	staffMember := router.Group("/staffMember", auth.AuthenticateMiddleware())
 	{
-		// GET example.com/admin/product?id=x
-		admin.GET("/product", handlers.GetProduct)
+		// GET example.com/staffMember/product?id=x
+		staffMember.GET("/product", handlers.GetProduct)
 
-		admin.GET("/products", handlers.GetAllProducts)
-		admin.POST("/product/new", handlers.Create)
+		staffMember.GET("/products", handlers.GetAllProducts)
+		staffMember.POST("/product/new", handlers.Create)
 
-		// PUT example.com/admin/product?id=x
-		admin.PUT("/product", handlers.Update)
+		// PUT example.com/staffMember/product?id=x
+		staffMember.PUT("/product", handlers.Update)
 
-		// DELETE example.com/admin/product?id=x
-		admin.DELETE("/product", handlers.DeleteProduct)
+		// DELETE example.com/staffMember/product?id=x
+		staffMember.DELETE("/product", handlers.DeleteProduct)
 
-		// DELETE example.com/admin/product?id=x&vid=x
-		admin.DELETE("/variant", handlers.DeleteProductVariant)
-		// admin.POST("/auth-with-password", AuthWithPassword)
-		// admin.POST("/request-password-reset", RequestPasswordReset)
-		// admin.POST("/confirm-password-reset", ConfirmPasswordReset)
-		// admin.POST("/auth-refresh", AuthRefresh)
-		// admin.GET("", list) // get Admin List
-		// admin.POST("", create) // create new admin
-		// admin.GET("/:id", view) // view a admin detail
-		// admin.PATCH("/:id", update) // update the admin details
-		// admin.DELETE("/:id", delete) // delete the admin
+		// DELETE example.com/staffMember/product?id=x&vid=x
+		staffMember.DELETE("/variant", handlers.DeleteProductVariant)
+		// staffMember.POST("/auth-with-password", AuthWithPassword)
+		// staffMember.POST("/request-password-reset", RequestPasswordReset)
+		// staffMember.POST("/confirm-password-reset", ConfirmPasswordReset)
+		// staffMember.POST("/auth-refresh", AuthRefresh)
+		// staffMember.GET("", list) // get StaffMember List
+		// staffMember.POST("", create) // create new staffMember
+		// staffMember.GET("/:id", view) // view a staffMember detail
+		// staffMember.PATCH("/:id", update) // update the staffMember details
+		// staffMember.DELETE("/:id", delete) // delete the staffMember
 	}
 	return router
 }
 
-func hashAdmin() gin.HandlerFunc {
+func hashStaffMember() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		hashNoAdmin, err := auth.HashAdmin()
+		hashNoStaffMember, err := auth.HashStaffMember()
 		if err != nil {
 			ctx.JSON(http.StatusForbidden, gin.H{
 				"error":   "Internal Server Error",
@@ -73,9 +73,9 @@ func hashAdmin() gin.HandlerFunc {
 			ctx.Abort()
 			return
 		}
-		if !hashNoAdmin {
+		if !hashNoStaffMember {
 			ctx.JSON(http.StatusForbidden, gin.H{
-				"error": "Contact Admin for signup",
+				"error": "Contact StaffMember for signup",
 			})
 			ctx.Abort()
 			return
