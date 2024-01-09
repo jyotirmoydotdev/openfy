@@ -10,14 +10,14 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func RegisterUser(ctx *gin.Context) {
-	var newUser struct {
+func RegisterCustomer(ctx *gin.Context) {
+	var newCustomer struct {
 		Email     string `json:"email"`
 		FirstName string `json:"firstName"`
 		LastName  string `json:"lastName"`
 		Password  string `json:"password,omitempty"`
 	}
-	if err := ctx.ShouldBindJSON(&newUser); err != nil {
+	if err := ctx.ShouldBindJSON(&newCustomer); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
@@ -33,8 +33,8 @@ func RegisterUser(ctx *gin.Context) {
 		return
 	}
 
-	// Check if user with the same email already exists
-	exists, err := models.UserExistByEmail(dbInstance, newUser.Email)
+	// Check if customer with the same email already exists
+	exists, err := models.CustomerExistByEmail(dbInstance, newCustomer.Email)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
@@ -50,8 +50,8 @@ func RegisterUser(ctx *gin.Context) {
 		return
 	}
 
-	// Create a new user hash password
-	hashPassword, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
+	// Create a new customer hash password
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(newCustomer.Password), bcrypt.DefaultCost)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
@@ -60,13 +60,13 @@ func RegisterUser(ctx *gin.Context) {
 		return
 	}
 
-	userModel := models.NewUserModel(dbInstance)
+	customerModel := models.NewCustomerModel(dbInstance)
 
-	newUserDatabase := models.Customer{
-		Email:     strings.ToLower(newUser.Email),
+	newCustomerDatabase := models.Customer{
+		Email:     strings.ToLower(newCustomer.Email),
 		Password:  string(hashPassword),
-		FirstName: newUser.FirstName,
-		LastName:  newUser.LastName,
+		FirstName: newCustomer.FirstName,
+		LastName:  newCustomer.LastName,
 		DeliveryAddresses: []models.DeliveryAddress{
 			{
 				Country:   "",
@@ -78,33 +78,33 @@ func RegisterUser(ctx *gin.Context) {
 			},
 		},
 	}
-	// Save user to the database
-	if err := userModel.Save(&newUserDatabase); err != nil {
+	// Save customer to the database
+	if err := customerModel.Save(&newCustomerDatabase); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
 			"message": err.Error(),
 		})
 		return
 	}
-	UserSecret, err := generateRandomKey()
+	CustomerSecret, err := generateRandomKey()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Error while creating secreatKey",
 		})
 	}
-	userID, err := userModel.GetUserID(strings.ToLower(newUser.Email))
+	customerID, err := customerModel.GetCustomerID(strings.ToLower(newCustomer.Email))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal server error",
 			"message": err.Error(),
 		})
 	}
-	newUserSecret := models.UserSecrets{
-		UserID: userID,
-		Email:  strings.ToLower(newUser.Email),
-		Secret: UserSecret,
+	newCustomerSecret := models.CustomerSecrets{
+		CustomerID: customerID,
+		Email:      strings.ToLower(newCustomer.Email),
+		Secret:     CustomerSecret,
 	}
-	if err := userModel.SaveUserSecret(&newUserSecret); err != nil {
+	if err := customerModel.SaveCustomerSecret(&newCustomerSecret); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
 			"message": err.Error(),
@@ -112,11 +112,11 @@ func RegisterUser(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"status": "User registered successfully",
+		"status": "Customer registered successfully",
 	})
 }
 
-func LoginUser(ctx *gin.Context) {
+func LoginCustomer(ctx *gin.Context) {
 	var loginRequest struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
@@ -136,11 +136,11 @@ func LoginUser(ctx *gin.Context) {
 		return
 	}
 	loginRequest.Email = strings.ToLower(loginRequest.Email)
-	var userOk bool
-	if _, err := models.GetUserSecretKeyByEmail(dbInstance, loginRequest.Email); err != nil {
-		userOk = false
+	var customerOk bool
+	if _, err := models.GetCustomerSecretKeyByEmail(dbInstance, loginRequest.Email); err != nil {
+		customerOk = false
 	} else {
-		userHashedPassword, err := models.GetUserHashedPasswordByEmail(dbInstance, loginRequest.Email)
+		customerHashedPassword, err := models.GetCustomerHashedPasswordByEmail(dbInstance, loginRequest.Email)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{
 				"error":   "Internal Server Error",
@@ -148,12 +148,12 @@ func LoginUser(ctx *gin.Context) {
 			})
 			return
 		}
-		if err := bcrypt.CompareHashAndPassword([]byte(userHashedPassword), []byte(loginRequest.Password)); err == nil {
-			userOk = true
+		if err := bcrypt.CompareHashAndPassword([]byte(customerHashedPassword), []byte(loginRequest.Password)); err == nil {
+			customerOk = true
 		}
 	}
-	if userOk {
-		Token, err := GenerateUserJWT(loginRequest.Email)
+	if customerOk {
+		Token, err := GenerateCustomerJWT(loginRequest.Email)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{
 				"error":   "Internal Server error",
@@ -167,11 +167,11 @@ func LoginUser(ctx *gin.Context) {
 		return
 	} else {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Not a valid user",
+			"error": "Not a valid customer",
 		})
 		return
 	}
 }
 
-func UpdateUser(ctx *gin.Context) {
+func UpdateCustomer(ctx *gin.Context) {
 }

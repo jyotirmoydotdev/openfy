@@ -13,7 +13,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func GenerateUserJWT(email string) (string, error) {
+func GenerateCustomerJWT(email string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": email,
 		"exp":   time.Now().Add(time.Hour * 336).Unix(), // Token Valid for 14 Days
@@ -22,7 +22,7 @@ func GenerateUserJWT(email string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	secretKey, err := models.GetUserSecretKeyByEmail(dbInstance, email)
+	secretKey, err := models.GetCustomerSecretKeyByEmail(dbInstance, email)
 	if err != nil {
 		return "", err
 	}
@@ -44,34 +44,34 @@ func GenerateUserJWT(email string) (string, error) {
 		return "", err
 	}
 
-	userToken := models.UserToken{
+	customerToken := models.CustomerToken{
 		Email:             email,
 		Token:             string(hashToken),
 		LastUsed:          time.Now(),
 		TokenExpiry:       time.Now().Add(time.Hour * 24),
 		IsActive:          true,
 		IPAddresses:       "",
-		UserAgent:         "",
+		CustomerAgent:     "",
 		DeviceInformation: "",
 		RevocationReason:  "",
 	}
 	if exist, err := models.CheckEmailExist(dbInstance, email); err != nil {
 		return "", err
 	} else if !exist {
-		if err := models.SaveToken(dbInstance, &userToken); err != nil {
+		if err := models.SaveToken(dbInstance, &customerToken); err != nil {
 			return "", err
 		}
 	} else {
-		if err := models.UpdateToken(dbInstance, &userToken); err != nil {
+		if err := models.UpdateToken(dbInstance, &customerToken); err != nil {
 			return "", err
 		}
 	}
 	return signToken, nil
 }
-func ValidateUserToken(tokenString string) (jwt.MapClaims, error) {
+func ValidateCustomerToken(tokenString string) (jwt.MapClaims, error) {
 	tokenString = strings.TrimPrefix(tokenString, "Bearer ")
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
-		return []byte(extractUserSecretKeyFromToken(t)), nil
+		return []byte(extractCustomerSecretKeyFromToken(t)), nil
 	})
 	if err != nil || !token.Valid {
 		return nil, fmt.Errorf("invalid token: %v", err)
@@ -117,7 +117,7 @@ func ValidateUserToken(tokenString string) (jwt.MapClaims, error) {
 	}
 	return claims, nil
 }
-func extractUserSecretKeyFromToken(token *jwt.Token) string {
+func extractCustomerSecretKeyFromToken(token *jwt.Token) string {
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		return ""
@@ -130,13 +130,13 @@ func extractUserSecretKeyFromToken(token *jwt.Token) string {
 	if err != nil {
 		return ""
 	}
-	secretKey, err := models.GetUserSecretKeyByEmail(dbInstance, email)
+	secretKey, err := models.GetCustomerSecretKeyByEmail(dbInstance, email)
 	if err != nil {
 		return ""
 	}
 	return secretKey
 }
-func AuthenticateUserMiddleware() gin.HandlerFunc {
+func AuthenticateCustomerMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		tokenString := ctx.GetHeader("Authorization")
 		if tokenString == "" {
@@ -146,7 +146,7 @@ func AuthenticateUserMiddleware() gin.HandlerFunc {
 			ctx.Abort()
 			return
 		}
-		claims, err := ValidateUserToken(tokenString)
+		claims, err := ValidateCustomerToken(tokenString)
 		if err != nil {
 			ctx.JSON(http.StatusUnauthorized, gin.H{
 				"error": "Unauthorized",

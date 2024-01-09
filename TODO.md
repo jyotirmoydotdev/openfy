@@ -12,24 +12,24 @@ This document outlines tasks, features, and improvements that need attention in 
 
 ## Features
 
-- [ ] **User Authentication & Management**:
-  - [x] Implement user registration functionality.
-  - [ ] Allow users to reset their passwords.
-  - [ ] Enhance user profile management.
+- [ ] **Customer Authentication & Management**:
+  - [x] Implement customer registration functionality.
+  - [ ] Allow customers to reset their passwords.
+  - [ ] Enhance customer profile management.
 
 - [ ] **Product Management**:
   - [ ] Add support for categories and tags.
   - [ ] Implement product search functionality.
-  - [ ] Allow users to leave reviews for products.
+  - [ ] Allow customers to leave reviews for products.
 
 - [ ] **Order Management**:
   - [ ] Implement a shopping cart system.
-  - [ ] Allow users to place and track orders.
+  - [ ] Allow customers to place and track orders.
   - [ ] Generate order confirmation emails.
 
 - [ ] **Admin Panel**:
   - [ ] Create a dedicated admin dashboard.
-  - [ ] Implement user and order management features.
+  - [ ] Implement customer and order management features.
   - [ ] Enhance product management capabilities.
 
 ## Enhancements
@@ -44,10 +44,10 @@ This document outlines tasks, features, and improvements that need attention in 
   - [ ] Implement caching mechanisms where applicable.
   - [ ] Evaluate and implement any necessary indexing.
 
-- [ ] **User Experience**:
+- [ ] **Customer Experience**:
   - [ ] Implement responsive design for a better mobile experience.
   - [ ] Add pagination for product listings.
-  - [ ] Improve error handling and user feedback.
+  - [ ] Improve error handling and customer feedback.
 
 ## Bugs
 
@@ -70,8 +70,8 @@ This document outlines tasks, features, and improvements that need attention in 
 
 ## Documentation
 
-- [ ] **User Guide**:
-  - [ ] Create a comprehensive user guide for installation and usage.
+- [ ] **Customer Guide**:
+  - [ ] Create a comprehensive customer guide for installation and usage.
   - [ ] Document API endpoints and usage.
 
 - [ ] **Code Comments**:
@@ -80,7 +80,7 @@ This document outlines tasks, features, and improvements that need attention in 
 
 ## Contribution Guidelines
 
-- When working on an item, create a branch named after the feature or task (e.g., `feature/user-auth`).
+- When working on an item, create a branch named after the feature or task (e.g., `feature/customer-auth`).
 - Follow the project's coding style and guidelines.
 - Open a pull request with a clear description and reference to the related issue.
 

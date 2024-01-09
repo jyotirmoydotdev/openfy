@@ -350,12 +350,12 @@ func GetAllActiveProducts(ctx *gin.Context) {
 		})
 		return
 	}
-	var userProduct []UserProduct
+	var customerProduct []CustomerProduct
 	for i := range products {
-		userProduct = append(userProduct, ConvertToUserProduct(products[i]))
+		customerProduct = append(customerProduct, ConvertToCustomerProduct(products[i]))
 	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": userProduct,
+		"data": customerProduct,
 	})
 }
 
@@ -422,13 +422,13 @@ func validateProduct(product RequestProduct) (*models.Product, error) {
 	return &productDatabase, nil
 }
 
-type UserOption struct {
+type CustomerOption struct {
 	ID     uint   `json:"id"`
 	Name   string `json:"name"`
 	Values string `json:"values"`
 }
 
-type UserVariant struct {
+type CustomerVariant struct {
 	ID                 uint    `json:"id"`
 	Price              float64 `json:"price"`
 	CompareAtPrice     float64 `json:"compareAtPrice"`
@@ -440,22 +440,22 @@ type UserVariant struct {
 	InventoryAvailable int     `json:"inventoryAvailable"`
 }
 
-type UserProduct struct {
-	ID              uint          `json:"id"`
-	Handle          string        `json:"handle"`
-	Description     string        `json:"description"`
-	TotalVariants   int           `json:"totalVariants"`
-	TotalInventory  int           `json:"totalInventory"`
-	OnlineStoreURL  string        `json:"onlineStoreUrl"`
-	HasSKUs         bool          `json:"hasSkus"`
-	HasBarcodes     bool          `json:"hasBarcodes"`
-	ProductCategory string        `json:"productCategory"`
-	Options         []UserOption  `json:"options"`
-	Variants        []UserVariant `json:"variants"`
+type CustomerProduct struct {
+	ID              uint              `json:"id"`
+	Handle          string            `json:"handle"`
+	Description     string            `json:"description"`
+	TotalVariants   int               `json:"totalVariants"`
+	TotalInventory  int               `json:"totalInventory"`
+	OnlineStoreURL  string            `json:"onlineStoreUrl"`
+	HasSKUs         bool              `json:"hasSkus"`
+	HasBarcodes     bool              `json:"hasBarcodes"`
+	ProductCategory string            `json:"productCategory"`
+	Options         []CustomerOption  `json:"options"`
+	Variants        []CustomerVariant `json:"variants"`
 }
 
-func ConvertToUserProduct(adminProduct models.Product) UserProduct {
-	userProduct := UserProduct{
+func ConvertToCustomerProduct(adminProduct models.Product) CustomerProduct {
+	customerProduct := CustomerProduct{
 		ID:              adminProduct.ID,
 		Handle:          adminProduct.Handle,
 		Description:     adminProduct.Description,
@@ -465,13 +465,13 @@ func ConvertToUserProduct(adminProduct models.Product) UserProduct {
 		HasSKUs:         adminProduct.HasSKUs,
 		HasBarcodes:     adminProduct.HasBarcodes,
 		ProductCategory: adminProduct.ProductCategory,
-		Options:         make([]UserOption, len(adminProduct.Options)),
-		Variants:        make([]UserVariant, len(adminProduct.Variants)),
+		Options:         make([]CustomerOption, len(adminProduct.Options)),
+		Variants:        make([]CustomerVariant, len(adminProduct.Variants)),
 	}
 
 	// Convert Options
 	for i, adminOption := range adminProduct.Options {
-		userProduct.Options[i] = UserOption{
+		customerProduct.Options[i] = CustomerOption{
 			ID:     adminOption.ID,
 			Name:   adminOption.Name,
 			Values: adminOption.Values,
@@ -480,7 +480,7 @@ func ConvertToUserProduct(adminProduct models.Product) UserProduct {
 
 	// Convert Variants
 	for i, adminVariant := range adminProduct.Variants {
-		userProduct.Variants[i] = UserVariant{
+		customerProduct.Variants[i] = CustomerVariant{
 			ID:                 adminVariant.ID,
 			Price:              adminVariant.Price,
 			CompareAtPrice:     adminVariant.CompareAtPrice,
@@ -493,7 +493,7 @@ func ConvertToUserProduct(adminProduct models.Product) UserProduct {
 		}
 	}
 
-	return userProduct
+	return customerProduct
 }
 
 func validateSelectedOptions(productData *models.Product) error {

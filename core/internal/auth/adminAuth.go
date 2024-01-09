@@ -19,11 +19,11 @@ type DBInstance struct {
 
 func SignupAdmin(ctx *gin.Context) {
 	var newAdmin struct {
-		Email     string `json:"email"`
-		Username  string `json:"username"`
-		FirstName string `json:"firstname"`
-		LastName  string `json:"lastname"`
-		Password  string `json:"password"`
+		Email        string `json:"email"`
+		Customername string `json:"customername"`
+		FirstName    string `json:"firstname"`
+		LastName     string `json:"lastname"`
+		Password     string `json:"password"`
 	}
 
 	if err := ctx.ShouldBindJSON(&newAdmin); err != nil {
@@ -38,23 +38,23 @@ func SignupAdmin(ctx *gin.Context) {
 	}
 
 	newAdmin.Email = strings.ToLower(newAdmin.Email)
-	newAdmin.Username = strings.ToLower(newAdmin.Username)
+	newAdmin.Customername = strings.ToLower(newAdmin.Customername)
 
-	// Validate the username
-	// Check if the username is atleast 4 character or maximum 16 character
-	if len(newAdmin.Username) < 4 || len(newAdmin.Username) > 16 {
+	// Validate the customername
+	// Check if the customername is atleast 4 character or maximum 16 character
+	if len(newAdmin.Customername) < 4 || len(newAdmin.Customername) > 16 {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":       "INVALID_INPUT",
 			"message":     "Invalid input data",
 			"success":     false,
-			"field":       "username",
-			"description": "username must be minimum of 3 and maximun of 16 character",
+			"field":       "customername",
+			"description": "customername must be minimum of 3 and maximun of 16 character",
 		})
 		return
 	}
 
-	// Check if the username is small character and number
-	for _, c := range newAdmin.Username {
+	// Check if the customername is small character and number
+	for _, c := range newAdmin.Customername {
 		if (97 <= c && c <= 122) || (48 <= c && c <= 57) {
 			continue
 		} else {
@@ -62,8 +62,8 @@ func SignupAdmin(ctx *gin.Context) {
 				"error":       "INVALID_INPUT",
 				"message":     "Invalid input data",
 				"success":     false,
-				"field":       "username",
-				"description": "username can only contain letters and numbers",
+				"field":       "customername",
+				"description": "customername can only contain letters and numbers",
 			})
 			return
 		}
@@ -79,14 +79,14 @@ func SignupAdmin(ctx *gin.Context) {
 		return
 	}
 
-	// Check if a username exist in the database
-	if usernameExist, err := models.AdminExistByUsername(dbInstance, newAdmin.Username); err != nil && !usernameExist {
+	// Check if a customername exist in the database
+	if customernameExist, err := models.AdminExistByCustomername(dbInstance, newAdmin.Customername); err != nil && !customernameExist {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":       "INVALID_INPUT",
 			"message":     "Invalid input data",
 			"success":     false,
-			"field":       "username",
-			"description": "username not available",
+			"field":       "customername",
+			"description": "customername not available",
 		})
 		return
 	}
@@ -159,7 +159,7 @@ func SignupAdmin(ctx *gin.Context) {
 		return
 	}
 
-	newAdminId, err := adminModel.GetAdminID(newAdmin.Username)
+	newAdminId, err := adminModel.GetAdminID(newAdmin.Customername)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
@@ -168,9 +168,9 @@ func SignupAdmin(ctx *gin.Context) {
 		return
 	}
 	newAdminSecret := models.AdminSecrets{
-		AdminID:  newAdminId,
-		Username: newAdmin.Username,
-		Secret:   secretKey,
+		AdminID:      newAdminId,
+		Customername: newAdmin.Customername,
+		Secret:       secretKey,
 	}
 
 	if err := adminModel.SaveAdminSecret(&newAdminSecret); err != nil {
@@ -190,8 +190,8 @@ func SignupAdmin(ctx *gin.Context) {
 func LoginAdmin(ctx *gin.Context) {
 	// Structure to hold incoming JSON data
 	var loginRequest struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
+		Customername string `json:"customername"`
+		Password     string `json:"password"`
 	}
 	if err := ctx.ShouldBindJSON(&loginRequest); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -213,7 +213,7 @@ func LoginAdmin(ctx *gin.Context) {
 		return
 	}
 
-	if check, err := models.AdminExistByUsername(dbInstance, loginRequest.Username); err != nil || !check {
+	if check, err := models.AdminExistByCustomername(dbInstance, loginRequest.Customername); err != nil || !check {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":       "INVALID_ADMIN",
 			"message":     "Invalid Admin",
@@ -223,8 +223,8 @@ func LoginAdmin(ctx *gin.Context) {
 		})
 		return
 	}
-	// Find the admin by username
-	adminHashedPassword, err := models.GetAdminHashedPasswordByUsername(dbInstance, loginRequest.Username)
+	// Find the admin by customername
+	adminHashedPassword, err := models.GetAdminHashedPasswordByCustomername(dbInstance, loginRequest.Customername)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
@@ -235,7 +235,7 @@ func LoginAdmin(ctx *gin.Context) {
 	// Compare the password hash
 	// If a match admin is found, generate and return a JWT
 	if err := bcrypt.CompareHashAndPassword([]byte(adminHashedPassword), []byte(loginRequest.Password)); err == nil {
-		token, err := GenerateJWT(dbInstance, loginRequest.Username)
+		token, err := GenerateJWT(dbInstance, loginRequest.Customername)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{
 				"error":       "INTERNAL_SERVER_ERROR",

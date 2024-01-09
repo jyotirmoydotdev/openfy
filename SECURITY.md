@@ -18,4 +18,4 @@ Please follow these guidelines to report a security vulnerability:
 
 Only the latest release of Openfy is actively supported. It is recommended to always use the latest version to benefit from security fixes and improvements.
 
-Thank you for your contribution to the security of Openfy. We appreciate your help in keeping our project safe for all users.
+Thank you for your contribution to the security of Openfy. We appreciate your help in keeping our project safe for all customers.

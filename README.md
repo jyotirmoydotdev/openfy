@@ -1,6 +1,6 @@
 <p align="center">
 <a href="" target="">
-<img src="https://raw.githubusercontent.com/jyotirmoydotdev/Openfy/main/src/OpenfyLogo.svg" alt="Openfy logo">
+<img src="https://raw.githubcustomercontent.com/jyotirmoydotdev/Openfy/main/src/OpenfyLogo.svg" alt="Openfy logo">
 </a>
 </p>
 
@@ -8,12 +8,12 @@
 
 # Openfy
 
-Openfy is a self-hosted e-commerce platform built with Go and Gin, providing a flexible and customizable solution for managing products and handling user authentication.
+Openfy is a self-hosted e-commerce platform built with Go and Gin, providing a flexible and customizable solution for managing products and handling customer authentication.
 
 ## Features
 
 - **Product Management**: Easily create, update, and delete products.
-- **User Authentication**: Secure user authentication with JWT tokens.
+- **Customer Authentication**: Secure customer authentication with JWT tokens.
 - **Admin Panel**: Admin-specific routes for managing products.
 - **Flexible and Extendable**: Built with Go and Gin for flexibility and extensibility.
 
@@ -52,17 +52,17 @@ Before running Openfy, ensure you have the following installed:
 
 ## Routes
 
-- **User Routes**:
-  - `POST /signup`: Register a new user.
-  - `POST /login`: User login.
+- **Customer Routes**:
+  - `POST /signup`: Register a new customer.
+  - `POST /login`: Customer login.
   - `GET /products`: Retrieve details of all active products.
 
 - **Admin Routes**:
-  - `POST /admin/signup`: Register a new admin user.
+  - `POST /admin/signup`: Register a new admin customer.
   - `POST /admin/login`: Admin login.
 
-- **Authenticated User Routes** (Protected by JWT):
-  - `GET /user/ping`: Test endpoint for authenticated users.
+- **Authenticated Customer Routes** (Protected by JWT):
+  - `GET /customer/ping`: Test endpoint for authenticated customers.
 
 - **Authenticated Admin Routes** (Protected by JWT):
   - `GET /admin/product`: Retrieve details of a specific product.
@@ -75,7 +75,7 @@ Before running Openfy, ensure you have the following installed:
 
 ## Authentication
 
-- User authentication is implemented using JWT tokens.
+- Customer authentication is implemented using JWT tokens.
 - To authenticate, include the JWT token in the "Authorization" header using the "Bearer" scheme.
 
 ## Preview

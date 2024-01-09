@@ -16,17 +16,17 @@ func SetupRouter() *gin.Engine {
 	}
 	router := gin.Default()
 
-	router.POST("/signup", auth.RegisterUser)
-	router.POST("/login", auth.LoginUser)
+	router.POST("/signup", auth.RegisterCustomer)
+	router.POST("/login", auth.LoginCustomer)
 	router.GET("/products", handlers.GetAllActiveProducts)
 
 	router.POST("/admin/signup", hashAdmin(), auth.SignupAdmin)
 	router.POST("/admin/login", auth.LoginAdmin)
 
-	// User route
-	user := router.Group("/user", auth.AuthenticateUserMiddleware())
+	// Customer route
+	customer := router.Group("/customer", auth.AuthenticateCustomerMiddleware())
 	{
-		user.GET("/ping", func(ctx *gin.Context) {
+		customer.GET("/ping", func(ctx *gin.Context) {
 			ctx.JSON(http.StatusOK, gin.H{
 				"message": "pong",
 			})

@@ -19,8 +19,8 @@ type Customer struct {
 	Phone                  int               `gorm:"column:phone"`
 	State                  string            `gorm:"column:state"`
 	Age                    int               `gorm:"column:age"`
-	DeliveryAddresses      []DeliveryAddress `gorm:"foreignKey:UserID"`
-	UserCreatTime          string            `gorm:"column:userCreateTime"`
+	DeliveryAddresses      []DeliveryAddress `gorm:"foreignKey:CustomerID"`
+	CustomerCreatTime      string            `gorm:"column:customerCreateTime"`
 	LifetimeDuration       string            `gorm:"column:lifetimeDuration"`
 	TotalSpentAmount       float64           `gorm:"column:totalSpentAmount"`
 	TotalSpentCurrencyCode string            `gorm:"column:totalSpentCurrencyCode"`
@@ -31,7 +31,7 @@ type Customer struct {
 
 type DeliveryAddress struct {
 	ID            uint   `gorm:"column:id;primaryKey"`
-	UserID        uint   `gorm:"column:user_id;index"`
+	CustomerID    uint   `gorm:"column:customer_id;index"`
 	FormattedArea string `gorm:"column:formattedArea"`
 	FirstName     string `gorm:"column:firstName"`
 	LastName      string `gorm:"column:lastName"`
@@ -46,14 +46,14 @@ type DeliveryAddress struct {
 	Zip           int    `gorm:"column:zip"`
 }
 
-type UserSecrets struct {
-	ID     uint   `gorm:"primaryKey" json:"id" `
-	UserID uint   `gorm:"column:user_id"`
-	Email  string `gorm:"column:email"`
-	Secret string `gorm:"column:secret"`
+type CustomerSecrets struct {
+	ID         uint   `gorm:"primaryKey" json:"id" `
+	CustomerID uint   `gorm:"column:customer_id"`
+	Email      string `gorm:"column:email"`
+	Secret     string `gorm:"column:secret"`
 }
 
-type UserToken struct {
+type CustomerToken struct {
 	ID                uint      `gorm:"primaryKey" json:"id" `
 	Email             string    `gorm:"column:email;primaryKey"`
 	Token             string    `gorm:"column:token"`
@@ -61,46 +61,46 @@ type UserToken struct {
 	TokenExpiry       time.Time `gorm:"column:token_expiry"`
 	IsActive          bool      `gorm:"column:is_active"`
 	IPAddresses       string    `gorm:"column:ip_addresses"`
-	UserAgent         string    `gorm:"column:user_agent"`
+	CustomerAgent     string    `gorm:"column:customer_agent"`
 	DeviceInformation string    `gorm:"column:device_information"`
 	RevocationReason  string    `gorm:"column:revocation_reason"`
 }
 
-type UserModel struct {
+type CustomerModel struct {
 	db *gorm.DB
 }
 
-func NewUserModel(db *gorm.DB) *UserModel {
-	return &UserModel{db: db}
+func NewCustomerModel(db *gorm.DB) *CustomerModel {
+	return &CustomerModel{db: db}
 }
 
-func (ur *UserModel) Save(user *Customer) error {
-	return ur.db.Create(user).Error
+func (ur *CustomerModel) Save(customer *Customer) error {
+	return ur.db.Create(customer).Error
 }
 
-func (ur *UserModel) SaveUserSecret(UserSecret *UserSecrets) error {
-	return ur.db.Create(UserSecret).Error
+func (ur *CustomerModel) SaveCustomerSecret(CustomerSecret *CustomerSecrets) error {
+	return ur.db.Create(CustomerSecret).Error
 }
 
-func GetUserSecretKeyByEmail(db *gorm.DB, email string) (string, error) {
-	var userSecrets UserSecrets
-	err := db.Model(&UserSecrets{}).Select("secret").Where("email = ?", email).First(&userSecrets).Error
+func GetCustomerSecretKeyByEmail(db *gorm.DB, email string) (string, error) {
+	var customerSecrets CustomerSecrets
+	err := db.Model(&CustomerSecrets{}).Select("secret").Where("email = ?", email).First(&customerSecrets).Error
 	if err != nil {
 		return "", err
 	}
-	return userSecrets.Secret, nil
+	return customerSecrets.Secret, nil
 }
 
-func GetUserHashedPasswordByEmail(db *gorm.DB, email string) (string, error) {
-	var UserHashedPasswor Customer
-	err := db.Model(&Customer{}).Select("Password").Where("email = ?", email).First(&UserHashedPasswor).Error
+func GetCustomerHashedPasswordByEmail(db *gorm.DB, email string) (string, error) {
+	var CustomerHashedPasswor Customer
+	err := db.Model(&Customer{}).Select("Password").Where("email = ?", email).First(&CustomerHashedPasswor).Error
 	if err != nil {
 		return "", err
 	}
-	return UserHashedPasswor.Password, nil
+	return CustomerHashedPasswor.Password, nil
 }
 
-func UserExistByEmail(db *gorm.DB, email string) (bool, error) {
+func CustomerExistByEmail(db *gorm.DB, email string) (bool, error) {
 	var count int64
 	if err := db.Model(&Customer{}).Where("email = ?", email).Count(&count).Error; err != nil {
 		return false, err
@@ -108,47 +108,47 @@ func UserExistByEmail(db *gorm.DB, email string) (bool, error) {
 	return count > 0, nil
 }
 
-func SaveToken(db *gorm.DB, userToken *UserToken) error {
-	return db.Create(userToken).Error
+func SaveToken(db *gorm.DB, customerToken *CustomerToken) error {
+	return db.Create(customerToken).Error
 }
 
 func CheckEmailExist(db *gorm.DB, email string) (bool, error) {
 	var count int64
-	if err := db.Model(&UserToken{}).Where("email = ?", email).Count(&count).Error; err != nil {
+	if err := db.Model(&CustomerToken{}).Where("email = ?", email).Count(&count).Error; err != nil {
 		return false, err
 	}
 	return count > 0, nil
 }
 func GetTokenByEmail(db *gorm.DB, email string) (string, error) {
-	var userToken UserToken
-	err := db.Model(&UserToken{}).Select("token").Where("email = ?", email).First(&userToken).Error
+	var customerToken CustomerToken
+	err := db.Model(&CustomerToken{}).Select("token").Where("email = ?", email).First(&customerToken).Error
 	if err != nil {
 		return "", err
 	}
-	return userToken.Token, nil
+	return customerToken.Token, nil
 }
-func UpdateToken(db *gorm.DB, userToken *UserToken) error {
+func UpdateToken(db *gorm.DB, customerToken *CustomerToken) error {
 	updatedValues := map[string]interface{}{
-		"email":              userToken.Email,
-		"token":              userToken.Token,
-		"last_used":          userToken.LastUsed,
-		"token_expiry":       userToken.TokenExpiry,
-		"is_active":          userToken.IsActive,
-		"ip_addresses":       userToken.IPAddresses,
-		"user_agent":         userToken.UserAgent,
-		"device_information": userToken.DeviceInformation,
-		"revocation_reason":  userToken.RevocationReason,
+		"email":              customerToken.Email,
+		"token":              customerToken.Token,
+		"last_used":          customerToken.LastUsed,
+		"token_expiry":       customerToken.TokenExpiry,
+		"is_active":          customerToken.IsActive,
+		"ip_addresses":       customerToken.IPAddresses,
+		"customer_agent":     customerToken.CustomerAgent,
+		"device_information": customerToken.DeviceInformation,
+		"revocation_reason":  customerToken.RevocationReason,
 	}
-	return db.Model(&UserToken{}).Where("email = ?", userToken.Email).Updates(updatedValues).Error
+	return db.Model(&CustomerToken{}).Where("email = ?", customerToken.Email).Updates(updatedValues).Error
 }
 
-func (ad *UserModel) GetUserID(email string) (uint, error) {
-	var user Customer
-	if err := ad.db.Model(&Customer{}).Where("email = ?", email).First(&user).Error; err != nil {
+func (ad *CustomerModel) GetCustomerID(email string) (uint, error) {
+	var customer Customer
+	if err := ad.db.Model(&Customer{}).Where("email = ?", email).First(&customer).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return 0, fmt.Errorf("user not found")
+			return 0, fmt.Errorf("customer not found")
 		}
-		return 0, fmt.Errorf("error fetching user: %v", err)
+		return 0, fmt.Errorf("error fetching customer: %v", err)
 	}
-	return user.ID, nil
+	return customer.ID, nil
 }
