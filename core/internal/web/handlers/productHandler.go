@@ -454,42 +454,42 @@ type CustomerProduct struct {
 	Variants        []CustomerVariant `json:"variants"`
 }
 
-func ConvertToCustomerProduct(adminProduct models.Product) CustomerProduct {
+func ConvertToCustomerProduct(staffMemberProduct models.Product) CustomerProduct {
 	customerProduct := CustomerProduct{
-		ID:              adminProduct.ID,
-		Handle:          adminProduct.Handle,
-		Description:     adminProduct.Description,
-		TotalVariants:   adminProduct.TotalVariants,
-		TotalInventory:  adminProduct.TotalInventory,
-		OnlineStoreURL:  adminProduct.OnlineStoreURL,
-		HasSKUs:         adminProduct.HasSKUs,
-		HasBarcodes:     adminProduct.HasBarcodes,
-		ProductCategory: adminProduct.ProductCategory,
-		Options:         make([]CustomerOption, len(adminProduct.Options)),
-		Variants:        make([]CustomerVariant, len(adminProduct.Variants)),
+		ID:              staffMemberProduct.ID,
+		Handle:          staffMemberProduct.Handle,
+		Description:     staffMemberProduct.Description,
+		TotalVariants:   staffMemberProduct.TotalVariants,
+		TotalInventory:  staffMemberProduct.TotalInventory,
+		OnlineStoreURL:  staffMemberProduct.OnlineStoreURL,
+		HasSKUs:         staffMemberProduct.HasSKUs,
+		HasBarcodes:     staffMemberProduct.HasBarcodes,
+		ProductCategory: staffMemberProduct.ProductCategory,
+		Options:         make([]CustomerOption, len(staffMemberProduct.Options)),
+		Variants:        make([]CustomerVariant, len(staffMemberProduct.Variants)),
 	}
 
 	// Convert Options
-	for i, adminOption := range adminProduct.Options {
+	for i, staffMemberOption := range staffMemberProduct.Options {
 		customerProduct.Options[i] = CustomerOption{
-			ID:     adminOption.ID,
-			Name:   adminOption.Name,
-			Values: adminOption.Values,
+			ID:     staffMemberOption.ID,
+			Name:   staffMemberOption.Name,
+			Values: staffMemberOption.Values,
 		}
 	}
 
 	// Convert Variants
-	for i, adminVariant := range adminProduct.Variants {
+	for i, staffMemberVariant := range staffMemberProduct.Variants {
 		customerProduct.Variants[i] = CustomerVariant{
-			ID:                 adminVariant.ID,
-			Price:              adminVariant.Price,
-			CompareAtPrice:     adminVariant.CompareAtPrice,
-			CostPerItem:        adminVariant.CostPerItem,
-			Taxable:            adminVariant.Taxable,
-			RequiresShipping:   adminVariant.RequiresShipping,
-			WeightValue:        adminVariant.WeightValue,
-			WeightUnit:         adminVariant.WeightUnit,
-			InventoryAvailable: adminVariant.InventoryAvailable,
+			ID:                 staffMemberVariant.ID,
+			Price:              staffMemberVariant.Price,
+			CompareAtPrice:     staffMemberVariant.CompareAtPrice,
+			CostPerItem:        staffMemberVariant.CostPerItem,
+			Taxable:            staffMemberVariant.Taxable,
+			RequiresShipping:   staffMemberVariant.RequiresShipping,
+			WeightValue:        staffMemberVariant.WeightValue,
+			WeightUnit:         staffMemberVariant.WeightUnit,
+			InventoryAvailable: staffMemberVariant.InventoryAvailable,
 		}
 	}
 

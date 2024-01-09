@@ -1,8 +1,8 @@
 # Ignore database files
 core/db/databaseProduct.db
-core/db/databaseCustomerAdmin.db
+core/db/databaseCustomerStaffMember.db
 core/test/db/databaseProduct.db
-core/test/db/databaseCustomerAdmin.db
+core/test/db/databaseCustomerStaffMember.db
 
 # Ignore backup directory
 core/db/backup/

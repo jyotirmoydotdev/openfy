@@ -10,28 +10,28 @@ import (
 
 var token string
 
-// Check if Admin can signup or not
+// Check if StaffMember can signup or not
 // Expected : 200
-func TestAdminSignup(t *testing.T) {
-	type NewAdminStruct struct {
+func TestStaffMemberSignup(t *testing.T) {
+	type NewStaffMemberStruct struct {
 		Email     string
 		Username  string
 		FirstName string
 		LastName  string
 		Password  string
 	}
-	newAdmin := NewAdminStruct{
+	newStaffMember := NewStaffMemberStruct{
 		Email:     "test@example.com",
-		Username:  "testadmin",
+		Username:  "teststaffMember",
 		FirstName: "Test",
-		LastName:  "Admin",
+		LastName:  "StaffMember",
 		Password:  "testpassword",
 	}
-	jsonAdmin, err := json.Marshal(newAdmin)
+	jsonStaffMember, err := json.Marshal(newStaffMember)
 	if err != nil {
 		t.Fatal(err)
 	}
-	resp, err := http.Post(server.URL+"/admin/signup", "application/json", bytes.NewBuffer(jsonAdmin))
+	resp, err := http.Post(server.URL+"/staffMember/signup", "application/json", bytes.NewBuffer(jsonStaffMember))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -41,18 +41,18 @@ func TestAdminSignup(t *testing.T) {
 	}
 }
 
-// Check Admin can login or not
+// Check StaffMember can login or not
 // Expected : 200
-func TestAdminLogin(t *testing.T) {
+func TestStaffMemberLogin(t *testing.T) {
 	loginCredentials := map[string]string{
-		"username": "testadmin",
+		"username": "teststaffMember",
 		"password": "testpassword",
 	}
 	jsonCredentials, err := json.Marshal(loginCredentials)
 	if err != nil {
 		t.Fatal(err)
 	}
-	resp, err := http.Post(server.URL+"/admin/login", "application/json", bytes.NewBuffer(jsonCredentials))
+	resp, err := http.Post(server.URL+"/staffMember/login", "application/json", bytes.NewBuffer(jsonCredentials))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,28 +75,28 @@ func TestAdminLogin(t *testing.T) {
 	}
 }
 
-// Check if second new admin can signup or not
+// Check if second new staffMember can signup or not
 // Expected : 403
-func TestFailAdminSignup(t *testing.T) {
-	type NewAdminStruct struct {
+func TestFailStaffMemberSignup(t *testing.T) {
+	type NewStaffMemberStruct struct {
 		Username  string
 		Password  string
 		Email     string
 		FirstName string
 		LastName  string
 	}
-	newAdmin := NewAdminStruct{
-		Username:  "testadmin1",
+	newStaffMember := NewStaffMemberStruct{
+		Username:  "teststaffMember1",
 		Password:  "testpassword",
 		Email:     "test@example.com",
 		FirstName: "Test",
-		LastName:  "Admin",
+		LastName:  "StaffMember",
 	}
-	jsonAdmin, err := json.Marshal(newAdmin)
+	jsonStaffMember, err := json.Marshal(newStaffMember)
 	if err != nil {
 		t.Fatal(err)
 	}
-	resp, err := http.Post(server.URL+"/admin/signup", "application/json", bytes.NewBuffer(jsonAdmin))
+	resp, err := http.Post(server.URL+"/staffMember/signup", "application/json", bytes.NewBuffer(jsonStaffMember))
 	if err != nil {
 		t.Fatal(err)
 	}

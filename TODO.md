@@ -27,8 +27,8 @@ This document outlines tasks, features, and improvements that need attention in 
   - [ ] Allow customers to place and track orders.
   - [ ] Generate order confirmation emails.
 
-- [ ] **Admin Panel**:
-  - [ ] Create a dedicated admin dashboard.
+- [ ] **StaffMember Panel**:
+  - [ ] Create a dedicated staffMember dashboard.
   - [ ] Implement customer and order management features.
   - [ ] Enhance product management capabilities.
 

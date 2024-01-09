@@ -17,8 +17,8 @@ type DBInstance struct {
 	DB *gorm.DB
 }
 
-func SignupAdmin(ctx *gin.Context) {
-	var newAdmin struct {
+func SignupStaffMember(ctx *gin.Context) {
+	var newStaffMember struct {
 		Email     string `json:"email"`
 		Username  string `json:"username"`
 		FirstName string `json:"firstname"`
@@ -26,7 +26,7 @@ func SignupAdmin(ctx *gin.Context) {
 		Password  string `json:"password"`
 	}
 
-	if err := ctx.ShouldBindJSON(&newAdmin); err != nil {
+	if err := ctx.ShouldBindJSON(&newStaffMember); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":       "INVALID_JSON",
 			"message":     "Invalid JSON request",
@@ -37,12 +37,12 @@ func SignupAdmin(ctx *gin.Context) {
 		return
 	}
 
-	newAdmin.Email = strings.ToLower(newAdmin.Email)
-	newAdmin.Username = strings.ToLower(newAdmin.Username)
+	newStaffMember.Email = strings.ToLower(newStaffMember.Email)
+	newStaffMember.Username = strings.ToLower(newStaffMember.Username)
 
 	// Validate the username
 	// Check if the username is atleast 4 character or maximum 16 character
-	if len(newAdmin.Username) < 4 || len(newAdmin.Username) > 16 {
+	if len(newStaffMember.Username) < 4 || len(newStaffMember.Username) > 16 {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":       "INVALID_INPUT",
 			"message":     "Invalid input data",
@@ -54,7 +54,7 @@ func SignupAdmin(ctx *gin.Context) {
 	}
 
 	// Check if the username is small character and number
-	for _, c := range newAdmin.Username {
+	for _, c := range newStaffMember.Username {
 		if (97 <= c && c <= 122) || (48 <= c && c <= 57) {
 			continue
 		} else {
@@ -80,7 +80,7 @@ func SignupAdmin(ctx *gin.Context) {
 	}
 
 	// Check if a username exist in the database
-	if usernameExist, err := models.AdminExistByUsername(dbInstance, newAdmin.Username); err != nil && !usernameExist {
+	if usernameExist, err := models.StaffMemberExistByUsername(dbInstance, newStaffMember.Username); err != nil && !usernameExist {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":       "INVALID_INPUT",
 			"message":     "Invalid input data",
@@ -92,7 +92,7 @@ func SignupAdmin(ctx *gin.Context) {
 	}
 
 	// Check if a email exist in the database
-	if emailExist, err := models.AdminExistByEmail(dbInstance, newAdmin.Email); err != nil && !emailExist {
+	if emailExist, err := models.StaffMemberExistByEmail(dbInstance, newStaffMember.Email); err != nil && !emailExist {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":       "INVALID_INPUT",
 			"message":     "Invalid input data",
@@ -103,11 +103,11 @@ func SignupAdmin(ctx *gin.Context) {
 		return
 	}
 
-	var newAdminDatabase models.StaffMember
+	var newStaffMemberDatabase models.StaffMember
 
-	newAdminDatabase.Name = newAdmin.FirstName + " " + newAdmin.LastName
+	newStaffMemberDatabase.Name = newStaffMember.FirstName + " " + newStaffMember.LastName
 
-	hashPassword, err := bcrypt.GenerateFromPassword([]byte(newAdmin.Password), bcrypt.DefaultCost)
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(newStaffMember.Password), bcrypt.DefaultCost)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":       "INTERNAL_SERVER_ERROR",
@@ -119,7 +119,7 @@ func SignupAdmin(ctx *gin.Context) {
 		return
 	}
 
-	newAdmin.Password = string(hashPassword)
+	newStaffMember.Password = string(hashPassword)
 
 	secretKey, err := generateRandomKey()
 	if err != nil {
@@ -132,10 +132,10 @@ func SignupAdmin(ctx *gin.Context) {
 		})
 		return
 	}
-	adminModel := models.NewAdminModel(dbInstance)
+	staffMemberModel := models.NewStaffMemberModel(dbInstance)
 
-	// Check if the admin table id empty
-	AccountOwner, err := models.CheckAdminTableIsEmpty(dbInstance)
+	// Check if the staffMember table id empty
+	AccountOwner, err := models.CheckStaffMemberTableIsEmpty(dbInstance)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
@@ -143,15 +143,15 @@ func SignupAdmin(ctx *gin.Context) {
 		})
 		return
 	}
-	newAdminDatabase.AccountOwner = AccountOwner
+	newStaffMemberDatabase.AccountOwner = AccountOwner
 
-	err = copier.Copy(&newAdminDatabase, &newAdmin)
+	err = copier.Copy(&newStaffMemberDatabase, &newStaffMember)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
 
-	if err := adminModel.Save(&newAdminDatabase); err != nil {
+	if err := staffMemberModel.Save(&newStaffMemberDatabase); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
 			"message": err.Error(),
@@ -159,7 +159,7 @@ func SignupAdmin(ctx *gin.Context) {
 		return
 	}
 
-	newAdminId, err := adminModel.GetAdminID(newAdmin.Username)
+	newStaffMemberId, err := staffMemberModel.GetStaffMemberID(newStaffMember.Username)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
@@ -167,13 +167,13 @@ func SignupAdmin(ctx *gin.Context) {
 		})
 		return
 	}
-	newAdminSecret := models.AdminSecrets{
-		AdminID:  newAdminId,
-		Username: newAdmin.Username,
-		Secret:   secretKey,
+	newStaffMemberSecret := models.StaffMemberSecrets{
+		StaffMemberID: newStaffMemberId,
+		Username:      newStaffMember.Username,
+		Secret:        secretKey,
 	}
 
-	if err := adminModel.SaveAdminSecret(&newAdminSecret); err != nil {
+	if err := staffMemberModel.SaveStaffMemberSecret(&newStaffMemberSecret); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
 			"message": err.Error(),
@@ -183,11 +183,11 @@ func SignupAdmin(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"success":     true,
-		"description": "Admin Registered Successfully",
+		"description": "StaffMember Registered Successfully",
 	})
 }
 
-func LoginAdmin(ctx *gin.Context) {
+func LoginStaffMember(ctx *gin.Context) {
 	// Structure to hold incoming JSON data
 	var loginRequest struct {
 		Username string `json:"username"`
@@ -203,6 +203,7 @@ func LoginAdmin(ctx *gin.Context) {
 		})
 		return
 	}
+	loginRequest.Username = strings.ToLower(loginRequest.Username)
 
 	dbInstance, err := db.GetDB()
 	if err != nil {
@@ -213,18 +214,18 @@ func LoginAdmin(ctx *gin.Context) {
 		return
 	}
 
-	if check, err := models.AdminExistByUsername(dbInstance, loginRequest.Username); err != nil || !check {
+	if check, err := models.StaffMemberExistByUsername(dbInstance, loginRequest.Username); err != nil || !check {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":       "INVALID_ADMIN",
-			"message":     "Invalid Admin",
+			"message":     "Invalid StaffMember",
 			"success":     false,
 			"field":       "",
-			"description": "The admin doesn't exit",
+			"description": "The staffMember doesn't exit",
 		})
 		return
 	}
-	// Find the admin by username
-	adminHashedPassword, err := models.GetAdminHashedPasswordByUsername(dbInstance, loginRequest.Username)
+	// Find the staffMember by username
+	staffMemberHashedPassword, err := models.GetStaffMemberHashedPasswordByUsername(dbInstance, loginRequest.Username)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
@@ -233,8 +234,8 @@ func LoginAdmin(ctx *gin.Context) {
 		return
 	}
 	// Compare the password hash
-	// If a match admin is found, generate and return a JWT
-	if err := bcrypt.CompareHashAndPassword([]byte(adminHashedPassword), []byte(loginRequest.Password)); err == nil {
+	// If a match staffMember is found, generate and return a JWT
+	if err := bcrypt.CompareHashAndPassword([]byte(staffMemberHashedPassword), []byte(loginRequest.Password)); err == nil {
 		token, err := GenerateJWT(dbInstance, loginRequest.Username)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -256,22 +257,22 @@ func LoginAdmin(ctx *gin.Context) {
 		})
 		return
 	}
-	// No matching admin found
+	// No matching staffMember found
 	ctx.JSON(http.StatusBadRequest, gin.H{
 		"error":       "INVALID_ADMIN",
-		"message":     "invalid admin",
+		"message":     "invalid staffMember",
 		"success":     false,
 		"field":       "x",
-		"description": "No admin found",
+		"description": "No staffMember found",
 	})
 }
 
-func HashAdmin() (bool, error) {
+func HashStaffMember() (bool, error) {
 	dbInstance, err := db.GetDB()
 	if err != nil {
 		return false, err
 	}
-	isEmpty, err := models.CheckAdminTableIsEmpty(dbInstance)
+	isEmpty, err := models.CheckStaffMemberTableIsEmpty(dbInstance)
 	if err != nil {
 		return false, err
 	}

@@ -20,7 +20,7 @@ func teardown() {
 	server.Close()
 }
 func resetTestDatabase() error {
-	dbInstance, err := sql.Open("sqlite3", "./db/databaseCustomerAdmin.db")
+	dbInstance, err := sql.Open("sqlite3", "./db/databaseCustomerStaffMember.db")
 	if err != nil {
 		return fmt.Errorf("error opening test database: %v", err)
 	}
@@ -32,7 +32,7 @@ func resetTestDatabase() error {
 		"DELETE FROM shop_details;",
 		"DELETE FROM delivery_addresses;",
 		"DELETE FROM sqlite_sequence;",
-		"DELETE FROM admin_secrets;",
+		"DELETE FROM staff_member_secrets;",
 		"DELETE FROM staff_members;",
 		"DELETE FROM customer_tokens;",
 	}

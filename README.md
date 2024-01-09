@@ -14,7 +14,7 @@ Openfy is a self-hosted e-commerce platform built with Go and Gin, providing a f
 
 - **Product Management**: Easily create, update, and delete products.
 - **Customer Authentication**: Secure customer authentication with JWT tokens.
-- **Admin Panel**: Admin-specific routes for managing products.
+- **StaffMember Panel**: StaffMember-specific routes for managing products.
 - **Flexible and Extendable**: Built with Go and Gin for flexibility and extensibility.
 
 ## Prerequisites
@@ -57,20 +57,20 @@ Before running Openfy, ensure you have the following installed:
   - `POST /login`: Customer login.
   - `GET /products`: Retrieve details of all active products.
 
-- **Admin Routes**:
-  - `POST /admin/signup`: Register a new admin customer.
-  - `POST /admin/login`: Admin login.
+- **StaffMember Routes**:
+  - `POST /staffMember/signup`: Register a new staffMember customer.
+  - `POST /staffMember/login`: StaffMember login.
 
 - **Authenticated Customer Routes** (Protected by JWT):
   - `GET /customer/ping`: Test endpoint for authenticated customers.
 
-- **Authenticated Admin Routes** (Protected by JWT):
-  - `GET /admin/product`: Retrieve details of a specific product.
-  - `GET /admin/products`: Retrieve details of all products.
-  - `POST /admin/product/new`: Create a new product.
-  - `PUT /admin/product`: Update an existing product.
-  - `DELETE /admin/product`: Delete a product.
-  - `DELETE /admin/variant`: Delete a product variant.
+- **Authenticated StaffMember Routes** (Protected by JWT):
+  - `GET /staffMember/product`: Retrieve details of a specific product.
+  - `GET /staffMember/products`: Retrieve details of all products.
+  - `POST /staffMember/product/new`: Create a new product.
+  - `PUT /staffMember/product`: Update an existing product.
+  - `DELETE /staffMember/product`: Delete a product.
+  - `DELETE /staffMember/variant`: Delete a product variant.
 
 
 ## Authentication
