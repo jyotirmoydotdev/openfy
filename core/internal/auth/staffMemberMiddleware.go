@@ -33,7 +33,7 @@ func GenerateJWT(db *gorm.DB, username string) (string, error) {
 	return signalToken, nil
 }
 func ValidateToken(tokenString string) (jwt.MapClaims, error) {
-	dbInstance, err := database.GetCustomerDB()
+	dbInstance, err := database.GetStaffMemberDB()
 	if err != nil {
 		return nil, err
 	}

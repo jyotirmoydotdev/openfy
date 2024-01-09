@@ -8,63 +8,87 @@ import (
 	"gorm.io/gorm"
 )
 
-var dbInstance *gorm.DB
-var productdbInstance *gorm.DB
+var customerInstance *gorm.DB
+var staffMember *gorm.DB
+var productInstance *gorm.DB
 
 func GetCustomerDB() (*gorm.DB, error) {
-	if dbInstance != nil {
-		return dbInstance, nil
+	if customerInstance != nil {
+		return customerInstance, nil
 	}
-	db, err := gorm.Open(sqlite.Open("./database/databaseCustomerStaffMember.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open("./database/databaseCustomer.db"), &gorm.Config{})
 	if err != nil {
-		return nil, fmt.Errorf("error opening database: %v", err)
+		return nil, fmt.Errorf("error opening databaseCustomer: %v", err)
 	}
-	dbInstance = db
+	customerInstance = db
+	return db, nil
+}
+
+func GetStaffMemberDB() (*gorm.DB, error) {
+	if staffMember != nil {
+		return staffMember, nil
+	}
+	db, err := gorm.Open(sqlite.Open("./database/databaseStaffMember.db"), &gorm.Config{})
+	if err != nil {
+		return nil, fmt.Errorf("error opening databaseStaffMember: %v", err)
+	}
+	staffMember = db
 	return db, nil
 }
 
 func GetProductDB() (*gorm.DB, error) {
-	if productdbInstance != nil {
-		return productdbInstance, nil
+	if productInstance != nil {
+		return productInstance, nil
 	}
 	db, err := gorm.Open(sqlite.Open("./database/databaseProduct.db"), &gorm.Config{})
 	if err != nil {
-		return nil, fmt.Errorf("error opening database: %v", err)
+		return nil, fmt.Errorf("error opening databaseProduct: %v", err)
 	}
-	productdbInstance = db
+	productInstance = db
 	return db, nil
 }
 
 func InitializeDatabases() error {
-	db, err := GetCustomerDB()
+	customerDB, err := GetCustomerDB()
 	if err != nil {
 		return err
 	}
-	err = db.AutoMigrate(
+	err = customerDB.AutoMigrate(
 		&models.Customer{},
 		&models.CustomerSecrets{},
 		&models.DeliveryAddress{},
 		&models.ShopDetail{},
-		&models.StaffMember{},
-		&models.StaffMemberSecrets{},
 		&models.CustomerToken{},
 	)
 	if err != nil {
-		return fmt.Errorf("error auto migrating models: %v", err)
+		return fmt.Errorf("error auto migrating customerDB: %v", err)
 	}
 
-	productdb, err := GetProductDB()
+	staffMemberDB, err := GetStaffMemberDB()
 	if err != nil {
 		return err
 	}
-	err = productdb.AutoMigrate(
+
+	err = staffMemberDB.AutoMigrate(
+		&models.StaffMember{},
+		&models.StaffMemberSecrets{},
+	)
+	if err != nil {
+		return fmt.Errorf("error auto migrating staffMemberDB: %v", err)
+	}
+
+	productDB, err := GetProductDB()
+	if err != nil {
+		return err
+	}
+	err = productDB.AutoMigrate(
 		&models.Product{},
 		&models.Option{},
 		&models.Variant{},
 		&models.SelectedOption{},
 	)
 	if err != nil {
-		return fmt.Errorf("error auto migrating models: %v", err)
+		return fmt.Errorf("error auto migrating GetProductDB: %v", err)
 	}
 	return nil
 }

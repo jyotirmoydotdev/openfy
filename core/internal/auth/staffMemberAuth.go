@@ -70,7 +70,7 @@ func SignupStaffMember(ctx *gin.Context) {
 	}
 
 	// Get the Database instance to save the data
-	dbInstance, err := database.GetCustomerDB()
+	dbInstance, err := database.GetStaffMemberDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
@@ -205,7 +205,7 @@ func LoginStaffMember(ctx *gin.Context) {
 	}
 	loginRequest.Username = strings.ToLower(loginRequest.Username)
 
-	dbInstance, err := database.GetCustomerDB()
+	dbInstance, err := database.GetStaffMemberDB()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal Server Error",
@@ -268,7 +268,7 @@ func LoginStaffMember(ctx *gin.Context) {
 }
 
 func HashStaffMember() (bool, error) {
-	dbInstance, err := database.GetCustomerDB()
+	dbInstance, err := database.GetStaffMemberDB()
 	if err != nil {
 		return false, err
 	}
