@@ -1,6 +1,6 @@
 {
     "rewrites": [
-      { "source": "/(.*)", "destination": "https://github.com/jyotirmoydotdev/openfy/" }
+      { "source": "/(.*)", "destination": "/index.html" }
     ]
   }
   
