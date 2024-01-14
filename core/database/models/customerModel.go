@@ -8,42 +8,80 @@ import (
 )
 
 type Customer struct {
-	ID                     uint              `gorm:"column:id;primaryKey"`
-	Password               string            `gorm:"column:password;omitempty"`
-	DisplayName            string            `gorm:"column:display_name"`
-	FirstName              string            `gorm:"column:firstName"`
-	LastName               string            `gorm:"column:lastName"`
-	Email                  string            `gorm:"column:email;index"`
-	Locale                 string            `gorm:"column:locale"`
-	TaxExempt              bool              `gorm:"column:taxExempt"`
-	Phone                  int               `gorm:"column:phone"`
-	State                  string            `gorm:"column:state"`
-	Age                    int               `gorm:"column:age"`
-	DeliveryAddresses      []DeliveryAddress `gorm:"foreignKey:CustomerID"`
-	CustomerCreatTime      string            `gorm:"column:customerCreateTime"`
-	LifetimeDuration       string            `gorm:"column:lifetimeDuration"`
-	TotalSpentAmount       float64           `gorm:"column:totalSpentAmount"`
-	TotalSpentCurrencyCode string            `gorm:"column:totalSpentCurrencyCode"`
-	NumberOfOrders         int               `gorm:"column:numberOfOrders"`
-	LastOrderId            uint              `gorm:"column:lastOrderId"`
-	LastOrderCreatedAt     string            `gorm:"column:lastOrderCreatedAt"`
+	gorm.Model
+	ID                        uint                  `gorm:"column:id;primaryKey"`
+	Email                     string                `gorm:"column:email;index"`
+	CreatedAt                 string                `gorm:"column:createdAt"`
+	UpdatedAt                 string                `gorm:"column:updatedAt"`
+	FirstName                 string                `gorm:"column:firstName"`
+	LastName                  string                `gorm:"column:lastName"`
+	OrdersCount               int                   `gorm:"column:ordersCount"`
+	State                     string                `gorm:"column:state"`
+	TotalSpent                float64               `gorm:"column:totalSpent"`
+	LastOrderId               uint                  `gorm:"column:lastOrderId"`
+	Note                      string                `gorm:"column:note"`
+	VerifiedEmail             bool                  `gorm:"column:verifiedEmail"`
+	MultipassIdentifier       bool                  `gorm:"column:multipassIdentifier"`
+	TaxExempt                 bool                  `gorm:"column:taxExempt"`
+	Tags                      bool                  `gorm:"column:tags"`
+	LastOrderName             string                `gorm:"column:lastOrderName"`
+	Currency                  string                `gorm:"column:currency"`
+	Phone                     string                `gorm:"column:phone"`
+	TaxExemptions             string                `gorm:"foreignKey:taxExemptions"`
+	Password                  string                `gorm:"column:password;omitempty"`
+	DisplayName               string                `gorm:"column:display_name"`
+	Locale                    string                `gorm:"column:locale"`
+	Age                       int                   `gorm:"column:age"`
+	CustomerCreatTime         string                `gorm:"column:customerCreateTime"`
+	LifetimeDuration          string                `gorm:"column:lifetimeDuration"`
+	LastOrderCreatedAt        string                `gorm:"column:lastOrderCreatedAt"`
+	AcceptsMarketing          bool                  `gorm:"column:acceptsMarketing"`
+	AcceptsMarketingUpdatedAt string                `gorm:"column:acceptsMarketingUpdatedAt"`
+	MarketingOptInLevel       string                `gorm:"column:marketingOptInLevel"`
+	DeliveryAddresses         []DeliveryAddress     `gorm:"foreignKey:CustomerID"`
+	EmailMarketingConsent     EmailMarketingConsent `gorm:"embedded"`
+	SmsMarketingConsent       SmsMarketingConsent   `gorm:"embedded"`
+	Metafield                 Metafield             `gorm:"embedded"`
+}
+
+type EmailMarketingConsent struct {
+	State            string `gorm:"column:state"`
+	OptInLevel       string `gorm:"column:optInLevel"`
+	ConsentUpdatedAt string `gorm:"column:consentUpdatedAt"`
+}
+
+type Metafield struct {
+	Key       string `gorm:"column:key"`
+	Namespace string `gorm:"column:namespace"`
+	Value     string `gorm:"column:value"`
+	Type      string `gorm:"column:type"`
+}
+
+type SmsMarketingConsent struct {
+	State                string `gorm:"column:state"`
+	OptInLevel           string `gorm:"column:optInLevel"`
+	ConsentUpdatedAt     string `gorm:"column:consentUpdatedAt"`
+	ConsentCollectedFrom string `gorm:"column:consentCollectedFrom"`
 }
 
 type DeliveryAddress struct {
-	ID            uint   `gorm:"column:id;primaryKey"`
-	CustomerID    uint   `gorm:"column:customer_id;index"`
-	FormattedArea string `gorm:"column:formattedArea"`
-	FirstName     string `gorm:"column:firstName"`
-	LastName      string `gorm:"column:lastName"`
-	Company       string `gorm:"column:company"`
-	Address1      string `gorm:"column:address1"`
-	Address2      string `gorm:"column:address2"`
-	Apartment     string `gorm:"column:apartment"`
-	City          string `gorm:"column:city"`
-	Province      string `gorm:"column:province"`
-	Country       string `gorm:"column:country"`
-	Phone         int    `gorm:"column:phone"`
-	Zip           int    `gorm:"column:zip"`
+	ID           uint   `gorm:"column:id;primaryKey"`
+	CustomerID   uint   `gorm:"column:customer_id;index"`
+	FirstName    string `gorm:"column:firstName"`
+	LastName     string `gorm:"column:lastName"`
+	Company      string `gorm:"column:company"`
+	Address1     string `gorm:"column:address1"`
+	Address2     string `gorm:"column:address2"`
+	Apartment    string `gorm:"column:apartment"`
+	City         string `gorm:"column:city"`
+	Province     string `gorm:"column:province"`
+	Country      string `gorm:"column:country"`
+	Zip          int    `gorm:"column:zip"`
+	Phone        int    `gorm:"column:phone"`
+	ProvinceCode string `gorm:"column:provinceCode"`
+	CountryCode  string `gorm:"column:countryCode"`
+	CountryName  string `gorm:"column:countryName"`
+	Default      bool   `gorm:"column:default"`
 }
 
 type CustomerSecrets struct {
