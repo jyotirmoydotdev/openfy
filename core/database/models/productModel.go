@@ -8,63 +8,96 @@ import (
 )
 
 type Product struct {
-	ID                    uint      `gorm:"column:id;primaryKey" json:"id"`
-	Handle                string    `gorm:"column:handle" json:"handle"`
-	Description           string    `gorm:"column:description" json:"description"`
-	Status                bool      `gorm:"column:status" json:"status"`
-	TotalVariants         int       `gorm:"column:totalVariants" json:"totalVariants"`
-	TotalInventory        int       `gorm:"column:totalInventory" json:"totalInventory"`
-	HasOnlyDefaultVariant bool      `gorm:"column:hasOnlyDefaultVariant" json:"hasOnlyDefaultVariant"`
-	OnlineStoreURL        string    `gorm:"column:onlineStoreUrl" json:"onlineStoreUrl"`
-	HasSKUs               bool      `gorm:"column:hasSkus" json:"hasSkus"`
-	HasBarcodes           bool      `gorm:"column:hasBarcodes" json:"hasBarcodes"`
-	SKURequired           bool      `gorm:"column:skuRequired" json:"skuRequired"`
-	Tags                  string    `gorm:"column:tags" json:"tags"`
-	Collections           string    `gorm:"column:collections" json:"collections"`
-	ProductCategory       string    `gorm:"column:productCategory" json:"productCategory"`
-	SEOTitle              string    `gorm:"column:SEOTitle" json:"SEOTitle"`
-	SEODescription        string    `gorm:"column:SEODescription" json:"SEODescription"`
-	Options               []Option  `gorm:"foreignKey:ProductID"`
-	Variants              []Variant `gorm:"foreignKey:ProductID"`
+	Description    string    `gorm:"column:description" `
+	CreatedAt      string    `gorm:"column:CreatedAt"`
+	Handle         string    `gorm:"column:handle"`
+	ID             uint      `gorm:"column:id;primaryKey"`
+	Images         []Image   `gorm:"foreignKey:ProductID"`
+	Options        []Option  `gorm:"foreignKey:ProductID"`
+	ProductType    string    `gorm:"column:productType"`
+	PublishAt      string    `gorm:"column:publishAt"`
+	PublishScope   string    `gorm:"column:publishScope"`
+	Status         bool      `gorm:"column:status"`
+	Tags           string    `gorm:"column:tags"`
+	TemplateSuffix string    `gorm:"column:templateSuffix"`
+	Title          string    `gorm:"column:title"`
+	UpdatedAt      string    `gorm:"column:updatedAt"`
+	Variants       []Variant `gorm:"foreignKey:ProductID"`
+	Vendor         string    `gorm:"column:vendor"`
+
+	TotalVariants         int    `gorm:"column:totalVariants"`
+	TotalInventory        int    `gorm:"column:totalInventory"`
+	HasOnlyDefaultVariant bool   `gorm:"column:hasOnlyDefaultVariant"`
+	OnlineStoreURL        string `gorm:"column:onlineStoreUrl"`
+	HasSKUs               bool   `gorm:"column:hasSkus"`
+	HasBarcodes           bool   `gorm:"column:hasBarcodes"`
+	SKURequired           bool   `gorm:"column:skuRequired"`
+	Collections           string `gorm:"column:collections"`
+	ProductCategory       string `gorm:"column:productCategory"`
+	SEOTitle              string `gorm:"column:SEOTitle"`
+	SEODescription        string `gorm:"column:SEODescription"`
 }
 
 type Option struct {
-	ID        uint   `gorm:"primaryKey" json:"id" `
-	ProductID uint   `gorm:"column:product_id" json:"product_id"  `
-	Name      string `gorm:"column:name" json:"name"  `
-	Position  int    `gorm:"column:position" json:"position"  `
-	Values    string `gorm:"column:values" json:"values"  `
+	ID        uint   `gorm:"primaryKey"`
+	ProductID uint   `gorm:"column:product_id"`
+	Name      string `gorm:"column:name"`
+	Position  int    `gorm:"column:position"`
+	Values    string `gorm:"column:values"`
 }
 
 type Variant struct {
-	ID                                 uint             `gorm:"primaryKey" json:"id"`
-	ProductID                          uint             `gorm:"column:product_id" json:"product_id"`
-	Price                              float64          `gorm:"column:price" json:"price"`
-	CompareAtPrice                     float64          `gorm:"column:compareAtPrice" json:"compareAtPrice"`
-	CostPerItem                        float64          `gorm:"column:costPerItem" json:"costPerItem"`
-	Taxable                            bool             `gorm:"column:taxable" json:"taxable"`
-	Profit                             float64          `gorm:"column:profit" json:"profit"`
-	Margin                             float64          `gorm:"column:margin" json:"margin"`
-	Barcode                            string           `gorm:"column:barcode" json:"barcode"`
-	SKU                                string           `gorm:"column:sku" json:"sku"`
-	RequiresShipping                   bool             `gorm:"column:requiresShipping" json:"requiresShipping"`
-	WeightValue                        float64          `gorm:"column:weightValue" json:"weightValue"`
-	WeightUnit                         string           `gorm:"column:weightUnit" json:"weightUnit"`
-	InventoryAvailable                 int              `gorm:"column:inventoryAvailable" json:"inventoryAvailable"`
-	InventoryCommitted                 int              `gorm:"column:inventoryCommitted" json:"inventoryCommitted"`
-	InventoryOnHand                    int              `gorm:"column:inventoryOnHand" json:"inventoryOnHand"`
-	InventoryUnavailableDamaged        int              `gorm:"column:inventoryUnavailableDamaged" json:"inventoryUnavailableDamaged"`
-	InventoryUnavailableQualityControl int              `gorm:"column:inventoryUnavailableQualityControl" json:"inventoryUnavailableQualityControl"`
-	InventoryUnavailableSafetyStock    int              `gorm:"column:inventoryUnavailableSafetyStock" json:"inventoryUnavailableSafetyStock"`
-	InventoryUnavailableOther          int              `gorm:"column:inventoryUnavailableOther" json:"inventoryUnavailableOther"`
-	SelectedOptions                    []SelectedOption `gorm:"foreignKey:VariantID"`
+	Barcode             string             `gorm:"column:barcode"`
+	CompareAtPrice      float64            `gorm:"column:compareAtPrice"`
+	CreatedAt           string             `gorm:"column:CreatedAt"`
+	FullfillmentService string             `gorm:"column:fullfillmentService"`
+	Grams               uint               `gorm:"column:grams"`
+	ID                  uint               `gorm:"primaryKey"`
+	ImageID             uint               `gorm:"column:imageID"`
+	InventoryItemID     uint               `gorm:"column:inventoryItemID"`
+	InventoryManagement string             `gorm:"column:inventoryManagement"`
+	InventoryPolicy     string             `gorm:"column:inventoryPolicy"`
+	InventoryQuantity   int                `gorm:"column:inventoryQuantity"`
+	SelectedOptions     []SelectedOption   `gorm:"foreignKey:VariantID"`
+	PresentmentPrices   []PresentmentPrice `gorm:"foreignKey:VariantID"`
+	Position            uint               `gorm:"column:position"`
+	Price               float64            `gorm:"column:price"`
+	ProductID           uint               `gorm:"column:productID"`
+	RequiresShipping    bool               `gorm:"column:requiresShipping"`
+	SKU                 string             `gorm:"column:sku"`
+	Taxable             bool               `gorm:"column:taxable"`
+	TaxCode             string             `gorm:"column:taxCode"`
+	Title               string             `gorm:"column:title"`
+	UpdatedAt           string             `gorm:"column:updatedAt"`
+	Weight              float64            `gorm:"column:weight"`
+	WeightUnit          string             `gorm:"column:weightUnit"`
+
+	CostPerItem float64 `gorm:"column:costPerItem"`
+	Profit      float64 `gorm:"column:profit"`
+	Margin      float64 `gorm:"column:margin"`
+}
+
+type Image struct {
+	CreatedAt string `gorm:"column:CreatedAt"`
+	ID        uint   `gorm:"column:id"`
+	Position  uint   `gorm:"column:position"`
+	ProductID uint   `gorm:"column:product_id"`
+	Src       string `gorm:"column:src"`
+	Width     uint   `gorm:"column:width"`
+	Height    uint   `gorm:"column:height"`
+	UpdatedAt string `gorm:"column:updatedAt"`
 }
 
 type SelectedOption struct {
-	ID        uint   `gorm:"primaryKey" json:"id"`
-	VariantID uint   `gorm:"column:variant_id" json:"variant_id"`
-	Name      string `gorm:"column:name" json:"name"`
-	Value     string `gorm:"column:value" json:"value"`
+	ID        uint   `gorm:"primaryKey" `
+	VariantID uint   `gorm:"column:variant_id"`
+	Name      string `gorm:"column:name"`
+	Value     string `gorm:"column:value"`
+}
+type PresentmentPrice struct {
+	Price          string `gorm:"column:price"`
+	CompareAtPrice string `gorm:"column:compareAtPrice"`
+	CurrencyCode   string `gorm:"column:currencyCode"`
 }
 
 type ProductModel struct {
@@ -163,15 +196,9 @@ func (pd *ProductModel) Update(id int, updatedProduct *Product) error {
 			existingProduct.Variants[i].Barcode = updatedVariant.Barcode
 			existingProduct.Variants[i].SKU = updatedVariant.SKU
 			existingProduct.Variants[i].RequiresShipping = updatedVariant.RequiresShipping
-			existingProduct.Variants[i].WeightValue = updatedVariant.WeightValue
+			existingProduct.Variants[i].Weight = updatedVariant.Weight
 			existingProduct.Variants[i].WeightUnit = updatedVariant.WeightUnit
-			existingProduct.Variants[i].InventoryAvailable = updatedVariant.InventoryAvailable
-			existingProduct.Variants[i].InventoryCommitted = updatedVariant.InventoryCommitted
-			existingProduct.Variants[i].InventoryOnHand = updatedVariant.InventoryOnHand
-			existingProduct.Variants[i].InventoryUnavailableDamaged = updatedVariant.InventoryUnavailableDamaged
-			existingProduct.Variants[i].InventoryUnavailableQualityControl = updatedVariant.InventoryUnavailableQualityControl
-			existingProduct.Variants[i].InventoryUnavailableSafetyStock = updatedVariant.InventoryUnavailableSafetyStock
-			existingProduct.Variants[i].InventoryUnavailableOther = updatedVariant.InventoryUnavailableOther
+			existingProduct.Variants[i].InventoryQuantity = updatedVariant.InventoryQuantity
 
 			// Update or create SelectedOptions
 			for j, updatedSelectedOption := range updatedVariant.SelectedOptions {
@@ -193,25 +220,19 @@ func (pd *ProductModel) Update(id int, updatedProduct *Product) error {
 		} else {
 			// Create new variant
 			newVariant := Variant{
-				ProductID:                          existingProduct.ID,
-				Price:                              updatedVariant.Price,
-				CompareAtPrice:                     updatedVariant.CompareAtPrice,
-				CostPerItem:                        updatedVariant.CostPerItem,
-				Taxable:                            updatedVariant.Taxable,
-				Profit:                             updatedVariant.Profit,
-				Margin:                             updatedVariant.Margin,
-				Barcode:                            updatedVariant.Barcode,
-				SKU:                                updatedVariant.SKU,
-				RequiresShipping:                   updatedVariant.RequiresShipping,
-				WeightValue:                        updatedVariant.WeightValue,
-				WeightUnit:                         updatedVariant.WeightUnit,
-				InventoryAvailable:                 updatedVariant.InventoryAvailable,
-				InventoryCommitted:                 updatedVariant.InventoryCommitted,
-				InventoryOnHand:                    updatedVariant.InventoryOnHand,
-				InventoryUnavailableDamaged:        updatedVariant.InventoryUnavailableDamaged,
-				InventoryUnavailableQualityControl: updatedVariant.InventoryUnavailableQualityControl,
-				InventoryUnavailableSafetyStock:    updatedVariant.InventoryUnavailableSafetyStock,
-				InventoryUnavailableOther:          updatedVariant.InventoryUnavailableOther,
+				ProductID:         existingProduct.ID,
+				Price:             updatedVariant.Price,
+				CompareAtPrice:    updatedVariant.CompareAtPrice,
+				CostPerItem:       updatedVariant.CostPerItem,
+				Taxable:           updatedVariant.Taxable,
+				Profit:            updatedVariant.Profit,
+				Margin:            updatedVariant.Margin,
+				Barcode:           updatedVariant.Barcode,
+				SKU:               updatedVariant.SKU,
+				RequiresShipping:  updatedVariant.RequiresShipping,
+				Weight:            updatedVariant.Weight,
+				WeightUnit:        updatedVariant.WeightUnit,
+				InventoryQuantity: updatedVariant.InventoryQuantity,
 			}
 			// Create new SelectedOptions for the new variant
 			for _, updatedSelectedOption := range updatedVariant.SelectedOptions {
