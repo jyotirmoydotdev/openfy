@@ -274,7 +274,7 @@ func DeleteProductVariant(ctx *gin.Context) {
 		if product.Variants[i].Barcode != "" {
 			product.HasBarcodes = true
 		}
-		product.TotalInventory += product.Variants[i].InventoryAvailable
+		product.TotalInventory += product.Variants[i].InventoryQuantity
 	}
 	if len(product.Variants) == 1 {
 		product.HasOnlyDefaultVariant = true
@@ -409,15 +409,14 @@ func validateProduct(product RequestProduct) (*models.Product, error) {
 		if productDatabase.Variants[i].Barcode != "" {
 			productDatabase.HasBarcodes = true
 		}
-		productDatabase.TotalInventory += productDatabase.Variants[i].InventoryAvailable
+		productDatabase.TotalInventory += productDatabase.Variants[i].InventoryQuantity
 		if productDatabase.Variants[i].CostPerItem != 0.0 {
 			productDatabase.Variants[i].Profit = productDatabase.Variants[i].Price - productDatabase.Variants[i].CostPerItem
 			productDatabase.Variants[i].Margin = (((productDatabase.Variants[i].Price - productDatabase.Variants[i].CostPerItem) / productDatabase.Variants[i].Price) * 100)
 		}
-		if productDatabase.Variants[i].WeightValue != 0.0 {
+		if productDatabase.Variants[i].Weight != 0.0 {
 			productDatabase.Variants[i].RequiresShipping = true
 		}
-		productDatabase.Variants[i].InventoryOnHand = productDatabase.Variants[i].InventoryAvailable
 	}
 	return &productDatabase, nil
 }
@@ -487,9 +486,9 @@ func ConvertToCustomerProduct(staffMemberProduct models.Product) CustomerProduct
 			CostPerItem:        staffMemberVariant.CostPerItem,
 			Taxable:            staffMemberVariant.Taxable,
 			RequiresShipping:   staffMemberVariant.RequiresShipping,
-			WeightValue:        staffMemberVariant.WeightValue,
+			WeightValue:        staffMemberVariant.Weight,
 			WeightUnit:         staffMemberVariant.WeightUnit,
-			InventoryAvailable: staffMemberVariant.InventoryAvailable,
+			InventoryAvailable: staffMemberVariant.InventoryQuantity,
 		}
 	}
 
