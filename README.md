@@ -62,7 +62,6 @@ Before running Openfy, ensure you have the following installed:
   - `POST /staffMember/login`: StaffMember login.
 
 - **Authenticated Customer Routes** (Protected by JWT):
-  - `GET /customer/ping`: Test endpoint for authenticated customers.
 
 - **Authenticated StaffMember Routes** (Protected by JWT):
   - `GET /staffMember/product`: Retrieve details of a specific product.
