@@ -61,7 +61,6 @@ Before running Openfy, ensure you have the following installed:
   - `POST /staffMember/signup`: Register a new staffMember customer.
   - `POST /staffMember/login`: StaffMember login.
 
-- **Authenticated Customer Routes** (Protected by JWT):
 
 - **Authenticated StaffMember Routes** (Protected by JWT):
   - `GET /staffMember/product`: Retrieve details of a specific product.
