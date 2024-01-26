@@ -70,9 +70,4 @@ Before running Openfy, ensure you have the following installed:
   - `DELETE /staffMember/product`: Delete a product.
   - `DELETE /staffMember/variant`: Delete a product variant.
 
-
-## Preview
-
-To experience a sneak peek of our project, please visit the following link: [Project Preview](https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FDdnZ03JxOvicLeXQuts4gA%2FOpenfy%3Fpage-id%3D0%253A1%26type%3Ddesign%26node-id%3D33-20%26viewport%3D404%252C559%252C0.94%26t%3D98564Tf0lb67O8Ca-1%26scaling%3Dmin-zoom%26starting-point-node-id%3D33%253A20%26mode%3Ddesign).
-
 Explore the features, test functionalities, and provide us with valuable feedback. Your insights are crucial in shaping the final release, and we appreciate your participation in this preview phase.
