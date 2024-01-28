@@ -17,12 +17,6 @@ Openfy is a self-hosted e-commerce platform built with Go and Gin, providing a f
 - **StaffMember Panel**: StaffMember-specific routes for managing products.
 - **Flexible and Extendable**: Built with Go and Gin for flexibility and extensibility.
 
-## Prerequisites
-
-Before running Openfy, ensure you have the following installed:
-
-- Go (1.15 or higher)
-
 ## Getting Started
 
 1. Clone the repository:
