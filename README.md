@@ -4,6 +4,18 @@
 </a>
 </p>
 
+<p align="center">
+  <a href="">Openfy website</a>
+  •
+  <a href="">Developer Portal</a>
+  •
+  <a href="https://github.com/jyotirmoydotdev/Openfy/discussions">Join the Discussion</a>
+  •
+  <a href="CONTRIBUTING.md">Contribute</a>
+</p>
+
+<br/>
+
 > ⚠️ Note: This project is currently under development and may not be fully functional. Feel free to explore the code, but be aware that some features may not work as intended.
 
 # Openfy
