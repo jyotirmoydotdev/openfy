@@ -47,30 +47,30 @@ type Option struct {
 }
 
 type Variant struct {
-	Barcode             string             `gorm:"column:barcode"`
-	CompareAtPrice      float64            `gorm:"column:compareAtPrice"`
-	CreatedAt           string             `gorm:"column:CreatedAt"`
-	FullfillmentService string             `gorm:"column:fullfillmentService"`
-	Grams               uint               `gorm:"column:grams"`
-	ID                  uint               `gorm:"primaryKey"`
-	ImageID             uint               `gorm:"column:imageID"`
-	InventoryItemID     uint               `gorm:"column:inventoryItemID"`
-	InventoryManagement string             `gorm:"column:inventoryManagement"`
-	InventoryPolicy     string             `gorm:"column:inventoryPolicy"`
-	InventoryQuantity   int                `gorm:"column:inventoryQuantity"`
-	SelectedOptions     []SelectedOption   `gorm:"foreignKey:VariantID"`
-	PresentmentPrices   []PresentmentPrice `gorm:"foreignKey:VariantID"`
-	Position            uint               `gorm:"column:position"`
-	Price               float64            `gorm:"column:price"`
-	ProductID           uint               `gorm:"column:productID"`
-	RequiresShipping    bool               `gorm:"column:requiresShipping"`
-	SKU                 string             `gorm:"column:sku"`
-	Taxable             bool               `gorm:"column:taxable"`
-	TaxCode             string             `gorm:"column:taxCode"`
-	Title               string             `gorm:"column:title"`
-	UpdatedAt           string             `gorm:"column:updatedAt"`
-	Weight              float64            `gorm:"column:weight"`
-	WeightUnit          string             `gorm:"column:weightUnit"`
+	Barcode             string           `gorm:"column:barcode"`
+	CompareAtPrice      float64          `gorm:"column:compareAtPrice"`
+	CreatedAt           string           `gorm:"column:CreatedAt"`
+	FullfillmentService string           `gorm:"column:fullfillmentService"`
+	Grams               uint             `gorm:"column:grams"`
+	ID                  uint             `gorm:"primaryKey"`
+	ImageID             uint             `gorm:"column:imageID"`
+	InventoryItemID     uint             `gorm:"column:inventoryItemID"`
+	InventoryManagement string           `gorm:"column:inventoryManagement"`
+	InventoryPolicy     string           `gorm:"column:inventoryPolicy"`
+	InventoryQuantity   int              `gorm:"column:inventoryQuantity"`
+	SelectedOptions     []SelectedOption `gorm:"foreignKey:VariantID"`
+	// PresentmentPrices   []PresentmentPrice `gorm:"foreignKey:VariantID"`
+	Position         uint    `gorm:"column:position"`
+	Price            float64 `gorm:"column:price"`
+	ProductID        uint    `gorm:"column:productID"`
+	RequiresShipping bool    `gorm:"column:requiresShipping"`
+	SKU              string  `gorm:"column:sku"`
+	Taxable          bool    `gorm:"column:taxable"`
+	TaxCode          string  `gorm:"column:taxCode"`
+	Title            string  `gorm:"column:title"`
+	UpdatedAt        string  `gorm:"column:updatedAt"`
+	Weight           float64 `gorm:"column:weight"`
+	WeightUnit       string  `gorm:"column:weightUnit"`
 
 	CostPerItem float64 `gorm:"column:costPerItem"`
 	Profit      float64 `gorm:"column:profit"`
@@ -94,11 +94,12 @@ type SelectedOption struct {
 	Name      string `gorm:"column:name"`
 	Value     string `gorm:"column:value"`
 }
-type PresentmentPrice struct {
-	Price          string `gorm:"column:price"`
-	CompareAtPrice string `gorm:"column:compareAtPrice"`
-	CurrencyCode   string `gorm:"column:currencyCode"`
-}
+
+// type PresentmentPrice struct {
+// 	Price          string `gorm:"column:price"`
+// 	CompareAtPrice string `gorm:"column:compareAtPrice"`
+// 	CurrencyCode   string `gorm:"column:currencyCode"`
+// }
 
 type ProductModel struct {
 	db *gorm.DB
