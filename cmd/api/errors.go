@@ -11,7 +11,7 @@ func (app *application) logError(r *http.Request, err error) {
 	app.logger.Println(err)
 }
 
-func (app *application) errorResponse(ctx *gin.Context, status int, message interface{}) {
+func (app *application) errorResponse(ctx *gin.Context, status int, message any) {
 	env := envelope{"error": message}
 
 	err := app.writeJSON(ctx.Writer, status, env, nil)
